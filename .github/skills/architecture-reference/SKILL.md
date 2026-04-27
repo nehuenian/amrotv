@@ -60,7 +60,8 @@ amrotv/
 
 ```kotlin
 include(":app")
-include(":core:mvi")
+include(":core:mvi:kotlin")
+include(":core:mvi:android")
 include(":core:network")
 include(":core:ui")
 include(":libraries:logger:api")
@@ -85,7 +86,7 @@ include(":feature:movies:ui")
   └── :feature:movies:presentation:implementation
         ├── :feature:movies:presentation:api
         ├── :feature:movies:domain:api
-        └── :core:mvi
+        └── :core:mvi:android
   └── :feature:movies:data
         ├── :feature:movies:domain:api
         ├── :core:network
@@ -103,7 +104,7 @@ include(":feature:movies:ui")
 
 ## MVI Pattern
 
-### The Three Interfaces (`:core:mvi`)
+### The Three Interfaces (`:core:mvi:kotlin`)
 
 ```kotlin
 interface MviState
@@ -111,30 +112,10 @@ interface MviIntent
 interface MviEffect
 ```
 
-### MviViewModel Base (`:core:mvi`)
+### MviViewModel Base (`:core:mvi:android`)
 
-```kotlin
-abstract class MviViewModel<S : MviState, I : MviIntent, E : MviEffect>(
-    initialState: S
-) : ViewModel() {
-
-    private val _state = MutableStateFlow(initialState)
-    val state: StateFlow<S> = _state.asStateFlow()
-
-    private val _effects = Channel<E>(Channel.BUFFERED)
-    val effects: Flow<E> = _effects.receiveAsFlow()
-
-    abstract fun handleIntent(intent: I)
-
-    protected fun updateState(reducer: S.() -> S) {
-        _state.update { it.reducer() }
-    }
-
-    protected fun CoroutineScope.sendEffect(effect: E) {
-        launch { _effects.send(effect) }
-    }
-}
-```
+> Read the canonical implementation: `core/mvi/android/src/main/kotlin/nl/abnamro/amrotv/core/mvi/BaseAmroTvViewModel.kt`
+> Read the pure-Kotlin base: `core/mvi/kotlin/src/main/kotlin/nl/abnamro/amrotv/core/mvi/AmroTvViewModel.kt`
 
 ### State — `presentation:api`
 
@@ -236,8 +217,8 @@ Rules:
 | `domain:api` | Kotlin stdlib + coroutines only | Android, Hilt, Retrofit, Room |
 | `domain:implementation` | `domain:api`, Hilt | Android UI, Retrofit, Room |
 | `data` | `domain:api`, `core:network`, `libraries:logger:api`, Hilt | `presentation:*` |
-| `presentation:api` | `domain:api`, `core:mvi` | ViewModels, Android UI |
-| `presentation:implementation` | `presentation:api`, `domain:api`, `core:mvi`, `libraries:logger:api`, Hilt | Compose, NavController |
+| `presentation:api` | `domain:api`, `core:mvi:kotlin` | ViewModels, Android UI |
+| `presentation:implementation` | `presentation:api`, `domain:api`, `core:mvi:android`, `libraries:logger:api`, Hilt | Compose, NavController |
 | `ui` | `presentation:api`, `core:ui`, Compose | `domain:*` directly; use `hiltViewModel()` |
 
 Key rules:
@@ -282,35 +263,9 @@ class MyViewModel @Inject constructor(val dep: Dep) : MviViewModel<...>(...)
 ```kotlin
 @Serializable data object TrendingMovies
 @Serializable data class MovieDetail(val movieId: Int)
-
-@Composable
-fun AmroNavHost() {
-    val backStack = rememberNavBackStack(TrendingMovies)
-    NavDisplay(
-        backStack = backStack,
-        onBack = { backStack.removeLastOrNull() },
-        entryDecorators = listOf(
-            rememberSceneSetupNavEntryDecorator(),
-            rememberSavedStateNavEntryDecorator(),
-            rememberViewModelStoreNavEntryDecorator(),
-        ),
-        entryProvider = entryProvider {
-            addEntryProvider<TrendingMovies> { key ->
-                NavEntry(key) {
-                    TrendingMoviesScreen(
-                        onNavigateToDetail = { id -> backStack.add(MovieDetail(id)) }
-                    )
-                }
-            }
-            addEntryProvider<MovieDetail> { key ->
-                NavEntry(key) {
-                    MovieDetailScreen(movieId = key.movieId)
-                }
-            }
-        }
-    )
-}
 ```
+
+> Read the canonical nav host: `app/src/main/kotlin/nl/abnamro/amrotv/AmroNavHost.kt` (created in Commit 11)
 
 Rules:
 - Routes: `@Serializable data object` or `data class` in `:app`.
@@ -325,42 +280,7 @@ Rules:
 
 ### Screen structure
 
-```kotlin
-// Screen = stateful entry point (gets ViewModel + collects state)
-@Composable
-fun TrendingMoviesScreen(
-    onNavigateToDetail: (movieId: Int) -> Unit,
-    viewModel: TrendingMoviesViewModel = hiltViewModel(),
-) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
-
-    LaunchedEffect(Unit) {
-        viewModel.effects.collect { effect ->
-            when (effect) {
-                is TrendingMoviesEffect.NavigateToMovieDetail -> onNavigateToDetail(effect.movieId)
-            }
-        }
-    }
-
-    TrendingMoviesContent(state = state, onIntent = viewModel::handleIntent)
-}
-
-// Content = stateless, testable, previewable
-@Composable
-fun TrendingMoviesContent(
-    state: TrendingMoviesState,
-    onIntent: (TrendingMoviesIntent) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    // UI here — no ViewModel, no NavController, no direct data fetching
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun TrendingMoviesContentPreview() {
-    AmroTheme { TrendingMoviesContent(state = TrendingMoviesState(), onIntent = {}) }
-}
-```
+> Read a canonical screen: `feature/movies/ui/src/main/kotlin/nl/abnamro/amrotv/feature/movies/ui/TrendingMoviesScreen.kt` (created in Commit 10)
 
 Rules:
 - Always split into `Screen` (stateful) and `Content` (stateless + previewable).
@@ -457,76 +377,10 @@ KDoc is **required** on interfaces, abstract classes, and domain model propertie
 
 ### Examples
 
-```kotlin
-// ✅ Interface — class-level + every member documented
-/**
- * Abstracts the remote data source for movie data.
- *
- * Any new remote API (OMDB, JustWatch, etc.) must implement this interface.
- * Implementations map their own DTOs to domain models internally — no DTOs cross this boundary.
- */
-interface RemoteMovieDataSource {
-
-    /**
-     * Fetches a single page of trending movies.
-     *
-     * @param page 1-based page index.
-     * @return list of [Movie] domain models for the requested page.
-     * @throws IOException on network failure.
-     */
-    suspend fun getTrendingMovies(page: Int): List<Movie>
-
-    /**
-     * Fetches full detail for a single movie.
-     *
-     * @param id TMDB movie ID.
-     * @return [MovieDetail] with all fields populated.
-     */
-    suspend fun getMovieDetail(id: Int): MovieDetail
-
-    /**
-     * Fetches the complete list of TMDB movie genres.
-     *
-     * @return list of [Genre] objects, stable for the lifetime of the app session.
-     */
-    suspend fun getGenres(): List<Genre>
-}
-
-// ✅ Abstract base — class + type params documented
-/**
- * Base ViewModel for all MVI screens.
- *
- * Exposes [state] as a [StateFlow] and [effects] as a one-shot [Flow].
- * All user actions are routed through [handleIntent].
- *
- * @param S State type — must be a [MviState] data class.
- * @param I Intent type — must be a [MviIntent] sealed interface.
- * @param E Effect type — must be a [MviEffect] sealed interface.
- * @param initialState The initial value emitted on [state].
- */
-abstract class MviViewModel<S : MviState, I : MviIntent, E : MviEffect>(
-    initialState: S,
-) : ViewModel() { ... }
-
-// ✅ Domain model — property KDoc only on non-obvious fields
-/**
- * Full movie detail as returned by the domain layer.
- */
-data class MovieDetail(
-    val id: Int,
-    val title: String,
-    val tagline: String?,
-    /** Null when TMDB does not report the budget (API returns 0, mapper converts to null). */
-    val budget: Long?,
-    /** Null when TMDB does not report the revenue (API returns 0, mapper converts to null). */
-    val revenue: Long?,
-    /**
-     * Raw TMDB IMDb ID (e.g. `"tt0137523"`).
-     * Construct the full link as `"https://www.imdb.com/title/$imdbId/"`.
-     */
-    val imdbId: String?,
-)
-```
+> Read real KDoc examples in:
+> - `core/mvi/src/main/kotlin/nl/abnamro/amrotv/core/mvi/MviViewModel.kt` — abstract class with type-param docs
+> - `feature/movies/data/src/main/kotlin/.../datasource/remote/RemoteMovieDataSource.kt` — interface with `@param`/`@return`/`@throws`
+> - `feature/movies/domain/api/src/main/kotlin/.../MovieDetail.kt` — domain model with property KDoc on non-obvious fields
 
 ### Anti-patterns
 

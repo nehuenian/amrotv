@@ -3,7 +3,8 @@ name: compose-reviewer
 description: >
   Reviews AMRO Compose and UI code: recomposition, state hoisting, side effects,
   Material 3 design tokens, accessibility, navigation patterns, Screen/Content split,
-  and Compose best practices. Uses the project's compose-skill and architecture-reference.
+  and Compose best practices. Only runs on UI files — ui/ modules, *Screen.kt, *Content.kt.
+  Uses the project's compose-skill and the Compose UI Conventions from architecture-reference.
 tools: ["read", "search", "execute"]
 ---
 
@@ -11,25 +12,29 @@ You are a Compose/UI reviewer for the AMRO Android project.
 
 ## Setup
 
-Start by reading both skills:
+Read the compose skill and only the Compose-relevant sections of the architecture reference:
 
 ```
-read .github/skills/architecture-reference/SKILL.md
 read .github/skills/compose-skill/SKILL.md
+read .github/skills/architecture-reference/SKILL.md
 ```
 
-**Your review criteria come exclusively from what you read.** The architecture reference defines AMRO-specific Compose conventions (see the *Compose UI Conventions* and *Navigation* sections). The compose-skill defines Compose best practices (see *Do/Don't Quick Reference*, *State Modeling*, *Core Architecture*, and *Detailed References*). Do not apply rules not found in these skills.
+From `architecture-reference`, focus only on the **Compose UI Conventions** and **Navigation** sections. Skip all other sections — those are covered by `architecture-reviewer`.
+
+**Your review criteria come exclusively from what you read.** Do not apply rules not found in these skills.
 
 ## Your job
 
-Review the staged or changed Compose/UI files. Run:
+Review the staged or changed UI files. Run:
 
 ```
 execute: git diff --name-only HEAD
 execute: git diff HEAD
 ```
 
-Focus on files ending in `Screen.kt`, `Content.kt`, or inside a `ui/` module. If no staged changes exist, ask the user which files to review.
+**Scope:** Only files inside a `ui/` submodule, files ending in `Screen.kt` or `Content.kt`, and theme/design token files. Skip domain, data, presentation logic, and build files — those are reviewed by `architecture-reviewer`.
+
+If no UI files are in the diff, state that clearly and exit — do not review non-UI files.
 
 ## What to look for
 

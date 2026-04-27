@@ -21,13 +21,16 @@ Each module picks only the plugins it needs — they compose cleanly.
 > amro-android-compose = { id = "amro.android.compose" }
 > ```
 
+### AGP 9.x rules
+
+- **Never** add `kotlin.android` explicitly — AGP 9.x auto-applies it for all Android library modules. Adding it manually causes: `"Cannot add extension with name 'kotlin', as there is an extension already registered"`.
+- Same for `kotlin.compose` — it also auto-applies `kotlin.android`.
+- For jvmTarget, use `tasks.withType<KotlinJvmCompile>().configureEach { compilerOptions { jvmTarget.set(JvmTarget.JVM_11) } }` only when not using a convention plugin that already sets it.
+
 ### Inter-module dependencies
 
-Always use **type-safe project accessors** (`projects.*`). Enable once in `settings.gradle.kts`:
-```kotlin
-enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
-```
-Then reference modules as:
+Always use type-safe project accessors (`projects.*`):
+
 ```kotlin
 implementation(projects.core.mvi)
 implementation(projects.libraries.logger.api)
@@ -35,175 +38,20 @@ implementation(projects.libraries.logger.api)
 
 ---
 
-## Pure-Kotlin module (`:libraries:logger:api`, `:feature:*:domain:api`)
+## Canonical build.gradle.kts references
 
-Modules with no Android APIs use `amro.kotlin.library`:
+For the exact up-to-date template for each module type, read the actual file:
 
-```kotlin
-plugins {
-    alias(libs.plugins.amro.kotlin.library)
-}
+| Module type | Canonical reference |
+|---|---|
+| Pure Kotlin (`:libraries:logger:api`, `:feature:*:domain:api`, `:core:mvi:kotlin`) | `libraries/logger/api/build.gradle.kts` |
+| Android library base (`:core:mvi:android`) | `core/mvi/android/build.gradle.kts` |
+| Android library + Hilt (`:core:network`) | `core/network/build.gradle.kts` |
+| Android library + Compose (`:core:ui`) | `core/ui/build.gradle.kts` |
+| Android library + Hilt + Serialization (`:feature:movies:data`) | `feature/movies/data/build.gradle.kts` |
+| Android library + Hilt (`:feature:movies:domain:implementation`) | `feature/movies/domain/implementation/build.gradle.kts` |
+| Android library (`:feature:movies:presentation:api`) | `feature/movies/presentation/api/build.gradle.kts` |
+| Android library + Hilt (`:feature:movies:presentation:implementation`) | `feature/movies/presentation/implementation/build.gradle.kts` |
+| Android library + Compose + Hilt (`:feature:movies:ui`) | `feature/movies/ui/build.gradle.kts` |
 
-dependencies {
-    implementation(libs.kotlinx.coroutines.core)
-}
-```
-
----
-
-## Android Library module (general template)
-
-```kotlin
-plugins {
-    alias(libs.plugins.amro.android.library)
-}
-
-android {
-    namespace = "nl.abnamro.amrotv.<module.path>"
-}
-```
-
-> `compileSdk`, `minSdk`, `compileOptions`, and `jvmTarget` are all set by the convention plugin.
-
----
-
-## `:core:mvi` build.gradle.kts
-
-`:core:mvi` is an **Android library** (not pure Kotlin) because it depends on `androidx.lifecycle:viewmodel-ktx`.
-
-```kotlin
-plugins {
-    alias(libs.plugins.amro.android.library)
-}
-
-android {
-    namespace = "nl.abnamro.amrotv.core.mvi"
-}
-
-dependencies {
-    implementation(libs.androidx.lifecycle.viewmodel.ktx)
-    implementation(libs.kotlinx.coroutines.core)
-}
-```
-
----
-
-## `:feature:*:domain:implementation` build.gradle.kts
-
-```kotlin
-plugins {
-    alias(libs.plugins.amro.android.library)
-    alias(libs.plugins.amro.android.hilt)
-}
-
-android {
-    namespace = "{featurePackage}.domain.implementation"
-}
-
-dependencies {
-    implementation(projects.feature.movies.domain.api)
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.compiler)
-}
-```
-
----
-
-## `:feature:*:data` build.gradle.kts
-
-```kotlin
-plugins {
-    alias(libs.plugins.amro.android.library)
-    alias(libs.plugins.amro.android.hilt)
-    alias(libs.plugins.kotlin.serialization)
-}
-
-android {
-    namespace = "{featurePackage}.data"
-}
-
-dependencies {
-    implementation(projects.feature.movies.domain.api)
-    implementation(projects.core.network)
-    implementation(projects.libraries.logger.api)
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.compiler)
-    implementation(libs.retrofit)
-    implementation(libs.retrofit.kotlinx.serialization)
-    implementation(libs.kotlinx.serialization.json)
-}
-```
-
----
-
-## `:feature:*:presentation:api` build.gradle.kts
-
-```kotlin
-plugins {
-    alias(libs.plugins.amro.android.library)
-}
-
-android {
-    namespace = "{featurePackage}.presentation.api"
-}
-
-dependencies {
-    implementation(projects.feature.movies.domain.api)
-    implementation(projects.core.mvi)
-}
-```
-
----
-
-## `:feature:*:presentation:implementation` build.gradle.kts
-
-```kotlin
-plugins {
-    alias(libs.plugins.amro.android.library)
-    alias(libs.plugins.amro.android.hilt)
-}
-
-android {
-    namespace = "{featurePackage}.presentation.implementation"
-}
-
-dependencies {
-    implementation(projects.feature.movies.presentation.api)
-    implementation(projects.feature.movies.domain.api)
-    implementation(projects.core.mvi)
-    implementation(projects.libraries.logger.api)
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.compiler)
-    implementation(libs.androidx.lifecycle.viewmodel.ktx)
-    implementation(libs.kotlinx.coroutines.android)
-}
-```
-
----
-
-## `:feature:*:ui` build.gradle.kts
-
-```kotlin
-plugins {
-    alias(libs.plugins.amro.android.library)
-    alias(libs.plugins.amro.android.compose)
-    alias(libs.plugins.amro.android.hilt)
-}
-
-android {
-    namespace = "{featurePackage}.ui"
-}
-
-dependencies {
-    implementation(projects.feature.movies.presentation.api)
-    implementation(projects.core.ui)
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.compose.ui)
-    implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.lifecycle.runtime.compose)
-    implementation(libs.hilt.navigation.compose)
-    implementation(libs.coil.compose)
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.compiler)
-}
-```
+> `:core:mvi` is split into `:core:mvi:kotlin` (pure Kotlin — interfaces, `AmroTvViewModel`) and `:core:mvi:android` (Android — `BaseAmroTvViewModel`, depends on `androidx.lifecycle`). Use `:core:mvi:kotlin` in `presentation:api`; use `:core:mvi:android` in `presentation:implementation`.

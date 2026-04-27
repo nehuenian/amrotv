@@ -76,27 +76,12 @@ Passed into `NetworkModule` via a dedicated Hilt qualifier (`@TmdbApiKey`).
 
 ## AuthInterceptor
 
-```kotlin
-class AuthInterceptor @Inject constructor(
-    @TmdbApiKey private val apiKey: String
-) : Interceptor {
-    override fun intercept(chain: Interceptor.Chain): Response {
-        val request = chain.request().newBuilder()
-            .addHeader("Authorization", "Bearer $apiKey")
-            .build()
-        return chain.proceed(request)
-    }
-}
-```
+> Read the canonical implementation: `core/network/src/main/kotlin/nl/abnamro/amrotv/core/network/AuthInterceptor.kt`
+>
+> Adds `Authorization: Bearer <token>` header to every request using the `@TmdbApiKey`-qualified String injected via Hilt.
 
 ---
 
 ## NetworkResult
 
-```kotlin
-sealed interface NetworkResult<out T> {
-    data class Success<T>(val data: T) : NetworkResult<T>
-    data class Error(val code: Int?, val message: String?) : NetworkResult<Nothing>
-    data object Loading : NetworkResult<Nothing>
-}
-```
+> Read the canonical implementation: `core/network/src/main/kotlin/nl/abnamro/amrotv/core/network/NetworkResult.kt`

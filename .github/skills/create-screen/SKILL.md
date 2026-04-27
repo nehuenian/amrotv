@@ -19,6 +19,8 @@ Read `.github/skills/architecture-reference/SKILL.md` before proceeding.
 
 ## Steps
 
+> Before writing any code, read the nearest existing screen in `feature/movies/ui/` as a structural reference (once Commit 10 exists). The templates below show the required skeleton — the actual file is the source of truth for imports and exact patterns.
+
 ### 1. Parse Arguments
 Argument format: `<ScreenName> in <feature-name>` (e.g. `MovieSearch in movies`)
 - **ScreenName** = PascalCase screen name (e.g. `MovieSearch`)
