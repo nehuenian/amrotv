@@ -37,12 +37,13 @@ user-invocable: true
 amrotv/
 ├── app/                                  # Android Application entry point
 ├── core/
-│   ├── mvi/                              # MVI base classes (MviViewModel, interfaces)
+│   ├── mvi/                              # MVI base classes (MviViewModel, interfaces) — Android library (needs androidx.lifecycle:viewmodel-ktx)
 │   ├── network/                          # Retrofit/OkHttp setup, AuthInterceptor, NetworkResult
 │   └── ui/                              # AmroTheme, shared Compose components
 ├── libraries/
-│   ├── api/                             # Logger interface (no Android deps)
-│   └── implementation/                  # TimberLogger + Hilt binding
+│   └── logger/
+│       ├── api/                          # Logger interface (no Android deps — pure Kotlin)
+│       └── implementation/               # TimberLogger + Hilt binding
 └── feature/
     └── movies/
         ├── data/                         # TmdbApiService, DTOs, mappers, MovieRepositoryImpl
@@ -62,8 +63,8 @@ include(":app")
 include(":core:mvi")
 include(":core:network")
 include(":core:ui")
-include(":libraries:api")
-include(":libraries:implementation")
+include(":libraries:logger:api")
+include(":libraries:logger:implementation")
 include(":feature:movies:domain:api")
 include(":feature:movies:domain:implementation")
 include(":feature:movies:data")
@@ -72,7 +73,7 @@ include(":feature:movies:presentation:implementation")
 include(":feature:movies:ui")
 ```
 
-> Always use `project(":path:to:module")`. Never use type-safe project accessors (`projects.*`).
+> Always use type-safe project accessors (`projects.*`) for inter-module dependencies. Enable with `enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")` in `settings.gradle.kts`.
 
 ### Dependency Graph (simplified)
 
@@ -88,14 +89,14 @@ include(":feature:movies:ui")
   └── :feature:movies:data
         ├── :feature:movies:domain:api
         ├── :core:network
-        └── :libraries:api
+        └── :libraries:logger:api
   └── :feature:movies:domain:implementation
         └── :feature:movies:domain:api
   └── :core:ui
-  └── :libraries:implementation
-        └── :libraries:api
+  └── :libraries:logger:implementation
+        └── :libraries:logger:api
 :core:network
-  └── :libraries:api
+  └── :libraries:logger:api
 ```
 
 ---
@@ -234,9 +235,9 @@ Rules:
 |-------|--------------|---------------|
 | `domain:api` | Kotlin stdlib + coroutines only | Android, Hilt, Retrofit, Room |
 | `domain:implementation` | `domain:api`, Hilt | Android UI, Retrofit, Room |
-| `data` | `domain:api`, `core:network`, `libraries:api`, Hilt | `presentation:*` |
+| `data` | `domain:api`, `core:network`, `libraries:logger:api`, Hilt | `presentation:*` |
 | `presentation:api` | `domain:api`, `core:mvi` | ViewModels, Android UI |
-| `presentation:implementation` | `presentation:api`, `domain:api`, `core:mvi`, `libraries:api`, Hilt | Compose, NavController |
+| `presentation:implementation` | `presentation:api`, `domain:api`, `core:mvi`, `libraries:logger:api`, Hilt | Compose, NavController |
 | `ui` | `presentation:api`, `core:ui`, Compose | `domain:*` directly; use `hiltViewModel()` |
 
 Key rules:
