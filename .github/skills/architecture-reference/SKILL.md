@@ -6,8 +6,8 @@ description: >
   Auto-load this skill whenever working on any AMRO code: writing a feature, reviewing Kotlin
   files, fixing a bug, creating a screen, wiring navigation, checking DI setup, or any task
   that touches the project's Kotlin source. When in doubt, load this skill first. If anything
-  touches modules, build files, data layer, networking, or tests, also check the reference files
-  listed at the bottom.
+  touches modules, build files, data layer, or networking, also check the reference files
+  listed at the bottom. For unit testing conventions, load the `unit-testing` skill.
 user-invocable: true
 ---
 
@@ -225,7 +225,7 @@ Key rules:
 - **DTOs never cross layer boundaries** — each data source maps its own DTOs to domain models internally.
 - **Repository interface** in `domain:api`; implementation in `data`.
 - **Use cases** are `fun interface` in `domain:api`; implementations in `domain:implementation`.
-- Repository and use case interfaces return `Flow<T>` (never `suspend` + return). Errors propagate via Flow exceptions.
+- Repository and use case interfaces use `suspend` functions returning `Outcome<T>`. `Outcome.Success` carries data; `Outcome.Error` wraps the cause and optionally carries stale cached data for resilience.
 
 > For full data layer design (DataSource abstraction, DTOs, Room, mappers, repository), see `references/data-layer.md`.
 
@@ -236,7 +236,8 @@ Key rules:
 | Use | When |
 |-----|------|
 | `@Module @InstallIn(SingletonComponent::class) object` | `@Provides` for third-party classes (Retrofit, OkHttp, Room) |
-| `@Module @InstallIn(SingletonComponent::class) abstract class` | `@Binds` to bind interfaces to implementations |
+| `@Module @InstallIn(SingletonComponent::class) abstract class` | `@Binds` for infrastructure interfaces (repositories, data sources) |
+| `@Module @InstallIn(ViewModelComponent::class) abstract class` | `@Binds` + `@ViewModelScoped` for domain use cases |
 
 | Annotation | Scope |
 |------------|-------|
@@ -401,5 +402,5 @@ Load these when the task touches the relevant area:
 |------|-------------|
 | `references/data-layer.md` | Building or modifying the data layer: DTOs, DataSources, Room, mappers, repository |
 | `references/networking.md` | TMDB endpoints, AuthInterceptor, NetworkResult, API token setup, image URLs |
-| `references/testing.md` | Writing unit, integration, or UI tests (JUnit 5, Turbine, Robot Pattern) |
 | `references/build-templates.md` | Creating new modules or writing/modifying `build.gradle.kts` files |
+| `unit-testing` skill | Writing unit, integration, or UI tests (JUnit 5, MockK, Turbine, Robot Pattern) |
