@@ -1,0 +1,12 @@
+plugins {
+    alias(libs.plugins.amro.android.library)
+}
+
+android {
+    namespace = "nl.abnamro.amrotv.core.mvi"
+}
+
+dependencies {
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+}
