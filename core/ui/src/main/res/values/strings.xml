@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Error View Strings -->
+    <string name="core_ui_error_generic_title">Something went wrong</string>
+    <string name="core_ui_error_retry_button">Retry</string>
+    <string name="core_ui_error_icon_content_desc">Error</string>
+
+    <!-- Empty View Strings -->
+    <string name="core_ui_empty_icon_content_desc">Empty</string>
+</resources>
