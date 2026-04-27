@@ -7,6 +7,7 @@ android {
 }
 
 dependencies {
+    implementation(projects.core.mvi.kotlin)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
 }

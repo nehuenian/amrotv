@@ -8,7 +8,7 @@ android {
 }
 
 dependencies {
-    api(projects.libraries.logger.api)
+    implementation(projects.libraries.logger.api)
     implementation(libs.timber)
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
