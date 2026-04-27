@@ -72,22 +72,27 @@ All generated code must be consistent with `architecture-reference`.
 
 ## Code review
 
-Run all three review agents **in parallel** after any code change:
+Two focused agents — pick based on what changed:
 
-| Agent | Focus |
-|-------|-------|
-| `architecture-reviewer` | Module boundaries, Hilt DI, MVI structure, clean architecture layers, navigation, build files, naming |
-| `code-rules-reviewer` | Project rules derived from `architecture-reference` — DI patterns, Logger usage, DTOs in wrong layer, NavController leaks, Screen/Content split, collectAsStateWithLifecycle, build syntax, design tokens |
-| `compose-reviewer` | Recomposition, state hoisting, side effects, Material3 tokens, accessibility, previews |
+| Agent | Scope | Focus |
+|-------|-------|-------|
+| `architecture-reviewer` | `domain/`, `data/`, `presentation/` logic, `core/`, `libraries/`, `build.gradle.kts` | Module boundaries, clean arch layers, Hilt DI, MVI contracts, logging, naming, KDoc, build files, data/networking/testing patterns |
+| `compose-reviewer` | `ui/` modules, `*Screen.kt`, `*Content.kt`, theme files | Recomposition, state hoisting, side effects, Screen/Content split, Material3 tokens, accessibility, previews |
+
+**Routing rules:**
+- Changed files are **only** in `ui/` / `*Screen.kt` / `*Content.kt` → run `compose-reviewer` only
+- Changed files are **only** non-UI (domain, data, presentation logic, build files) → run `architecture-reviewer` only
+- Changed files include **both** → run both agents in parallel
 
 ### Code review loop
 
 After applying changes:
-1. Invoke all three agents in parallel.
-2. Collect all comments.
-3. Address every comment.
-4. Re-run all three agents.
-5. Repeat until **all three agents report no remaining issues**.
+1. Determine which agent(s) apply based on the routing rules above.
+2. Invoke the relevant agent(s) (in parallel if both).
+3. Collect all comments.
+4. Address every comment.
+5. Re-run the same agent(s).
+6. Repeat until all relevant agents report no remaining issues.
 
 ---
 
@@ -98,7 +103,7 @@ After applying changes:
 Create a new branch for each feature or commit phase. Use worktrees to keep the main tree clean:
 ```bash
 git worktree add ../amrotv-<branch-name> -b <branch-name>
-# Example: git worktree add ../amrotv-feat-movies -b feat/movies-domain
+# Example: git worktree add ../amrotv-feature-movies-domain -b feature/movies-domain
 ```
 
 ### Before triggering a code review

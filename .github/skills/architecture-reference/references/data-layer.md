@@ -64,125 +64,44 @@ interface LocalMovieDataSource {
 
 ## DTOs (kotlinx.serialization, inside `tmdb/dto/`)
 
-```kotlin
-@Serializable data class TrendingMoviesResponseDto(
-    @SerialName("page") val page: Int,
-    @SerialName("results") val results: List<MovieDto>,
-    @SerialName("total_pages") val totalPages: Int,
-    @SerialName("total_results") val totalResults: Int,
-)
-
-@Serializable data class MovieDto(
-    @SerialName("id") val id: Int,
-    @SerialName("title") val title: String,
-    @SerialName("poster_path") val posterPath: String? = null,
-    @SerialName("backdrop_path") val backdropPath: String? = null,
-    @SerialName("genre_ids") val genreIds: List<Int> = emptyList(),
-    @SerialName("popularity") val popularity: Double = 0.0,
-    @SerialName("release_date") val releaseDate: String = "",
-    @SerialName("vote_average") val voteAverage: Double = 0.0,
-    @SerialName("overview") val overview: String = "",
-)
-
-@Serializable data class MovieDetailDto(
-    @SerialName("id") val id: Int,
-    @SerialName("title") val title: String,
-    @SerialName("tagline") val tagline: String? = null,
-    @SerialName("poster_path") val posterPath: String? = null,
-    @SerialName("backdrop_path") val backdropPath: String? = null,
-    @SerialName("genres") val genres: List<GenreDto> = emptyList(), // full objects, not IDs
-    @SerialName("overview") val overview: String? = null,
-    @SerialName("vote_average") val voteAverage: Double = 0.0,
-    @SerialName("vote_count") val voteCount: Int = 0,
-    @SerialName("budget") val budget: Long = 0L,    // 0 = not available → map to null
-    @SerialName("revenue") val revenue: Long = 0L,  // 0 = not available → map to null
-    @SerialName("status") val status: String = "",
-    @SerialName("imdb_id") val imdbId: String? = null,
-    @SerialName("runtime") val runtime: Int? = null,
-    @SerialName("release_date") val releaseDate: String = "",
-)
-
-@Serializable data class GenreListResponseDto(@SerialName("genres") val genres: List<GenreDto>)
-@Serializable data class GenreDto(@SerialName("id") val id: Int, @SerialName("name") val name: String)
-```
+> DTOs will be created in Commit 8 at:
+> `feature/movies/data/src/main/kotlin/nl/abnamro/amrotv/feature/movies/data/datasource/remote/tmdb/dto/`
+>
+> See `plan.md` for the full field list. Key notes:
+> - `budget` and `revenue` are `Long` (TMDB returns `0` for unknown) — mapper converts `0` → `null` in domain
+> - `MovieDetailDto` has `genres` as full objects (`List<GenreDto>`), unlike `MovieDto` which has `genreIds: List<Int>`
+> - All fields have defaults to be resilient to missing JSON keys
 
 ---
 
 ## TmdbMovieDataSource — Dynamic Page Count
 
-Page size is **not hardcoded** — derive `pagesNeeded` from the first-page response size:
-
-```kotlin
-class TmdbMovieDataSource @Inject constructor(
-    private val apiService: TmdbApiService,
-) : RemoteMovieDataSource {
-    override suspend fun getTrendingMovies(): List<Movie> {
-        val firstPage = apiService.getTrendingMovies(page = 1)
-        val pageSize = firstPage.results.size.takeIf { it > 0 } ?: return emptyList()
-        val pagesNeeded = ceil(100.0 / pageSize).toInt()
-        val remaining = if (pagesNeeded > 1) coroutineScope {
-            (2..pagesNeeded).map { page -> async { apiService.getTrendingMovies(page) } }.awaitAll()
-        } else emptyList()
-        return (firstPage.results + remaining.flatMap { it.results })
-            .take(100)
-            .map { it.toDomain() }
-    }
-}
-```
+> Read the implementation once created in Commit 8:
+> `feature/movies/data/src/main/kotlin/.../datasource/remote/tmdb/TmdbMovieDataSource.kt`
+>
+> Key requirement: page size is **not hardcoded** — derive `pagesNeeded` from the first-page response:
+> `pagesNeeded = ceil(100.0 / pageSize).toInt()`
+> Fetch remaining pages in parallel with `coroutineScope { (2..n).map { async { ... } }.awaitAll() }`.
 
 ---
 
 ## Room Entities (private to `room/entity/`)
 
-```kotlin
-@Entity(tableName = "movies")
-data class MovieEntity(
-    @PrimaryKey val id: Int,
-    val title: String,
-    val posterPath: String?,
-    val backdropPath: String?,
-    val genreIds: String,  // serialized as comma-separated "28,12,878"
-    val popularity: Double,
-    val releaseDate: String,
-    val voteAverage: Double,
-    val overview: String,
-)
-
-@Entity(tableName = "genres")
-data class GenreEntity(
-    @PrimaryKey val id: Int,
-    val name: String,
-)
-```
-
-`RoomMovieDataSource` maps `Movie ↔ MovieEntity` and `Genre ↔ GenreEntity` internally.
+> Entities will be created in Commit 8 at `feature/movies/data/src/.../datasource/local/room/entity/`
+>
+> Key design choices:
+> - `genreIds` stored as a comma-separated string (e.g. `"28,12,878"`) — no join table needed for MVP
+> - `RoomMovieDataSource` maps `Movie ↔ MovieEntity` and `Genre ↔ GenreEntity` internally — entities never cross the `LocalMovieDataSource` boundary
 
 ---
 
 ## MovieRepositoryImpl — Orchestration Only
 
-Repository contains **no mapping logic, no DTOs, no entities**. It orchestrates data sources only.
-
-```kotlin
-class MovieRepositoryImpl @Inject constructor(
-    private val remote: RemoteMovieDataSource,
-    private val local: LocalMovieDataSource,
-    private val logger: Logger,
-) : MovieRepository {
-    override fun getTrendingMovies(): Flow<List<Movie>> = flow {
-        try {
-            val movies = remote.getTrendingMovies()
-            local.saveMovies(movies)
-            emit(movies)
-        } catch (e: Exception) {
-            logger.e(TAG, "Remote failed, trying cache", e)
-            val cached = local.getCachedMovies()
-            if (cached.isNotEmpty()) emit(cached) else throw e
-        }
-    }
-    // getMovieDetail + getGenres: same pattern
-}
-```
+> Read the implementation once created in Commit 8:
+> `feature/movies/data/src/main/kotlin/.../repository/MovieRepositoryImpl.kt`
+>
+> Key rule: **no mapping logic, no DTOs, no entities** — orchestrates data sources only.
+> Pattern: try remote first → save to local → emit; on error → load from local; if local empty → propagate error.
 
 ---
 
@@ -205,12 +124,6 @@ class CompositeMovieDataSource @Inject constructor(
 
 ## Hilt Wiring (`DataBindingsModule`)
 
-```kotlin
-@Module
-@InstallIn(SingletonComponent::class)
-abstract class DataBindingsModule {
-    @Binds abstract fun bindRemoteDataSource(impl: TmdbMovieDataSource): RemoteMovieDataSource
-    @Binds abstract fun bindLocalDataSource(impl: RoomMovieDataSource): LocalMovieDataSource
-    @Binds abstract fun bindMovieRepository(impl: MovieRepositoryImpl): MovieRepository
-}
-```
+> Standard `@Binds` pattern. Read an existing module (e.g. `core/network/`) for reference.
+> `DataBindingsModule` binds: `TmdbMovieDataSource → RemoteMovieDataSource`, `RoomMovieDataSource → LocalMovieDataSource`, `MovieRepositoryImpl → MovieRepository`.
+

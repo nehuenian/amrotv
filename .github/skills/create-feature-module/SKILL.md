@@ -20,6 +20,8 @@ Read the architecture reference at `.github/skills/architecture-reference/SKILL.
 
 ## Steps
 
+> Before writing any code, read the corresponding `feature/movies/{submodule}/` files as canonical references for both build files and source structure.
+
 ### 1. Derive Names
 
 From argument `$ARGUMENTS` (kebab-case, e.g. `actor-info`):
@@ -64,167 +66,32 @@ include(":feature:{featureName}:ui")
 
 ### 4. Create build.gradle.kts Files
 
-**domain/api/build.gradle.kts** — pure Kotlin, no Android:
+Use convention plugins from `build-logic/`. Read the corresponding `feature/movies/{submodule}/build.gradle.kts` as the canonical template to copy from.
+
+Convention plugin combinations per module type:
+
+| Submodule | Plugins |
+|---|---|
+| `domain/api` | `amro.kotlin.library` only |
+| `domain/implementation` | `amro.android.library` + `amro.android.hilt` |
+| `data` | `amro.android.library` + `amro.android.hilt` + `kotlin.serialization` |
+| `presentation/api` | `amro.android.library` only |
+| `presentation/implementation` | `amro.android.library` + `amro.android.hilt` |
+| `ui` | `amro.android.library` + `amro.android.compose` + `amro.android.hilt` |
+
+All modules need `android { namespace = "{featurePackage}.{submodule}" }` (except pure Kotlin `domain/api`).
+
+Inter-module dependencies use type-safe project accessors (`projects.*`). The correct MVI module depends on the submodule:
+- `presentation:api` → `projects.core.mvi.kotlin` (interfaces + pure ViewModel only)
+- `presentation:implementation` → `projects.core.mvi.android` (Android ViewModel with lifecycle)
+
 ```kotlin
-plugins {
-    alias(libs.plugins.kotlin.jvm)
-}
-
-dependencies {
-    implementation(libs.kotlinx.coroutines.core)
-}
-```
-
-**domain/implementation/build.gradle.kts**:
-```kotlin
-plugins {
-    alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.hilt)
-    alias(libs.plugins.ksp)
-}
-
-android {
-    namespace = "{featurePackage}.domain.implementation"
-    compileSdk = 36
-    defaultConfig { minSdk = 24 }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-    kotlinOptions { jvmTarget = "11" }
-}
-
-dependencies {
-    implementation(project(":feature:{featureName}:domain:api"))
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.compiler)
-}
-```
-
-**data/build.gradle.kts**:
-```kotlin
-plugins {
-    alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.hilt)
-    alias(libs.plugins.ksp)
-    alias(libs.plugins.kotlin.serialization)
-}
-
-android {
-    namespace = "{featurePackage}.data"
-    compileSdk = 36
-    defaultConfig { minSdk = 24 }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-    kotlinOptions { jvmTarget = "11" }
-}
-
-dependencies {
-    implementation(project(":feature:{featureName}:domain:api"))
-    implementation(project(":core:network"))
-    implementation(project(":libraries:api"))
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.compiler)
-    implementation(libs.retrofit)
-    implementation(libs.retrofit.kotlinx.serialization)
-    implementation(libs.kotlinx.serialization.json)
-}
-```
-
-**presentation/api/build.gradle.kts**:
-```kotlin
-plugins {
-    alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
-}
-
-android {
-    namespace = "{featurePackage}.presentation.api"
-    compileSdk = 36
-    defaultConfig { minSdk = 24 }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-    kotlinOptions { jvmTarget = "11" }
-}
-
-dependencies {
-    implementation(project(":feature:{featureName}:domain:api"))
-    implementation(project(":core:mvi"))
-}
-```
-
-**presentation/implementation/build.gradle.kts**:
-```kotlin
-plugins {
-    alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.hilt)
-    alias(libs.plugins.ksp)
-}
-
-android {
-    namespace = "{featurePackage}.presentation.implementation"
-    compileSdk = 36
-    defaultConfig { minSdk = 24 }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-    kotlinOptions { jvmTarget = "11" }
-}
-
-dependencies {
-    implementation(project(":feature:{featureName}:presentation:api"))
-    implementation(project(":feature:{featureName}:domain:api"))
-    implementation(project(":core:mvi"))
-    implementation(project(":libraries:api"))
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.compiler)
-    implementation(libs.androidx.lifecycle.viewmodel.ktx)
-    implementation(libs.kotlinx.coroutines.android)
-}
-```
-
-**ui/build.gradle.kts**:
-```kotlin
-plugins {
-    alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.hilt)
-    alias(libs.plugins.ksp)
-}
-
-android {
-    namespace = "{featurePackage}.ui"
-    compileSdk = 36
-    defaultConfig { minSdk = 24 }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-    kotlinOptions { jvmTarget = "11" }
-    buildFeatures { compose = true }
-}
-
-dependencies {
-    implementation(project(":feature:{featureName}:presentation:api"))
-    implementation(project(":core:ui"))
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.compose.ui)
-    implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.lifecycle.runtime.compose)
-    implementation(libs.hilt.navigation.compose)
-    implementation(libs.coil.compose)
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.compiler)
-}
+implementation(projects.feature.{featureName}.domain.api)
+// presentation:api uses:
+implementation(projects.core.mvi.kotlin)
+// presentation:implementation uses:
+implementation(projects.core.mvi.android)
+implementation(projects.libraries.logger.api)
 ```
 
 ### 5. Create Template Code

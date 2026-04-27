@@ -28,19 +28,19 @@
 Use `@Nested` inner classes to group related test cases:
 
 ```kotlin
-// src/test/kotlin/.../GetTrendingMoviesUseCaseImplTest.kt
-class GetTrendingMoviesUseCaseImplTest {
+// src/test/kotlin/.../{Screen}UseCaseImplTest.kt
+class {Screen}UseCaseImplTest {
 
-    private val repository: MovieRepository = mockk()
-    private val useCase = GetTrendingMoviesUseCaseImpl(repository)
+    private val repository: {Feature}Repository = mockk()
+    private val useCase = {Screen}UseCaseImpl(repository)
 
     @Nested
     inner class WhenNoFilterApplied {
         @Test
-        fun `returns all movies sorted by popularity descending by default`() = runTest {
-            every { repository.getTrendingMovies() } returns flowOf(unsortedMovies)
+        fun `returns all items sorted by default criteria`() = runTest {
+            every { repository.get{Items}() } returns flowOf(unsortedItems)
             useCase().test {
-                assertEquals(moviesSortedByPopularityDesc, awaitItem())
+                assertEquals(itemsSortedByDefault, awaitItem())
                 awaitComplete()
             }
         }
@@ -49,19 +49,18 @@ class GetTrendingMoviesUseCaseImplTest {
     @Nested
     inner class WhenFilteringByGenre {
         @Test
-        fun `returns only movies matching the genre`() = runTest {
-            val movies = listOf(movieWithGenre(28), movieWithGenre(35))
-            every { repository.getTrendingMovies() } returns flowOf(movies)
-            useCase(genreFilter = 28).test {
-                assertEquals(listOf(movieWithGenre(28)), awaitItem())
+        fun `returns only items matching the filter`() = runTest {
+            every { repository.get{Items}() } returns flowOf(mixedItems)
+            useCase(filter = someFilter).test {
+                assertTrue(awaitItem().all { it.matches(someFilter) })
                 awaitComplete()
             }
         }
 
         @Test
-        fun `returns empty list when no movies match genre`() = runTest {
-            every { repository.getTrendingMovies() } returns flowOf(listOf(movieWithGenre(28)))
-            useCase(genreFilter = 99).test {
+        fun `returns empty list when no items match filter`() = runTest {
+            every { repository.get{Items}() } returns flowOf(items)
+            useCase(filter = nonMatchingFilter).test {
                 assertTrue(awaitItem().isEmpty())
                 awaitComplete()
             }
@@ -71,7 +70,7 @@ class GetTrendingMoviesUseCaseImplTest {
     @Nested
     inner class WhenSorting {
         @Test fun `sorts by title ascending`() = runTest { /* ... */ }
-        @Test fun `sorts by release date descending`() = runTest { /* ... */ }
+        @Test fun `sorts by date descending`() = runTest { /* ... */ }
     }
 }
 ```
@@ -83,38 +82,35 @@ class GetTrendingMoviesUseCaseImplTest {
 Use `@ExtendWith(MainDispatcherExtension::class)` (JUnit 5 extension, replaces `@get:Rule`):
 
 ```kotlin
-// src/test/kotlin/.../TrendingMoviesViewModelTest.kt
+// src/test/kotlin/.../{Screen}ViewModelTest.kt
 @ExtendWith(MainDispatcherExtension::class)
-class TrendingMoviesViewModelTest {
+class {Screen}ViewModelTest {
 
-    private val getTrendingMovies: GetTrendingMoviesUseCase = mockk()
-    private val getGenres: GetGenresUseCase = mockk()
+    private val get{Items}: Get{Items}UseCase = mockk()
     private val logger: Logger = mockk(relaxed = true)
 
     private val viewModel by lazy {
-        TrendingMoviesViewModel(getTrendingMovies, getGenres, logger)
+        {Screen}ViewModel(get{Items}, logger)
     }
 
     @Nested
     inner class WhenLoading {
         @Test
         fun `emits loading state then success state`() = runTest {
-            every { getTrendingMovies(any(), any(), any()) } returns flowOf(fakeMovies)
-            every { getGenres() } returns flowOf(fakeGenres)
+            every { get{Items}(/* any args */) } returns flowOf(fakeItems)
 
             viewModel.state.test {
                 assertTrue(awaitItem().isLoading)
                 val success = awaitItem()
                 assertFalse(success.isLoading)
-                assertEquals(fakeMovies, success.movies)
+                assertNull(success.error)
                 cancelAndIgnoreRemainingEvents()
             }
         }
 
         @Test
         fun `emits error state on exception`() = runTest {
-            every { getTrendingMovies(any(), any(), any()) } returns flow { throw IOException("Network error") }
-            every { getGenres() } returns flowOf(emptyList())
+            every { get{Items}(/* any args */) } returns flow { throw IOException("Network error") }
 
             viewModel.state.test {
                 skipItems(1) // loading
@@ -127,17 +123,16 @@ class TrendingMoviesViewModelTest {
     }
 
     @Nested
-    inner class WhenFiltering {
+    inner class When{SomeIntent} {
         @Test
-        fun `FilterByGenre intent updates selectedGenreId in state`() = runTest {
-            every { getTrendingMovies(any(), any(), any()) } returns flowOf(fakeMovies)
-            every { getGenres() } returns flowOf(fakeGenres)
+        fun `{SomeIntent} intent updates state correctly`() = runTest {
+            every { get{Items}(/* any args */) } returns flowOf(fakeItems)
 
             viewModel.state.test {
                 skipItems(2) // loading + initial success
-                viewModel.handleIntent(TrendingMoviesIntent.FilterByGenre(28))
-                val filtered = awaitItem()
-                assertEquals(28, filtered.selectedGenreId)
+                viewModel.handleIntent({Screen}Intent.{SomeIntent}(someParam))
+                val updated = awaitItem()
+                assertEquals(expectedValue, updated.someField)
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -153,11 +148,11 @@ Uses **Room in-memory DB** + **MockWebServer** with real JSON fixtures. Tests th
 
 ```kotlin
 @RunWith(AndroidJUnit4::class)
-class MovieRepositoryImplIntegrationTest {
+class {Feature}RepositoryImplIntegrationTest {
 
     private val mockWebServer = MockWebServer()
     private lateinit var db: AmroDatabase
-    private lateinit var repository: MovieRepositoryImpl
+    private lateinit var repository: {Feature}RepositoryImpl
 
     @Before
     fun setUp() {
@@ -172,9 +167,9 @@ class MovieRepositoryImplIntegrationTest {
             .addConverterFactory(/* kotlinx.serialization */)
             .build()
 
-        val remote = TmdbMovieDataSource(retrofit.create(TmdbApiService::class.java))
-        val local = RoomMovieDataSource(db.movieDao(), db.genreDao())
-        repository = MovieRepositoryImpl(remote, local, FakeLogger())
+        val remote = Tmdb{Feature}DataSource(retrofit.create(Tmdb{Feature}ApiService::class.java))
+        val local = Room{Feature}DataSource(db.{feature}Dao())
+        repository = {Feature}RepositoryImpl(remote, local, FakeLogger())
     }
 
     @After
@@ -182,19 +177,19 @@ class MovieRepositoryImplIntegrationTest {
 
     @Test
     fun `returns network data on success`() = runBlocking {
-        mockWebServer.enqueue(MockResponse().setBody(TRENDING_JSON_FIXTURE))
-        repository.getTrendingMovies().first().also { movies ->
-            assertEquals(20, movies.size)
-            assertEquals("Inception", movies.first().title)
+        mockWebServer.enqueue(MockResponse().setBody(JSON_FIXTURE))
+        repository.get{Items}().first().also { items ->
+            assertFalse(items.isEmpty())
         }
     }
 
     @Test
     fun `falls back to cache when network fails`() = runBlocking {
-        local.saveMovies(fakeMovies)
+        // seed local cache
+        local.save{Items}(fakeItems)
         mockWebServer.enqueue(MockResponse().setResponseCode(500))
-        repository.getTrendingMovies().first().also { movies ->
-            assertEquals(fakeMovies, movies)
+        repository.get{Items}().first().also { items ->
+            assertEquals(fakeItems, items)
         }
     }
 }
@@ -206,35 +201,32 @@ Room DAO tests follow the same pattern (`inMemoryDatabaseBuilder`) but test DAOs
 
 ## Integration Tests — Presentation Layer
 
-Uses real UseCase implementations backed by a `FakeMovieRepository` (no MockK at this level). Located in `src/test/` of `:feature:movies:presentation:implementation`.
+Uses real UseCase implementations backed by a `Fake{Feature}Repository` (no MockK at this level). Located in `src/test/` of `:feature:{feature}:presentation:implementation`.
 
 ```kotlin
-// FakeMovieRepository.kt
-class FakeMovieRepository(
-    var movies: List<Movie> = emptyList(),
-    var genres: List<Genre> = emptyList(),
-) : MovieRepository {
-    override fun getTrendingMovies(): Flow<List<Movie>> = flowOf(movies)
-    override fun getMovieDetail(id: Int): Flow<MovieDetail> = flowOf(fakeMovieDetail)
-    override fun getGenres(): Flow<List<Genre>> = flowOf(genres)
+// Fake{Feature}Repository.kt
+class Fake{Feature}Repository(
+    var items: List<{Item}> = emptyList(),
+) : {Feature}Repository {
+    override fun get{Items}(): Flow<List<{Item}>> = flowOf(items)
+    override fun get{Item}Detail(id: Int): Flow<{Item}Detail> = flowOf(fake{Item}Detail)
 }
 
-// TrendingMoviesViewModelIntegrationTest.kt
+// {Screen}ViewModelIntegrationTest.kt
 @ExtendWith(MainDispatcherExtension::class)
-class TrendingMoviesViewModelIntegrationTest {
+class {Screen}ViewModelIntegrationTest {
 
-    private val fakeRepo = FakeMovieRepository(movies = fakeMovies, genres = fakeGenres)
-    private val getTrendingMovies = GetTrendingMoviesUseCaseImpl(fakeRepo)
-    private val getGenres = GetGenresUseCaseImpl(fakeRepo)
-    private val viewModel by lazy { TrendingMoviesViewModel(getTrendingMovies, getGenres, FakeLogger()) }
+    private val fakeRepo = Fake{Feature}Repository(items = fakeItems)
+    private val get{Items} = Get{Items}UseCaseImpl(fakeRepo)
+    private val viewModel by lazy { {Screen}ViewModel(get{Items}, FakeLogger()) }
 
     @Test
-    fun `genre filter intent reduces movie list end-to-end`() = runTest {
+    fun `filter intent reduces item list end-to-end`() = runTest {
         viewModel.state.test {
             skipItems(2) // loading + initial success
-            viewModel.handleIntent(TrendingMoviesIntent.FilterByGenre(28))
+            viewModel.handleIntent({Screen}Intent.Filter(someFilter))
             val filtered = awaitItem()
-            assertTrue(filtered.movies.all { 28 in it.genreIds })
+            assertTrue(filtered.items.all { it.matches(someFilter) })
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -250,27 +242,24 @@ UI tests live in `src/androidTest/` and use `createComposeRule()` (screen-level,
 ```
 src/androidTest/.../
 ├── robots/
-│   ├── TrendingMoviesRobot.kt
-│   └── MovieDetailRobot.kt
-├── TrendingMoviesScreenTest.kt
-└── MovieDetailScreenTest.kt
+│   ├── {Screen}Robot.kt
+│   └── {OtherScreen}Robot.kt
+├── {Screen}ScreenTest.kt
+└── {OtherScreen}ScreenTest.kt
 ```
 
 ```kotlin
-// robots/TrendingMoviesRobot.kt
-class TrendingMoviesRobot(private val composeRule: ComposeContentTestRule) {
+// robots/{Screen}Robot.kt
+class {Screen}Robot(private val composeRule: ComposeContentTestRule) {
 
-    fun assertMoviesListVisible() = apply {
-        composeRule.onNodeWithTag("movies_list").assertIsDisplayed()
+    fun assert{List}Visible() = apply {
+        composeRule.onNodeWithTag("{list}_list").assertIsDisplayed()
     }
-    fun assertMovieVisible(title: String) = apply {
-        composeRule.onNodeWithText(title).assertIsDisplayed()
+    fun assert{Item}Visible(label: String) = apply {
+        composeRule.onNodeWithText(label).assertIsDisplayed()
     }
-    fun filterByGenre(genreName: String) = apply {
-        composeRule.onNodeWithText(genreName).performClick()
-    }
-    fun clickMovie(title: String) = apply {
-        composeRule.onNodeWithText(title).performClick()
+    fun click{Action}(label: String) = apply {
+        composeRule.onNodeWithText(label).performClick()
     }
     fun assertLoadingVisible() = apply {
         composeRule.onNodeWithTag("loading_view").assertIsDisplayed()
@@ -281,50 +270,50 @@ class TrendingMoviesRobot(private val composeRule: ComposeContentTestRule) {
 }
 
 // DSL entry point
-fun ComposeContentTestRule.trendingMoviesRobot(
-    block: TrendingMoviesRobot.() -> Unit,
-) = TrendingMoviesRobot(this).apply(block)
+fun ComposeContentTestRule.{screen}Robot(
+    block: {Screen}Robot.() -> Unit,
+) = {Screen}Robot(this).apply(block)
 
-// TrendingMoviesScreenTest.kt
+// {Screen}ScreenTest.kt
 @RunWith(AndroidJUnit4::class)
-class TrendingMoviesScreenTest {
+class {Screen}ScreenTest {
 
     @get:Rule val composeRule = createComposeRule()
 
     @Test
-    fun `movies list is visible when data is loaded`() {
+    fun `list is visible when data is loaded`() {
         composeRule.setContent {
             AmroTheme {
-                TrendingMoviesContent(
-                    state = TrendingMoviesState(isLoading = false, movies = fakeMovies, genres = fakeGenres),
+                {Screen}Content(
+                    state = {Screen}State(isLoading = false, items = fakeItems),
                     onIntent = {},
                 )
             }
         }
-        composeRule.trendingMoviesRobot {
-            assertMoviesListVisible()
-            assertMovieVisible(fakeMovies.first().title)
+        composeRule.{screen}Robot {
+            assert{List}Visible()
+            assert{Item}Visible(fakeItems.first().title)
         }
     }
 
     @Test
-    fun `clicking genre chip fires FilterByGenre intent`() {
-        val onIntent = mockk<(TrendingMoviesIntent) -> Unit>(relaxed = true)
+    fun `clicking filter fires correct intent`() {
+        val onIntent = mockk<({Screen}Intent) -> Unit>(relaxed = true)
         composeRule.setContent {
             AmroTheme {
-                TrendingMoviesContent(state = TrendingMoviesState(genres = fakeGenres), onIntent = onIntent)
+                {Screen}Content(state = {Screen}State(/* fake data */), onIntent = onIntent)
             }
         }
-        composeRule.trendingMoviesRobot { filterByGenre(fakeGenres.first().name) }
-        verify { onIntent(TrendingMoviesIntent.FilterByGenre(fakeGenres.first().id)) }
+        composeRule.{screen}Robot { click{Action}(fakeFilter.label) }
+        verify { onIntent({Screen}Intent.{FilterIntent}(fakeFilter.id)) }
     }
 
     @Test
     fun `loading indicator is shown when isLoading is true`() {
         composeRule.setContent {
-            AmroTheme { TrendingMoviesContent(state = TrendingMoviesState(isLoading = true), onIntent = {}) }
+            AmroTheme { {Screen}Content(state = {Screen}State(isLoading = true), onIntent = {}) }
         }
-        composeRule.trendingMoviesRobot { assertLoadingVisible() }
+        composeRule.{screen}Robot { assertLoadingVisible() }
     }
 }
 ```
@@ -342,7 +331,7 @@ class TrendingMoviesScreenTest {
 | Utility | Purpose |
 |---------|---------|
 | `MainDispatcherExtension` | JUnit 5 `Extension` that sets `Dispatchers.Main` to `UnconfinedTestDispatcher` |
-| `FakeMovieRepository` | In-memory `MovieRepository` implementation for integration/ViewModel tests |
+| `Fake{Feature}Repository` | In-memory `{Feature}Repository` for integration/ViewModel tests |
 | `FakeLogger` | No-op `Logger` for tests |
 | `mockk(relaxed = true)` | Ignores calls on deps like `Logger` without explicit stubs |
 | `coEvery / coVerify` | For suspend functions |
