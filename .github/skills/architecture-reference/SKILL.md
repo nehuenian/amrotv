@@ -265,7 +265,7 @@ class MyViewModel @Inject constructor(val dep: Dep) : MviViewModel<...>(...)
 @Serializable data class MovieDetail(val movieId: Int)
 ```
 
-> Read the canonical nav host: `app/src/main/kotlin/nl/abnamro/amrotv/AmroNavHost.kt` (created in Commit 11)
+> `AmroNavHost.kt` does not exist yet — it will be created in Commit 11. Until then, use the navigation rules below as the source of truth.
 
 Rules:
 - Routes: `@Serializable data object` or `data class` in `:app`.
@@ -280,7 +280,7 @@ Rules:
 
 ### Screen structure
 
-> Read a canonical screen: `feature/movies/ui/src/main/kotlin/nl/abnamro/amrotv/feature/movies/ui/TrendingMoviesScreen.kt` (created in Commit 10)
+> `TrendingMoviesScreen.kt` does not exist yet — it will be created in Commit 10. Until then, use the screen rules below as the source of truth.
 
 Rules:
 - Always split into `Screen` (stateful) and `Content` (stateless + previewable).
@@ -378,9 +378,9 @@ KDoc is **required** on interfaces, abstract classes, and domain model propertie
 ### Examples
 
 > Read real KDoc examples in:
-> - `core/mvi/src/main/kotlin/nl/abnamro/amrotv/core/mvi/MviViewModel.kt` — abstract class with type-param docs
-> - `feature/movies/data/src/main/kotlin/.../datasource/remote/RemoteMovieDataSource.kt` — interface with `@param`/`@return`/`@throws`
-> - `feature/movies/domain/api/src/main/kotlin/.../MovieDetail.kt` — domain model with property KDoc on non-obvious fields
+> - `core/mvi/android/src/main/kotlin/nl/abnamro/amrotv/core/mvi/BaseAmroTvViewModel.kt` — abstract class with type-param docs
+> - `core/mvi/kotlin/src/main/kotlin/nl/abnamro/amrotv/core/mvi/StateReducer.kt` — interface with member KDoc
+> - `core/network/src/main/kotlin/nl/abnamro/amrotv/core/network/NetworkResult.kt` — sealed class with property docs
 
 ### Anti-patterns
 

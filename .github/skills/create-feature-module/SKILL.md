@@ -81,10 +81,15 @@ Convention plugin combinations per module type:
 
 All modules need `android { namespace = "{featurePackage}.{submodule}" }` (except pure Kotlin `domain/api`).
 
-Inter-module dependencies use type-safe project accessors (`projects.*`):
+Inter-module dependencies use type-safe project accessors (`projects.*`). The correct MVI module depends on the submodule:
+- `presentation:api` → `projects.core.mvi.kotlin` (interfaces + pure ViewModel only)
+- `presentation:implementation` → `projects.core.mvi.android` (Android ViewModel with lifecycle)
 
 ```kotlin
 implementation(projects.feature.{featureName}.domain.api)
+// presentation:api uses:
+implementation(projects.core.mvi.kotlin)
+// presentation:implementation uses:
 implementation(projects.core.mvi.android)
 implementation(projects.libraries.logger.api)
 ```

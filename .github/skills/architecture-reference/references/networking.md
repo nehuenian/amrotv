@@ -78,7 +78,7 @@ Passed into `NetworkModule` via a dedicated Hilt qualifier (`@TmdbApiKey`).
 
 > Read the canonical implementation: `core/network/src/main/kotlin/nl/abnamro/amrotv/core/network/AuthInterceptor.kt`
 >
-> Adds `Authorization: Bearer <token>` header to every request using the `@TmdbApiKey`-qualified String injected via Hilt.
+> Adds `Authorization: Bearer <token>` header to every request. Uses `BuildConfigProvider` (injected via Hilt) and reads `buildConfigProvider.tmdbReadAccessToken`.
 
 ---
 

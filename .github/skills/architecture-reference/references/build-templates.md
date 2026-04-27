@@ -32,7 +32,7 @@ Each module picks only the plugins it needs — they compose cleanly.
 Always use type-safe project accessors (`projects.*`):
 
 ```kotlin
-implementation(projects.core.mvi)
+implementation(projects.core.mvi.kotlin)
 implementation(projects.libraries.logger.api)
 ```
 
