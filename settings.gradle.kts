@@ -27,9 +27,10 @@ dependencyResolutionManagement {
 
 rootProject.name = "AMROTV"
 include(":app")
+include(":core:domain")
 include(":core:mvi:kotlin")
 include(":core:mvi:android")
-include(":core:network")
+include(":core:data")
 include(":core:build-config")
 include(":core:ui")
 include(":libraries:logger:api")

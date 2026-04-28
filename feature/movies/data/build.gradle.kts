@@ -10,7 +10,7 @@ android {
 
 dependencies {
     implementation(projects.feature.movies.domain.api)
-    implementation(projects.core.network)
+    implementation(projects.core.data)
     implementation(projects.libraries.logger.api)
     implementation(libs.retrofit)
     implementation(libs.retrofit.kotlinx.serialization)

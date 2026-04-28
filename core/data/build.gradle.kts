@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "nl.abnamro.amrotv.core.network"
+    namespace = "nl.abnamro.amrotv.core.data"
 }
 
 dependencies {

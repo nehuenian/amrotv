@@ -1,12 +1,14 @@
-package nl.abnamro.amrotv.core.network
+package nl.abnamro.amrotv.core.data.di
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import nl.abnamro.amrotv.core.buildconfig.BuildConfigProvider
+import nl.abnamro.amrotv.core.data.interceptors.AuthInterceptor
 import nl.abnamro.amrotv.libraries.logger.api.LogLevel
 import nl.abnamro.amrotv.libraries.logger.api.Logger
 import okhttp3.MediaType.Companion.toMediaType
@@ -40,6 +42,7 @@ object NetworkModule {
 
     @Provides
     @Singleton
+    @JvmName("provideOkHttpClient")
     internal fun provideOkHttpClient(
         authInterceptor: AuthInterceptor,
         loggingInterceptor: HttpLoggingInterceptor,
@@ -48,6 +51,7 @@ object NetworkModule {
         .addInterceptor(loggingInterceptor)
         .build()
 
+    @OptIn(ExperimentalSerializationApi::class)
     @Provides
     @Singleton
     fun provideRetrofitBuilder(okHttpClient: OkHttpClient, json: Json): Retrofit.Builder =

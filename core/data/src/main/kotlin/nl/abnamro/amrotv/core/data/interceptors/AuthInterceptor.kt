@@ -1,4 +1,4 @@
-package nl.abnamro.amrotv.core.network
+package nl.abnamro.amrotv.core.data.interceptors
 
 import nl.abnamro.amrotv.core.buildconfig.BuildConfigProvider
 import okhttp3.Interceptor
