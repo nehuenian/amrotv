@@ -1,9 +1,9 @@
 package nl.abnamro.amrotv.feature.movies.domain.api.repository
 
+import nl.abnamro.amrotv.core.domain.model.Outcome
 import nl.abnamro.amrotv.feature.movies.domain.api.model.Genre
 import nl.abnamro.amrotv.feature.movies.domain.api.model.Movie
 import nl.abnamro.amrotv.feature.movies.domain.api.model.MovieDetail
-import nl.abnamro.amrotv.feature.movies.domain.api.model.Outcome
 
 /**
  * Source of truth for all movie data.
