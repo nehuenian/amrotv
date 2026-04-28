@@ -120,18 +120,44 @@ interface MviEffect
 ### State — `presentation:api`
 
 ```kotlin
+// Requires: implementation(libs.kotlinx.collections.immutable)
 data class {Screen}State(
     val isLoading: Boolean = false,
-    val error: String? = null,
+    val errors: ImmutableList<{Feature}Error> = persistentListOf(),
     // ... screen-specific fields
 ) : MviState
 ```
 
 Rules:
-- `isLoading`, `error` are always present.
+- `isLoading`, `errors` are always present.
 - State is a `data class`, never a sealed class.
 - State holds **domain models** directly (not DTOs).
-- Error is `String?` (null = no error). Never store `Exception` objects in state.
+- Errors are `ImmutableList<{Feature}Error>` (empty = no errors). Multiple errors can coexist (e.g. movies + genres both failing). Never store `Exception` objects in state.
+- **Never** put raw `Throwable.message` strings in state — they are unstable, potentially null, and too technical for UI. Use `{Feature}Error` enum values; the UI maps each entry to a string resource.
+
+### Error enum — `presentation:api`
+
+Each feature defines a typed error enum at the top level of `presentation:api`:
+
+```kotlin
+/**
+ * Represents a categorised error that can occur in the {feature} feature.
+ *
+ * The UI layer maps each entry to an Android string resource, keeping hardcoded
+ * strings out of the domain and presentation layers and enabling proper localisation.
+ */
+enum class {Feature}Error {
+    /** Failed to load the primary data for this feature. */
+    {THING}_LOAD_FAILED,
+    // ... one entry per independent failure type
+}
+```
+
+Rules:
+- Declare it as a top-level `enum class` in `presentation:api` (not inside a screen sub-package).
+- One entry per independent failure type (e.g. `MOVIES_LOAD_FAILED`, `GENRES_LOAD_FAILED`).
+- The UI layer (`:ui`) maps each entry to a string resource via `when(error) { … }` — no strings ever enter the presentation layer.
+- Raw `Throwable.message` stays exclusively in `logger.log(…)` calls.
 
 ### Intent — `presentation:api`
 
@@ -147,13 +173,14 @@ Rules:
 - `sealed interface`, not `sealed class`.
 - `data object` for intents with no payload; `data class` for intents with payload.
 - Names are imperative verbs: `Load`, `Filter`, `Toggle`, `Open`, `Retry`.
+- Only user intents belong here — **never** result types (`ContentLoaded`, `LoadFailed`).
 
 ### Effect — `presentation:api`
 
 ```kotlin
 sealed interface {Screen}Effect : MviEffect {
     data class NavigateToMovieDetail(val movieId: Int) : {Screen}Effect
-    data class ShowError(val message: String) : {Screen}Effect
+    data class OpenUrl(val url: String) : {Screen}Effect
 }
 ```
 
@@ -161,6 +188,34 @@ Rules:
 - Effects are **one-time events** (navigation, snackbar, URL opening).
 - Collected with `LaunchedEffect(Unit)` in the screen composable via `viewModel.effects.collect`.
 - Never re-send effects on recomposition.
+- **Do not add a `ShowError` effect** — errors belong in `state.errors` (`ImmutableList<{Feature}Error>`) for persistent UI display. Effects are for transient, non-recoverable one-shots only.
+
+### StateReducers — `presentation:implementation`
+
+An injectable factory class whose methods each return a `StateReducer<{Screen}State>` lambda
+for one named transition. All state logic lives here — the ViewModel is pure orchestration.
+
+```kotlin
+// {Screen}StateReducers.kt — in presentation:implementation (NOT in :api)
+class {Screen}StateReducers @Inject constructor() {
+
+    fun initialState(): {Screen}State = {Screen}State()
+
+    fun loading(): StateReducer<{Screen}State> =
+        StateReducer { it.copy(isLoading = true, errors = persistentListOf()) }
+
+    fun contentLoaded(data: List<DomainModel>): StateReducer<{Screen}State> =
+        StateReducer { it.copy(isLoading = false, data = data, errors = persistentListOf()) }
+
+    fun loadFailed(errors: List<{Feature}Error>): StateReducer<{Screen}State> =
+        StateReducer { it.copy(isLoading = false, errors = errors.toPersistentList()) }
+}
+```
+
+Rules:
+- Must be `public` — injected into a `@HiltViewModel` which is `public`.
+- Each method is a pure function — no side effects.
+- `initialState()` returns the screen's default state. It lives here (not in the ViewModel) so that if the initial state ever requires injected dependencies (e.g. a persisted user preference), they are added to `StateReducers`'s constructor without touching the ViewModel.
 
 ### ViewModel — `presentation:implementation`
 
@@ -168,45 +223,54 @@ Rules:
 @HiltViewModel
 class {Screen}ViewModel @Inject constructor(
     private val getSomethingUseCase: GetSomethingUseCase,
+    private val stateReducers: {Screen}StateReducers,
     private val logger: Logger,
-) : MviViewModel<{Screen}State, {Screen}Intent, {Screen}Effect>(
-    initialState = {Screen}State()
+) : BaseAmroTvViewModel<{Screen}State, {Screen}Intent, {Screen}Effect>(
+    initialState = stateReducers.initialState(),
 ) {
     init { handleIntent({Screen}Intent.Load) }
 
     override fun handleIntent(intent: {Screen}Intent) {
         when (intent) {
-            is {Screen}Intent.Load -> loadData()
-            is {Screen}Intent.FilterByGenre -> updateState { copy(selectedGenreId = intent.genreId) }
-            is {Screen}Intent.OpenDetail -> viewModelScope.sendEffect(
-                {Screen}Effect.NavigateToMovieDetail(intent.movieId)
-            )
+            is {Screen}Intent.Load          -> {
+                updateState { it.reduceWith(stateReducers.loading()) }
+                loadData()
+            }
+            is {Screen}Intent.FilterByGenre -> {
+                updateState { it.reduceWith(stateReducers.filterByGenre(intent.genreId)) }
+                loadData()
+            }
+            is {Screen}Intent.OpenDetail    -> sendEffect({Screen}Effect.NavigateToMovieDetail(intent.movieId))
         }
     }
 
     private fun loadData() {
         viewModelScope.launch {
-            updateState { copy(isLoading = true, error = null) }
-            getSomethingUseCase()
-                .catch { e ->
-                    logger.e("TAG", "Failed to load", e)
-                    updateState { copy(isLoading = false, error = e.message) }
+            when (val result = getSomethingUseCase()) {
+                is Outcome.Success -> updateState { it.reduceWith(stateReducers.contentLoaded(result.data)) }
+                is Outcome.Error   -> {
+                    logger.log(LogLevel.ERROR, TAG, "Failed to load: ${result.cause.message}", result.cause)
+                    updateState { it.reduceWith(stateReducers.loadFailed(listOf({Feature}Error.{THING}_LOAD_FAILED))) }
                 }
-                .collect { data ->
-                    updateState { copy(isLoading = false, data = data) }
-                }
+            }
         }
+    }
+
+    private companion object {
+        const val TAG = "{Screen}ViewModel"
     }
 }
 ```
 
 Rules:
 - Always `@HiltViewModel` + `@Inject constructor`.
-- Use `viewModelScope.launch` for coroutine work.
-- Reset `isLoading = false` in both success and error paths.
-- Reset `error = null` when retrying.
-- Use `catch {}` on flows for error handling.
-- Inject `Logger` — never use `Log.d` directly.
+- Extend `BaseAmroTvViewModel<S, I, E>` — **three** type params; pass `initialState`.
+- Inject `{Screen}StateReducers` — all state transitions go through it.
+- Apply transitions with `updateState { it.reduceWith(stateReducers.xxx()) }`.
+- **Never** inline `copy()` calls in the ViewModel — all state logic belongs in `StateReducers`.
+- Use `sendEffect(effect)` (direct call — not `viewModelScope.sendEffect`).
+- Inject `Logger` — never use `Log.d` directly. Call `logger.log(LogLevel.LEVEL, TAG, msg, throwable)`.
+- `Logger` has no shorthand methods (`d/e/w/i`) — always use `logger.log(LogLevel.X, ...)`.
 
 ---
 
@@ -218,7 +282,7 @@ Rules:
 | `domain:implementation` | `domain:api`, Hilt | Android UI, Retrofit, Room |
 | `data` | `domain:api`, `core:network`, `libraries:logger:api`, Hilt | `presentation:*` |
 | `presentation:api` | `domain:api`, `core:mvi:kotlin` | ViewModels, Android UI |
-| `presentation:implementation` | `presentation:api`, `domain:api`, `core:mvi:android`, `libraries:logger:api`, Hilt | Compose, NavController |
+| `presentation:implementation` | `presentation:api`, `domain:api`, `core:mvi:android`, `core:mvi:kotlin`, `libraries:logger:api`, Hilt | Compose, NavController |
 | `ui` | `presentation:api`, `core:ui`, Compose | `domain:*` directly; use `hiltViewModel()` |
 
 Key rules:

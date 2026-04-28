@@ -2,26 +2,19 @@ package nl.abnamro.amrotv.feature.movies.domain.api.usecase
 
 import nl.abnamro.amrotv.core.domain.model.Outcome
 import nl.abnamro.amrotv.feature.movies.domain.api.model.Movie
-import nl.abnamro.amrotv.feature.movies.domain.api.model.SortOption
-import nl.abnamro.amrotv.feature.movies.domain.api.model.SortOrder
 
 /**
- * Retrieves the trending movies list, applying optional genre filtering and sorting. Filtering and
- * sorting are applied client-side.
+ * Retrieves the full list of trending movies without any filtering or sorting.
+ *
+ * Use [FilterAndSortMoviesUseCase] to apply genre filtering and sorting on the result.
  */
 fun interface GetTrendingMoviesUseCase {
 
     /**
-     * Fetches, filters, and sorts the trending movies list.
+     * Fetches the complete trending movies list from the data source.
      *
-     * @param genreId when non-null, only movies whose genre list contains this ID are returned.
-     * @param sortOption the field to sort the result by.
-     * @param sortOrder ascending or descending direction for the sort.
-     * @return [Outcome.Success] with the filtered and sorted movie list, or [Outcome.Error] on failure.
+     * @return [Outcome.Success] with the full unfiltered movie list, or [Outcome.Error] on failure.
+     * [Outcome.Error] may carry stale cached data.
      */
-    suspend operator fun invoke(
-        genreId: Int?,
-        sortOption: SortOption,
-        sortOrder: SortOrder,
-    ): Outcome<List<Movie>>
+    suspend operator fun invoke(): Outcome<List<Movie>>
 }

@@ -8,5 +8,6 @@ android {
 
 dependencies {
     implementation(projects.feature.movies.domain.api)
-    implementation(projects.core.mvi)
+    implementation(projects.core.mvi.kotlin)
+    implementation(libs.kotlinx.collections.immutable)
 }
