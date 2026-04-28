@@ -4,7 +4,7 @@ import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.test.runTest
-import nl.abnamro.amrotv.feature.movies.domain.api.model.Outcome
+import nl.abnamro.amrotv.core.domain.model.Outcome
 import nl.abnamro.amrotv.feature.movies.domain.api.repository.MovieRepository
 import nl.abnamro.amrotv.feature.movies.domain.api.usecase.GetGenresUseCase
 import nl.abnamro.amrotv.feature.movies.domain.implementation.usecase.MovieDomainMocks.Genres

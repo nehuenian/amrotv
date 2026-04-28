@@ -1,7 +1,7 @@
 package nl.abnamro.amrotv.feature.movies.domain.api.usecase
 
+import nl.abnamro.amrotv.core.domain.model.Outcome
 import nl.abnamro.amrotv.feature.movies.domain.api.model.MovieDetail
-import nl.abnamro.amrotv.feature.movies.domain.api.model.Outcome
 
 /**
  * Retrieves the full detail of a single movie.

@@ -1,7 +1,7 @@
 package nl.abnamro.amrotv.feature.movies.domain.api.usecase
 
+import nl.abnamro.amrotv.core.domain.model.Outcome
 import nl.abnamro.amrotv.feature.movies.domain.api.model.Movie
-import nl.abnamro.amrotv.feature.movies.domain.api.model.Outcome
 import nl.abnamro.amrotv.feature.movies.domain.api.model.SortOption
 import nl.abnamro.amrotv.feature.movies.domain.api.model.SortOrder
 
