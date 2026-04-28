@@ -20,7 +20,7 @@ read .github/skills/architecture-reference/SKILL.md
 read .github/skills/architecture-reference/references/build-templates.md
 read .github/skills/architecture-reference/references/data-layer.md
 read .github/skills/architecture-reference/references/networking.md
-read .github/skills/architecture-reference/references/testing.md
+read .github/skills/unit-testing/SKILL.md
 ```
 
 These files are the authoritative source for every pattern and convention in this codebase. **All review criteria come exclusively from them.** Do not apply rules not found in the skill.
@@ -51,7 +51,8 @@ Derive your full checklist directly from the skill sections you just read:
 - **KDoc Conventions** — from the *KDoc Conventions* section
 - **Logging** — Logger interface usage, no direct Timber calls outside `logger:implementation`
 - **Build files** — from *build-templates.md*
-- **Data / Networking / Testing** — from the respective reference files
+- **Data / Networking** — from the respective reference files
+- **Testing patterns** — from `unit-testing` skill (GIVEN/WHEN/THEN, MockK, Robot Pattern)
 
 Every flag you raise must cite the specific skill section it comes from.
 

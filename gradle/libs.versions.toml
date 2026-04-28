@@ -20,9 +20,10 @@ room = "2.8.4"
 kotlinxSerialization = "1.7.3"
 kotlinxCoroutines = "1.9.0"
 junitJupiter = "5.11.0"
+junitPlatform = "1.11.0"
 mockk = "1.13.12"
 turbine = "1.2.0"
-mannodermausJunit5 = "1.11.0"
+mannodermausJunit5 = "1.11.0.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -65,6 +66,7 @@ androidx-lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lif
 junit-jupiter-api = { group = "org.junit.jupiter", name = "junit-jupiter-api", version.ref = "junitJupiter" }
 junit-jupiter-engine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", version.ref = "junitJupiter" }
 junit-jupiter-params = { group = "org.junit.jupiter", name = "junit-jupiter-params", version.ref = "junitJupiter" }
+junit-platform-launcher = { group = "org.junit.platform", name = "junit-platform-launcher", version.ref = "junitPlatform" }
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 mockk-android = { group = "io.mockk", name = "mockk-android", version.ref = "mockk" }
 turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
