@@ -14,27 +14,40 @@ import kotlinx.coroutines.launch
 /**
  * Base ViewModel for all MVI screens.
  *
- * Implements [AmroTvViewModel] and delegates pure state transitions to [StateReducer].
- * Subclasses override [handleIntent] to orchestrate async work and dispatch effects
- * via [sendEffect] and pure state changes via [reduce].
+ * Implements [AmroTvViewModel] and delegates state transitions to injectable
+ * `{Screen}StateReducers` factory classes via [updateState]. Each state transition
+ * is expressed as a [StateReducer] lambda returned by a named factory method,
+ * keeping pure state logic isolated and testable without coroutines or a ViewModel.
  *
- * @param reducer drives initial state and all pure state transitions.
+ * Subclasses override [handleIntent] to orchestrate async work, call [updateState]
+ * for each state transition, and dispatch one-time commands via [sendEffect].
+ *
+ * @param initialState the state emitted before any intent is processed.
  */
 abstract class BaseAmroTvViewModel<S : MviState, I : MviIntent, E : MviEffect>(
-    private val reducer: StateReducer<S, I>,
+    initialState: S,
 ) : ViewModel(), AmroTvViewModel<S, I, E> {
 
-    private val _state = MutableStateFlow(reducer.initialState)
+    private val _state = MutableStateFlow(initialState)
     override val state: StateFlow<S> = _state.asStateFlow()
 
     private val _effects = Channel<E>(Channel.BUFFERED)
     override val effects: Flow<E> = _effects.receiveAsFlow()
 
-    override fun reduce(intent: I) {
-        _state.update { current -> reducer.reduce(current, intent) }
+    /**
+     * Applies [block] to the current state atomically and emits the result.
+     *
+     * Use this inside [handleIntent] or private async functions to apply a
+     * [StateReducer] from the screen's `{Screen}StateReducers` factory.
+     *
+     * @param block a pure function that transforms the current state into the next state.
+     */
+    protected fun updateState(block: (S) -> S) {
+        _state.update(block)
     }
 
-    override fun sendEffect(effect: E) {
+    protected fun sendEffect(effect: E) {
         viewModelScope.launch { _effects.send(effect) }
     }
 }
+

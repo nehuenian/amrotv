@@ -1,31 +1,44 @@
 package nl.abnamro.amrotv.core.mvi
 
 /**
- * Pure state machine for a single MVI screen.
+ * Pure, single-responsibility state transformer for one MVI screen state.
  *
- * Both the initial state and all state transitions are defined here, keeping
- * state logic isolated and unit-testable without a ViewModel or coroutines.
+ * Each instance represents **one named transition** (e.g. loading, contentLoaded, loadFailed).
+ * Instances are produced by an injectable `{Screen}StateReducers` factory class, keeping state
+ * logic isolated and unit-testable without a ViewModel or coroutines.
  *
  * Implementations must be **pure**: no coroutines, no I/O, no side effects.
- * Async work and one-time effects belong in [AmroTvViewModel].
  *
- * @param S State type — a [MviState] data class.
- * @param I Intent type — a [MviIntent] sealed interface.
+ * Usage:
+ * ```kotlin
+ * updateState { it.reduceWith(stateReducers.contentLoaded(movies, genres)) }
+ * ```
+ *
+ * @param S Screen state type — a [MviState] data class.
  */
-interface StateReducer<S : MviState, I : MviIntent> {
-
-    /** State emitted before any intent is processed. */
-    val initialState: S
+fun interface StateReducer<S : MviState> {
 
     /**
-     * Computes the next state from [currentState] and [intent].
+     * Computes the next state from [currentState].
      *
-     * Must be a pure function: same inputs always produce the same output,
+     * Must be a pure function: same input always produces the same output,
      * with no observable side effects.
      *
-     * @param currentState the state before this intent is applied.
-     * @param intent the user action driving the state transition.
-     * @return the next state after applying [intent] to [currentState].
+     * @param currentState the state before this transition is applied.
+     * @return the next state after applying this transition.
      */
-    fun reduce(currentState: S, intent: I): S
+    fun transform(currentState: S): S
 }
+
+/**
+ * Applies [reducer] to this state and returns the result.
+ */
+fun <S : MviState> S.reduceWith(reducer: StateReducer<S>): S = reducer.transform(this)
+
+/**
+ * Applies [reducerProvider] only when [predicate] is true; returns the state unchanged otherwise.
+ */
+inline fun <S : MviState> S.reduceWithIf(
+    reducerProvider: (S) -> StateReducer<S>,
+    predicate: (S) -> Boolean,
+): S = if (predicate(this)) reducerProvider(this).transform(this) else this
