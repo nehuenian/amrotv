@@ -16,9 +16,9 @@ object AmroTvDimensions {
     // Corner radii
     val cornerRadiusExtraSmall = 4.dp
     val cornerRadiusSmall = 8.dp
-    val cornerRadiusMedium = 12.dp
-    val cornerRadiusLarge = 16.dp
-    val cornerRadiusExtraLarge = 28.dp
+    val cornerRadiusMedium = 16.dp
+    val cornerRadiusLarge = 24.dp
+    val cornerRadiusExtraLarge = 32.dp
 
     // Spacing and padding
     val spacingExtraSmall = 4.dp
@@ -31,4 +31,7 @@ object AmroTvDimensions {
     val errorIconSize = 64.dp
     val loadingIndicatorSize = 48.dp
     val emptyStateIconSize = 64.dp
+
+    // Elevation
+    val elevationSmall = 4.dp
 }

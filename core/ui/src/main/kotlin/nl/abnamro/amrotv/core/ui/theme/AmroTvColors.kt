@@ -3,7 +3,9 @@ package nl.abnamro.amrotv.core.ui.theme
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
 
 /**
  * ABN Amro palette colors for the AMRO TV app.
@@ -24,6 +26,31 @@ object AmroTvColors {
     val PrimaryGreen = Color(0xFF009488)
     val SecondaryGold = Color(0xFFF9BD20)
     val TertiaryGray = Color(0xFF878787)
+
+    // On-media text — for text/icons overlaid on backdrop images
+    val OnMediaPrimary = Color(0xFFFFFFFF)    // titles, primary actions
+    val OnMediaSecondary = Color(0xCCFFFFFF)  // ratings, secondary labels (80% white)
+    val OnMediaTertiary = Color(0xBFFFFFFF)   // muted labels, e.g. release year (75% white)
+
+    // Secondary text on primary-colored surfaces (e.g. TopAppBar subtitle)
+    val OnPrimarySubtle = Color(0xCCFFFFFF)   // 80% white — visible on primary green
+
+    // Drop shadow applied to all text overlaid on backdrop images.
+    // Ensures legibility regardless of the underlying image brightness.
+    val OnMediaTextShadow = Shadow(
+        color = Color.Black.copy(alpha = 0.75f),
+        offset = Offset(0f, 1f),
+        blurRadius = 6f,
+    )
+
+    // Scrim gradients — for backdrop image overlays
+    val MediaScrimTransparent = Color(0x00000000)        // fully transparent gradient anchor / transparent surfaces
+    val MediaScrimStart = Color(0x26000000)       // 15% black — top of banner gradient
+    val MediaScrimMid = Color(0x59000000)         // 35% black — mid-point stop
+    val MediaScrimEnd = Color(0xD9000000)         // 85% black — bottom of card/banner gradient
+    val MediaScrimDetailStart = Color(0x1A000000) // 10% black — top of detail screen gradient
+    val MediaScrimDetailMid = Color(0x40000000)   // 25% black — mid-point of detail gradient
+    val MediaNavIconBackground = Color(0x66000000) // 40% black — circular background for nav icons over images
 
     // Light mode colors
     private val OnPrimaryLight = Color(0xFFFFFFFF)
