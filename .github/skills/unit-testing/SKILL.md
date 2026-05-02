@@ -84,9 +84,21 @@ class {Subject}Test {
 | **WHEN** | **One specific invocation** with a specific set of parameters | Exact method call + exact arguments |
 | **THEN** | One `@Test` per distinct observable outcome of that invocation | Different concerns (return value, side effect, error fields) |
 
-**GIVEN** describes the context that is set up once for a group of tests via `@BeforeEach`. Example: `GIVEN a list of movies returned by the repository`.
+**GIVEN** describes the context set up once for a group of tests via `@BeforeEach`. A GIVEN block is **required for every test** — even happy-path tests need a GIVEN to affirm the precondition (e.g. `GIVEN valid movie details are available`). Example: `GIVEN a list of movies returned by the repository`.
 
-**WHEN** encodes the exact call being made — including its parameter values. Each unique combination of parameters that produces a different outcome gets its own WHEN class. Example: `WHEN invoked with action genre filter and popularity sort ASC`. Do NOT use category names like "WHEN filtering by genre" that would group tests with different parameters.
+**Key GIVEN rules:**
+- **Always present**: Every test must be nested inside a GIVEN. There is no such thing as a "top-level WHEN" without a GIVEN.
+- **Merge when the context is the same**: If several WHEN blocks share the same preconditions (e.g. use case returns success AND a valid IMDB ID is present AND the screen is open), collapse them into one GIVEN block. Multiple WHENs under a single GIVEN is the preferred shape. Example: `GIVEN the use case returns valid movie details` → `WHEN the screen loads` + `WHEN the user taps IMDB` + `WHEN the user navigates back`.
+- **Keep separate when the context genuinely differs**: error vs. success, or a specific sub-state (e.g. sort sheet open) that is not shared.
+
+**WHEN** encodes the exact call being made with a description of what the parameters *represent* in domain terms. Each unique combination that produces a different outcome gets its own WHEN class.
+
+**Display name rules:**
+- Use **business / domain language** — describe what the user does or what the system shows, never API or intent class names. Bad: `"WHEN FilterByGenre is sent"`. Good: `"WHEN the user selects an action genre as a filter"`.
+- **No raw numbers or IDs** — replace literals with what they represent. Bad: `"WHEN the screen requests detail for movie id = 42"`. Good: `"WHEN the screen requests detail for a valid movie"`. Bad: `"WHEN the user selects genre 28 (Action)"`. Good: `"WHEN the user selects an action genre"`.
+- Enum names and directions are fine: `"popularity sort DESC"`, `"ascending sort order"`.
+
+Do NOT use category names like "WHEN filtering by genre" that would group tests with different parameters — each unique invocation still gets its own WHEN.
 
 **THEN** is where the observable outcomes live. Use multiple `@Test` methods under the same WHEN only when the same invocation produces **multiple distinct concerns that cannot be inferred from each other**:
 - error cause AND error data (two independent fields of `Outcome.Error`)

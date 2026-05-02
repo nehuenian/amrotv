@@ -10,6 +10,8 @@ import nl.abnamro.amrotv.core.mvi.BaseAmroTvViewModel
 import nl.abnamro.amrotv.core.mvi.reduceWith
 import nl.abnamro.amrotv.feature.movies.domain.api.model.Genre
 import nl.abnamro.amrotv.feature.movies.domain.api.model.Movie
+import nl.abnamro.amrotv.feature.movies.domain.api.model.SortOption
+import nl.abnamro.amrotv.feature.movies.domain.api.model.SortOrder
 import nl.abnamro.amrotv.feature.movies.domain.api.usecase.FilterAndSortMoviesUseCase
 import nl.abnamro.amrotv.feature.movies.domain.api.usecase.GetGenresUseCase
 import nl.abnamro.amrotv.feature.movies.domain.api.usecase.GetTrendingMoviesUseCase

@@ -12,34 +12,21 @@ ViewModels collect `StateFlow` on `Dispatchers.Main`. Inside `runTest`, `Dispatc
 
 Create this class once, alongside the ViewModel tests that need it (e.g. `feature/movies/presentation/implementation/src/test/.../MainDispatcherExtension.kt`):
 
-```kotlin
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.setMain
-import org.junit.jupiter.api.extension.AfterEachCallback
-import org.junit.jupiter.api.extension.BeforeEachCallback
-import org.junit.jupiter.api.extension.ExtensionContext
+Read the actual implementation: `feature/movies/presentation/implementation/src/test/kotlin/nl/abnamro/amrotv/feature/movies/presentation/implementation/util/MainDispatcherExtension.kt`
 
-class MainDispatcherExtension : BeforeEachCallback, AfterEachCallback {
-
-    val testDispatcher = UnconfinedTestDispatcher()
-
-    override fun beforeEach(context: ExtensionContext) {
-        Dispatchers.setMain(testDispatcher)
-    }
-
-    override fun afterEach(context: ExtensionContext) {
-        Dispatchers.resetMain()
-    }
-}
-```
+Key points:
+- Uses `StandardTestDispatcher` (lazy, not `UnconfinedTestDispatcher`) so tests can observe intermediate loading states before calling `advanceUntilIdle()`
+- Exposes `testDispatcher: TestDispatcher` for use in `runTest(mainExtension.testDispatcher)`
 
 ### Test class template
 
 ```kotlin
-@ExtendWith(MainDispatcherExtension::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class {Screen}ViewModelTest {
+
+    @JvmField
+    @RegisterExtension
+    val mainExtension = MainDispatcherExtension()
 
     @MockK lateinit var get{Items}: Get{Items}UseCase
     @MockK lateinit var logger: Logger
@@ -51,13 +38,14 @@ class {Screen}ViewModelTest {
         MockKAnnotations.init(this, relaxed = true)
         viewModel = {Screen}ViewModel(
             get{Items} = get{Items},
+            stateReducers = {Screen}StateReducers(/* mappers */),
             logger = logger,
         )
     }
 
     @Nested
-    @DisplayName("GIVEN use case returns success")
-    inner class GivenUseCaseReturnsSuccess {
+    @DisplayName("GIVEN the use case returns valid {items}")
+    inner class GivenUseCaseReturnsValid{Items} {
 
         @BeforeEach
         fun setUp() {
@@ -66,16 +54,17 @@ class {Screen}ViewModelTest {
 
         @Nested
         @DisplayName("WHEN the ViewModel is created")
-        inner class WhenCreated {
+        inner class WhenViewModelIsCreated {
 
             @Test
-            @DisplayName("THEN state transitions from loading to success")
-            fun stateTransitionsToSuccess() = runTest {
+            @DisplayName("THEN state transitions through loading to loaded")
+            fun stateTransitionsToLoaded() = runTest(mainExtension.testDispatcher) {
                 viewModel.state.test {
                     assertTrue(awaitItem().isLoading)
-                    val success = awaitItem()
-                    assertFalse(success.isLoading)
-                    assertNull(success.error)
+                    advanceUntilIdle()
+                    val loaded = awaitItem()
+                    assertFalse(loaded.isLoading)
+                    assertTrue(loaded.errors.isEmpty())
                     cancelAndIgnoreRemainingEvents()
                 }
             }
@@ -83,6 +72,8 @@ class {Screen}ViewModelTest {
     }
 }
 ```
+
+> Use `@JvmField @RegisterExtension` (field-level) — **not** `@ExtendWith(MainDispatcherExtension::class)` (class-level). The field approach gives access to `mainExtension.testDispatcher` for passing to `runTest(mainExtension.testDispatcher)`.
 
 ---
 
