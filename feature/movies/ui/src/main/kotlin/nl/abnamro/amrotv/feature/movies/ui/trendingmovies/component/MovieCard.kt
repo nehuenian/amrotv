@@ -31,11 +31,7 @@ import nl.abnamro.amrotv.feature.movies.ui.theme.MoviesDimensions
 import nl.abnamro.amrotv.feature.movies.ui.trendingmovies.component.preview.MoviePreviewProvider
 
 @Composable
-fun MovieCard(
-    movie: MoviePresentationModel,
-    onMovieClick: (Int) -> Unit,
-    modifier: Modifier = Modifier,
-) {
+fun MovieCard(movie: MoviePresentationModel, onMovieClick: (Int) -> Unit, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     Card(onClick = { onMovieClick(movie.id) }, modifier = modifier.fillMaxWidth()) {
         Box(modifier = Modifier.fillMaxWidth().aspectRatio(2f / 3f)) {
@@ -52,34 +48,21 @@ fun MovieCard(
                         .align(Alignment.BottomCenter)
                         .background(
                             Brush.verticalGradient(
-                                colors =
-                                    listOf(
-                                        AmroTvColors.MediaScrimTransparent,
-                                        AmroTvColors.MediaScrimEnd,
-                                    )
+                                colors = listOf(AmroTvColors.MediaScrimTransparent, AmroTvColors.MediaScrimEnd)
                             )
                         )
             )
-            Column(
-                modifier =
-                    Modifier.align(Alignment.BottomStart).padding(AmroTvDimensions.spacingSmall)
-            ) {
+            Column(modifier = Modifier.align(Alignment.BottomStart).padding(AmroTvDimensions.spacingSmall)) {
                 Text(
                     text = movie.title,
-                    style =
-                        MaterialTheme.typography.titleSmall.copy(
-                            shadow = AmroTvColors.OnMediaTextShadow
-                        ),
+                    style = MaterialTheme.typography.titleSmall.copy(shadow = AmroTvColors.OnMediaTextShadow),
                     color = AmroTvColors.OnMediaPrimary,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                 )
                 Text(
                     text = stringResource(R.string.movie_rating_format, movie.formattedRating),
-                    style =
-                        MaterialTheme.typography.bodySmall.copy(
-                            shadow = AmroTvColors.OnMediaTextShadow
-                        ),
+                    style = MaterialTheme.typography.bodySmall.copy(shadow = AmroTvColors.OnMediaTextShadow),
                     color = AmroTvColors.OnMediaSecondary,
                 )
             }
@@ -89,8 +72,6 @@ fun MovieCard(
 
 @PreviewLightDark
 @Composable
-private fun MovieCardPreview(
-    @PreviewParameter(MoviePreviewProvider::class) movie: MoviePresentationModel
-) {
+private fun MovieCardPreview(@PreviewParameter(MoviePreviewProvider::class) movie: MoviePresentationModel) {
     AmroTvTheme { MovieCard(movie = movie, onMovieClick = {}) }
 }

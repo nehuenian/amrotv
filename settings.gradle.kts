@@ -31,6 +31,8 @@ include(":app")
 
 include(":core:domain")
 
+include(":core:testing")
+
 include(":core:mvi:kotlin")
 
 include(":core:mvi:android")

@@ -1,0 +1,137 @@
+{
+  "results": [
+    {
+      "id": 1318447,
+      "title": "Apex",
+      "release_date": "2026-04-24",
+      "popularity": 520.2524,
+      "vote_average": 6.486,
+      "vote_count": 586,
+      "genre_ids": [
+        28,
+        53
+      ],
+      "poster_path": "/eTp7gSPkSF3Aw79mNx1NkBP1PZT.jpg",
+      "backdrop_path": "/p8777bPIlyFYcjqP2hU8htoz1RG.jpg",
+      "overview": "A grieving woman pushing her limits on a solo adventure in the Australian wild is ensnared in a twisted game with a cunning killer who thinks she's prey."
+    },
+    {
+      "id": 1314481,
+      "title": "The Devil Wears Prada 2",
+      "release_date": "2026-04-29",
+      "popularity": 208.5471,
+      "vote_average": 6.8,
+      "vote_count": 196,
+      "genre_ids": [
+        35,
+        18
+      ],
+      "poster_path": "/xTI42pmsP5EDnvsNJPEDubwWBQO.jpg",
+      "backdrop_path": "/y3fQa7pytlysovXzovpXc1OQlTW.jpg",
+      "overview": "Andy Sachs returns to Runway as Miranda Priestly navigates a new media landscape and Runway's position within. The duo reconnect with former assistant Emily Charlton, now the head of a luxury brand that possesses funding which could ensure Runway's survival."
+    },
+    {
+      "id": 936075,
+      "title": "Michael",
+      "release_date": "2026-04-22",
+      "popularity": 262.1418,
+      "vote_average": 7.47,
+      "vote_count": 434,
+      "genre_ids": [
+        10402,
+        18
+      ],
+      "poster_path": "/j57QWe3OoaXL9Idi9gLtsAybWLP.jpg",
+      "backdrop_path": "/xBT0oNq6rsTFv4SxG5uGRIEOrq6.jpg",
+      "overview": "The story of Michael Jackson, one of the most influential artists the world has ever known, and his life beyond the music. His journey from the discovery of his extraordinary talent as the lead of the Jackson Five, to the visionary artist whose creative ambition fueled a relentless pursuit to become the biggest entertainer in the world, highlighting both his life off-stage and some of the most iconic performances from his early solo career."
+    },
+    {
+      "id": 1292695,
+      "title": "They Will Kill You",
+      "release_date": "2026-03-25",
+      "popularity": 241.089,
+      "vote_average": 6.638,
+      "vote_count": 309,
+      "genre_ids": [
+        28,
+        35,
+        27
+      ],
+      "poster_path": "/6oI4oQKTWMVUlr8Ivqydp28Ruu6.jpg",
+      "backdrop_path": "/qnTdOizsXBzYu3uIbfhHSfE29TE.jpg",
+      "overview": "A woman answers a help wanted ad to be a housekeeper in a mysterious New York City high-rise, unaware that she is entering a community that has seen a number of disappearances over the years and may be under the grip of a Satanic cult."
+    },
+    {
+      "id": 1327819,
+      "title": "Hoppers",
+      "release_date": "2026-03-04",
+      "popularity": 218.0784,
+      "vote_average": 7.725,
+      "vote_count": 681,
+      "genre_ids": [
+        12,
+        16,
+        35,
+        10751,
+        878
+      ],
+      "poster_path": "/xjtWQ2CL1mpmMNwuU5HeS4Iuwuu.jpg",
+      "backdrop_path": "/u53UYu5XG2hNgWGvs3xGhAVzypl.jpg",
+      "overview": "Scientists have discovered how to 'hop' human consciousness into lifelike robotic animals, allowing people to communicate with animals as animals. Animal lover Mabel seizes an opportunity to use the technology, uncovering mysteries within the animal world beyond anything she could have imagined."
+    },
+    {
+      "id": 1007757,
+      "title": "Swapped",
+      "release_date": "2026-05-01",
+      "popularity": 198.5328,
+      "vote_average": 8.4,
+      "vote_count": 32,
+      "genre_ids": [
+        16,
+        12,
+        35,
+        10751,
+        14
+      ],
+      "poster_path": "/tHhxWxge06goXU6ZQH1hj7vK8Hd.jpg",
+      "backdrop_path": "/r4Tfw8CPeeI4EIHI3wH9qNkycZd.jpg",
+      "overview": "A tiny woodland creature and a majestic bird suddenly swap bodies, forcing them to team up to survive the wildest adventure of their lives."
+    },
+    {
+      "id": 687163,
+      "title": "Project Hail Mary",
+      "release_date": "2026-03-15",
+      "popularity": 154.5246,
+      "vote_average": 8.21,
+      "vote_count": 1876,
+      "genre_ids": [
+        878,
+        12
+      ],
+      "poster_path": "/yihdXomYb5kTeSivtFndMy5iDmf.jpg",
+      "backdrop_path": "/8Tfys3mDZVp4tNoH2ktm06a0Tau.jpg",
+      "overview": "Science teacher Ryland Grace wakes up on a spaceship light years from home with no recollection of who he is or how he got there. As his memory returns, he begins to uncover his mission: solve the riddle of the mysterious substance causing the sun to die out. He must call on his scientific knowledge and unorthodox ideas to save everything on Earth from extinction."
+    },
+    {
+      "id": 1226863,
+      "title": "The Super Mario Galaxy Movie",
+      "release_date": "2026-04-01",
+      "popularity": 501.9579,
+      "vote_average": 6.748,
+      "vote_count": 707,
+      "genre_ids": [
+        10751,
+        35,
+        12,
+        14,
+        16
+      ],
+      "poster_path": "/eJGWx219ZcEMVQJhAgMiqo8tYY.jpg",
+      "backdrop_path": "/xTd74mchq96pqfdlgmKDMQx12gv.jpg",
+      "overview": "Having thwarted Bowser's previous plot to marry Princess Peach, Mario and Luigi now face a fresh threat in Bowser Jr., who is determined to liberate his father from captivity and restore the family legacy. Alongside companions new and old, the brothers travel across the stars to stop the young heir's crusade."
+    }
+  ],
+  "page": 1,
+  "total_pages": 1,
+  "total_results": 8
+}

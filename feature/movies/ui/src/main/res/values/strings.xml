@@ -25,6 +25,7 @@
     <string name="movie_detail_default_title">Movie Detail</string>
     <string name="navigate_back_description">Navigate back</string>
     <string name="view_on_imdb">View on IMDb</string>
+    <string name="movie_overview_section">Movie overview</string>
     <string name="show_more">Show more</string>
     <string name="show_less">Show less</string>
     <string name="movie_rating_label">Rating</string>

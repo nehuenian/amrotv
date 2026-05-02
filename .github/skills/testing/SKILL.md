@@ -1,5 +1,5 @@
 ---
-name: unit-testing
+name: testing
 description: >
   Write, refactor, or review tests for AMRO — use cases, repositories, ViewModels, data
   layer components, and UI screens. Load this skill whenever you are creating or updating
@@ -7,18 +7,19 @@ description: >
   GIVEN/WHEN/THEN test cases with @Nested and @DisplayName, setting up @MockK/@InjectMockKs
   annotations, building mock data fixture objects, stubbing suspend functions with coEvery,
   using runTest for coroutine testing, deciding when to use Turbine vs direct assertion,
-  or implementing Espresso UI tests with the Robot Pattern.
-  When in doubt about any test pattern in this project, load this skill first.
+  or implementing E2E instrumented tests with Compose testing, Hilt, MockWebServer, and
+  the typed Robot Pattern. When in doubt about any test pattern in this project, load this
+  skill first.
 ---
 
-# AMRO Unit Testing Conventions
+# AMRO Testing Conventions
 
 ## Framework stack
 
 | Concern | Tool |
 |---------|------|
 | Test runner (unit tests) | JUnit 5 (Jupiter) — `tasks.withType<Test> { useJUnitPlatform() }` in `build.gradle.kts` |
-| Test runner (instrumented/UI tests) | JUnit 5 via `de.mannodermaus.android-junit5` plugin (required for `androidTest` on-device execution) |
+| Test runner (E2E / instrumented tests) | JUnit 4 — `@RunWith(AndroidJUnit4::class)` + `@HiltAndroidTest`; the `de.mannodermaus.android-junit5` plugin is present in the module but E2E test classes use JUnit 4 |
 | Mocking | MockK (`io.mockk:mockk`) |
 | Coroutines | `kotlinx.coroutines.test` — `runTest` |
 | Flow/StateFlow assertions | Turbine — only for Flow-returning code |
@@ -351,9 +352,10 @@ JUnit 5 runs `@BeforeEach` methods from outer to inner. A new test instance is c
 
 ---
 
-## Advanced patterns (ViewModel tests, Fake repositories, UI tests)
+## Advanced patterns (ViewModel tests, Fake repositories, E2E instrumented tests)
 
-For ViewModel tests, fake repository patterns, and Espresso UI tests with the Robot Pattern, read:
+For ViewModel tests, fake repository patterns, and E2E Compose instrumented tests with
+MockWebServer and the typed Robot Pattern, read:
 
 `references/advanced-patterns.md`
 
@@ -369,3 +371,6 @@ The following files are the reference implementation of all these conventions:
 - `feature/movies/domain/implementation/src/test/.../GetTrendingMoviesUseCaseImplTest.kt` — full GIVEN/WHEN/THEN with multiple preconditions, filters, sorts, and error scenarios
 - `feature/movies/domain/implementation/src/test/.../GetMovieDetailUseCaseImplTest.kt` — minimal delegation test pattern
 - `feature/movies/domain/implementation/src/test/.../GetGenresUseCaseImplTest.kt` — minimal delegation test pattern
+- `feature/movies/ui/src/androidTest/.../MoviesFlowE2ETest.kt` — E2E test class (JUnit 4 + Hilt + MockWebServer + Robot DSL)
+- `feature/movies/ui/src/androidTest/.../mock/MoviesMockDispatcher.kt` — MockWebServer dispatcher with concrete path routing
+- `feature/movies/ui/src/androidTest/.../robots/TrendingMoviesRobot.kt` — typed Robot with scoped action/verification interfaces

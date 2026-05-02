@@ -7,7 +7,7 @@ description: >
   files, fixing a bug, creating a screen, wiring navigation, checking DI setup, or any task
   that touches the project's Kotlin source. When in doubt, load this skill first. If anything
   touches modules, build files, data layer, or networking, also check the reference files
-  listed at the bottom. For unit testing conventions, load the `unit-testing` skill.
+  listed at the bottom. For unit and E2E testing conventions, load the `testing` skill.
 user-invocable: true
 ---
 
@@ -467,4 +467,4 @@ Load these when the task touches the relevant area:
 | `references/data-layer.md` | Building or modifying the data layer: DTOs, DataSources, Room, mappers, repository |
 | `references/networking.md` | TMDB endpoints, AuthInterceptor, NetworkResult, API token setup, image URLs |
 | `references/build-templates.md` | Creating new modules or writing/modifying `build.gradle.kts` files |
-| `unit-testing` skill | Writing unit, integration, or UI tests (JUnit 5, MockK, Turbine, Robot Pattern) |
+| `testing` skill | Writing unit, integration, or E2E instrumented tests (JUnit 5/4, MockK, Turbine, MockWebServer, typed Robot Pattern) |
