@@ -5,12 +5,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import nl.abnamro.amrotv.core.domain.model.Outcome
 import nl.abnamro.amrotv.core.mvi.BaseAmroTvViewModel
 import nl.abnamro.amrotv.core.mvi.reduceWith
 import nl.abnamro.amrotv.feature.movies.domain.api.model.Genre
 import nl.abnamro.amrotv.feature.movies.domain.api.model.Movie
-import nl.abnamro.amrotv.core.domain.model.Outcome
-import nl.abnamro.amrotv.feature.movies.domain.api.model.SortOrder
 import nl.abnamro.amrotv.feature.movies.domain.api.usecase.FilterAndSortMoviesUseCase
 import nl.abnamro.amrotv.feature.movies.domain.api.usecase.GetGenresUseCase
 import nl.abnamro.amrotv.feature.movies.domain.api.usecase.GetTrendingMoviesUseCase
@@ -47,55 +46,51 @@ class TrendingMoviesViewModel @Inject constructor(
             }
 
             is TrendingMoviesIntent.FilterByGenre -> {
-                updateState {
+                updateState { currentState ->
                     val filtered = filterAndSortMoviesUseCase(
                         allMovies,
                         intent.genreId,
-                        it.selectedSortOption,
-                        it.selectedSortOrder
+                        currentState.selectedSortOption,
+                        currentState.selectedSortOrder,
                     )
-                    it.reduceWith(stateReducers.filterByGenre(intent.genreId, filtered))
+                    currentState.reduceWith(stateReducers.filterByGenre(intent.genreId, filtered))
                 }
             }
 
             is TrendingMoviesIntent.ChangeSortOption -> {
-                updateState {
+                updateState { currentState ->
                     val sorted = filterAndSortMoviesUseCase(
                         allMovies,
-                        it.selectedGenreId,
+                        currentState.selectedGenreId,
                         intent.sortOption,
-                        it.selectedSortOrder
+                        currentState.selectedSortOrder,
                     )
-                    it.reduceWith(
-                        stateReducers.changeSortOption(
-                            intent.sortOption,
-                            sorted
-                        )
-                    )
+                    currentState.reduceWith(stateReducers.changeSortOption(intent.sortOption, sorted))
                 }
             }
 
-            TrendingMoviesIntent.ToggleSortOrder -> {
-                updateState {
-                    val newOrder =
-                        if (it.selectedSortOrder == SortOrder.ASC) SortOrder.DESC else SortOrder.ASC
+            is TrendingMoviesIntent.SelectSortOrder -> {
+                updateState { currentState ->
+                    if (currentState.selectedSortOrder == intent.order) return@updateState currentState
                     val sorted = filterAndSortMoviesUseCase(
                         allMovies,
-                        it.selectedGenreId,
-                        it.selectedSortOption,
-                        newOrder
+                        currentState.selectedGenreId,
+                        currentState.selectedSortOption,
+                        intent.order,
                     )
-                    it.reduceWith(stateReducers.toggleSortOrder(newOrder, sorted))
+                    currentState.reduceWith(stateReducers.selectSortOrder(intent.order, sorted))
                 }
             }
 
             is TrendingMoviesIntent.OpenMovieDetail ->
                 sendEffect(TrendingMoviesEffect.NavigateToMovieDetail(intent.movieId))
+
+            is TrendingMoviesIntent.SetSortSheetVisible ->
+                updateState { it.reduceWith(stateReducers.sortSheetVisible(intent.visible)) }
         }
     }
 
     private fun loadData() {
-        val currentState = state.value
         viewModelScope.launch {
             coroutineScope {
                 val moviesDeferred = async {
@@ -112,7 +107,7 @@ class TrendingMoviesViewModel @Inject constructor(
                             "Failed to load genres: ${genresResult.cause.message}",
                             genresResult.cause
                         )
-                        currentState.genres
+                        genresResult.data.orEmpty()
                     }
                 }
 
@@ -122,14 +117,14 @@ class TrendingMoviesViewModel @Inject constructor(
                             if (genresResult is Outcome.Error) add(MovieError.GENRES_LOAD_FAILED)
                         }
                         allMovies = moviesResult.data
-                        updateState {
+                        updateState { currentState ->
                             val movies = filterAndSortMoviesUseCase(
                                 allMovies,
-                                it.selectedGenreId,
-                                it.selectedSortOption,
-                                it.selectedSortOrder
+                                currentState.selectedGenreId,
+                                currentState.selectedSortOption,
+                                currentState.selectedSortOrder,
                             )
-                            it.reduceWith(
+                            currentState.reduceWith(
                                 stateReducers.contentLoaded(
                                     movies,
                                     genres,
@@ -153,14 +148,14 @@ class TrendingMoviesViewModel @Inject constructor(
                         val staleMovies = moviesResult.data
                         if (staleMovies != null) {
                             allMovies = staleMovies
-                            updateState {
+                            updateState { currentState ->
                                 val movies = filterAndSortMoviesUseCase(
                                     allMovies,
-                                    it.selectedGenreId,
-                                    it.selectedSortOption,
-                                    it.selectedSortOrder
+                                    currentState.selectedGenreId,
+                                    currentState.selectedSortOption,
+                                    currentState.selectedSortOrder,
                                 )
-                                it.reduceWith(
+                                currentState.reduceWith(
                                     stateReducers.contentLoaded(
                                         movies,
                                         genres,

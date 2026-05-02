@@ -6,9 +6,12 @@ import nl.abnamro.amrotv.core.mvi.StateReducer
 import nl.abnamro.amrotv.feature.movies.domain.api.model.MovieDetail
 import nl.abnamro.amrotv.feature.movies.presentation.api.MovieError
 import nl.abnamro.amrotv.feature.movies.presentation.api.moviedetail.MovieDetailState
+import nl.abnamro.amrotv.feature.movies.presentation.implementation.mapper.MovieDetailDomainToPresentationMapper
 import javax.inject.Inject
 
-class MovieDetailStateReducers @Inject constructor() {
+class MovieDetailStateReducers @Inject constructor(
+    private val movieDetailMapper: MovieDetailDomainToPresentationMapper,
+) {
 
     fun initialState(): MovieDetailState = MovieDetailState()
 
@@ -19,7 +22,7 @@ class MovieDetailStateReducers @Inject constructor() {
         StateReducer {
             it.copy(
                 isLoading = false,
-                movieDetail = movieDetail,
+                movieDetail = movieDetailMapper.map(movieDetail),
                 errors = persistentListOf()
             )
         }

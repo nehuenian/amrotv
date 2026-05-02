@@ -9,6 +9,9 @@ import nl.abnamro.amrotv.core.mvi.MviEffect
  */
 sealed interface MovieDetailEffect : MviEffect {
 
+    /** Requests the UI to navigate back to the previous screen. */
+    data object NavigateBack : MovieDetailEffect
+
     /** Requests the UI to open the given [url] in an external browser. */
     data class OpenUrl(val url: String) : MovieDetailEffect
 }

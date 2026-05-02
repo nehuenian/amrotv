@@ -1,8 +1,11 @@
 package nl.abnamro.amrotv.feature.movies.presentation.implementation
 
+import kotlinx.collections.immutable.persistentListOf
 import nl.abnamro.amrotv.feature.movies.domain.api.model.Genre
 import nl.abnamro.amrotv.feature.movies.domain.api.model.Movie
 import nl.abnamro.amrotv.feature.movies.domain.api.model.MovieDetail
+import nl.abnamro.amrotv.feature.movies.presentation.api.model.GenrePresentationModel
+import nl.abnamro.amrotv.feature.movies.presentation.api.model.MoviePresentationModel
 
 object PresentationMocks {
 
@@ -36,6 +39,36 @@ object PresentationMocks {
     object Genres {
         val action = Genre(id = Movies.ACTION_GENRE_ID, name = "Action")
         val comedy = Genre(id = Movies.COMEDY_GENRE_ID, name = "Comedy")
+        val all = listOf(action, comedy)
+    }
+
+    object PresentationMovies {
+        val action = MoviePresentationModel(
+            id = 1,
+            title = "Alpha",
+            genreIds = persistentListOf(Movies.ACTION_GENRE_ID),
+            popularity = 80.0,
+            releaseYear = "2024",
+            posterUrl = null,
+            backdropUrl = null,
+            formattedRating = "0.0",
+        )
+        val comedy = MoviePresentationModel(
+            id = 2,
+            title = "Beta",
+            genreIds = persistentListOf(Movies.COMEDY_GENRE_ID),
+            popularity = 50.0,
+            releaseYear = "2023",
+            posterUrl = null,
+            backdropUrl = null,
+            formattedRating = "0.0",
+        )
+        val all = listOf(action, comedy)
+    }
+
+    object PresentationGenres {
+        val action = GenrePresentationModel(id = Movies.ACTION_GENRE_ID, name = "Action")
+        val comedy = GenrePresentationModel(id = Movies.COMEDY_GENRE_ID, name = "Comedy")
         val all = listOf(action, comedy)
     }
 
