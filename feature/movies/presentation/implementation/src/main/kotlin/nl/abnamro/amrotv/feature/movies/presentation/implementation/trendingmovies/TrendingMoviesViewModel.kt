@@ -2,6 +2,7 @@ package nl.abnamro.amrotv.feature.movies.presentation.implementation.trendingmov
 
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -35,6 +36,7 @@ class TrendingMoviesViewModel @Inject constructor(
 ) {
 
     private var allMovies: List<Movie> = emptyList()
+    private var loadJob: Job? = null
 
     init {
         handleIntent(TrendingMoviesIntent.LoadMovies)
@@ -93,7 +95,8 @@ class TrendingMoviesViewModel @Inject constructor(
     }
 
     private fun loadData() {
-        viewModelScope.launch {
+        loadJob?.cancel()
+        loadJob = viewModelScope.launch {
             coroutineScope {
                 val moviesDeferred = async {
                     getTrendingMoviesUseCase()
