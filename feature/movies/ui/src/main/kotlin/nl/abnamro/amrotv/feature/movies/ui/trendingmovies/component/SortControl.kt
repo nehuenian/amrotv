@@ -2,10 +2,10 @@ package nl.abnamro.amrotv.feature.movies.ui.trendingmovies.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.ArrowDownward
@@ -28,7 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import kotlinx.coroutines.launch
-import nl.abnamro.amrotv.core.ui.preview.LightDarkPreview
+import nl.abnamro.amrotv.core.ui.preview.PreviewLightDark
 import nl.abnamro.amrotv.core.ui.theme.AmroTvDimensions
 import nl.abnamro.amrotv.core.ui.theme.AmroTvTheme
 import nl.abnamro.amrotv.feature.movies.domain.api.model.SortOption
@@ -44,8 +44,8 @@ fun SortControl(
     sortOrder: SortOrder,
     showSheet: Boolean,
     onShowSheetChange: (Boolean) -> Unit,
-    onSortOptionSelected: (SortOption) -> Unit,
-    onSortOrderSelected: (SortOrder) -> Unit,
+    onSortOptionSelect: (SortOption) -> Unit,
+    onSortOrderSelect: (SortOrder) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val sheetState = rememberModalBottomSheetState()
@@ -58,7 +58,7 @@ fun SortControl(
                 stringResource(
                     R.string.sort_chip_label,
                     sortOption.toDisplayName(),
-                    sortOrder.toDisplayName()
+                    sortOrder.toDisplayName(),
                 )
             )
         },
@@ -74,21 +74,18 @@ fun SortControl(
     )
 
     if (showSheet) {
-        ModalBottomSheet(
-            onDismissRequest = { onShowSheetChange(false) },
-            sheetState = sheetState,
-        ) {
+        ModalBottomSheet(onDismissRequest = { onShowSheetChange(false) }, sheetState = sheetState) {
             SortSheetContent(
                 sortOption = sortOption,
                 sortOrder = sortOrder,
-                onSortOptionSelected = { selected ->
-                    onSortOptionSelected(selected)
+                onSortOptionSelect = { selected ->
+                    onSortOptionSelect(selected)
                     coroutineScope.launch {
                         sheetState.hide()
                         onShowSheetChange(false)
                     }
                 },
-                onSortOrderSelected = onSortOrderSelected,
+                onSortOrderSelect = onSortOrderSelect,
             )
         }
     }
@@ -98,14 +95,14 @@ fun SortControl(
 private fun SortSheetContent(
     sortOption: SortOption,
     sortOrder: SortOrder,
-    onSortOptionSelected: (SortOption) -> Unit,
-    onSortOrderSelected: (SortOrder) -> Unit,
+    onSortOptionSelect: (SortOption) -> Unit,
+    onSortOrderSelect: (SortOrder) -> Unit,
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = AmroTvDimensions.spacingMedium)
-            .padding(bottom = AmroTvDimensions.spacingExtraLarge),
+        modifier =
+            Modifier.fillMaxWidth()
+                .padding(horizontal = AmroTvDimensions.spacingMedium)
+                .padding(bottom = AmroTvDimensions.spacingExtraLarge),
         verticalArrangement = Arrangement.spacedBy(AmroTvDimensions.spacingSmall),
     ) {
         Text(
@@ -118,7 +115,7 @@ private fun SortSheetContent(
             SortOption.entries.forEachIndexed { index, option ->
                 SegmentedButton(
                     selected = sortOption == option,
-                    onClick = { onSortOptionSelected(option) },
+                    onClick = { onSortOptionSelect(option) },
                     shape = SegmentedButtonDefaults.itemShape(index, SortOption.entries.size),
                     label = { Text(option.toDisplayName()) },
                 )
@@ -134,15 +131,16 @@ private fun SortSheetContent(
             SortOrder.entries.forEachIndexed { index, order ->
                 SegmentedButton(
                     selected = sortOrder == order,
-                    onClick = { onSortOrderSelected(order) },
+                    onClick = { onSortOrderSelect(order) },
                     shape = SegmentedButtonDefaults.itemShape(index, SortOrder.entries.size),
                     icon = {
                         Icon(
-                            imageVector = if (order == SortOrder.ASC) {
-                                Icons.Filled.ArrowUpward
-                            } else {
-                                Icons.Filled.ArrowDownward
-                            },
+                            imageVector =
+                                if (order == SortOrder.ASC) {
+                                    Icons.Filled.ArrowUpward
+                                } else {
+                                    Icons.Filled.ArrowDownward
+                                },
                             contentDescription = null,
                             modifier = Modifier.size(SegmentedButtonDefaults.IconSize),
                         )
@@ -155,26 +153,28 @@ private fun SortSheetContent(
 }
 
 @Composable
-private fun SortOption.toDisplayName(): String = stringResource(
-    when (this) {
-        SortOption.POPULARITY -> R.string.sort_popularity
-        SortOption.TITLE -> R.string.sort_title
-        SortOption.RELEASE_DATE -> R.string.sort_release_date
-    },
-)
+private fun SortOption.toDisplayName(): String =
+    stringResource(
+        when (this) {
+            SortOption.POPULARITY -> R.string.sort_popularity
+            SortOption.TITLE -> R.string.sort_title
+            SortOption.RELEASE_DATE -> R.string.sort_release_date
+        }
+    )
 
 @Composable
-private fun SortOrder.toDisplayName(): String = stringResource(
-    when (this) {
-        SortOrder.ASC -> R.string.sort_ascending_description
-        SortOrder.DESC -> R.string.sort_descending_description
-    },
-)
+private fun SortOrder.toDisplayName(): String =
+    stringResource(
+        when (this) {
+            SortOrder.ASC -> R.string.sort_ascending_description
+            SortOrder.DESC -> R.string.sort_descending_description
+        }
+    )
 
-@LightDarkPreview
+@PreviewLightDark
 @Composable
 private fun SortControlPreview(
-    @PreviewParameter(SortControlPreviewProvider::class) state: SortControlPreviewState,
+    @PreviewParameter(SortControlPreviewProvider::class) state: SortControlPreviewState
 ) {
     AmroTvTheme {
         SortControl(
@@ -182,25 +182,23 @@ private fun SortControlPreview(
             sortOrder = state.order,
             showSheet = false,
             onShowSheetChange = {},
-            onSortOptionSelected = {},
-            onSortOrderSelected = {},
+            onSortOptionSelect = {},
+            onSortOrderSelect = {},
         )
     }
 }
 
-@LightDarkPreview
+@PreviewLightDark
 @Composable
 private fun SortSheetContentPreview(
-    @PreviewParameter(SortControlPreviewProvider::class) state: SortControlPreviewState,
+    @PreviewParameter(SortControlPreviewProvider::class) state: SortControlPreviewState
 ) {
     AmroTvTheme {
         SortSheetContent(
             sortOption = state.option,
             sortOrder = state.order,
-            onSortOptionSelected = {},
-            onSortOrderSelected = {},
+            onSortOptionSelect = {},
+            onSortOrderSelect = {},
         )
     }
 }
-
-

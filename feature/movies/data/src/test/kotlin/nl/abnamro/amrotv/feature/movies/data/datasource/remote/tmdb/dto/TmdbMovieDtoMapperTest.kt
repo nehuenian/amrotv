@@ -21,13 +21,19 @@ internal class TmdbMovieDtoMapperTest {
             @Test
             @DisplayName("THEN posterUrl is prefixed with the image base URL")
             fun posterUrlPrefixed() {
-                assertEquals("https://image.tmdb.org/t/p/w500/poster.jpg", Dtos.movieDto.toDomain().posterUrl)
+                assertEquals(
+                    "https://image.tmdb.org/t/p/w500/poster.jpg",
+                    Dtos.movieDto.toDomain().posterUrl,
+                )
             }
 
             @Test
             @DisplayName("THEN backdropUrl is prefixed with the image base URL")
             fun backdropUrlPrefixed() {
-                assertEquals("https://image.tmdb.org/t/p/w500/backdrop.jpg", Dtos.movieDto.toDomain().backdropUrl)
+                assertEquals(
+                    "https://image.tmdb.org/t/p/w500/backdrop.jpg",
+                    Dtos.movieDto.toDomain().backdropUrl,
+                )
             }
 
             @Test
@@ -92,7 +98,10 @@ internal class TmdbMovieDtoMapperTest {
             @Test
             @DisplayName("THEN posterUrl is prefixed with the image base URL")
             fun posterUrlPrefixed() {
-                assertEquals("https://image.tmdb.org/t/p/w500/detail_poster.jpg", Dtos.movieDetailDto.toDomain().posterUrl)
+                assertEquals(
+                    "https://image.tmdb.org/t/p/w500/detail_poster.jpg",
+                    Dtos.movieDetailDto.toDomain().posterUrl,
+                )
             }
 
             @Test

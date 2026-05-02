@@ -10,8 +10,8 @@ import retrofit2.http.Query
 /**
  * Retrofit service interface for the TMDB (The Movie Database) REST API v3.
  *
- * All endpoints are suspend functions and return deserialized DTO objects.
- * Base URL is configured at the Hilt provider level.
+ * All endpoints are suspend functions and return deserialized DTO objects. Base URL is configured
+ * at the Hilt provider level.
  */
 internal interface TmdbApiService {
 
@@ -50,7 +50,5 @@ internal interface TmdbApiService {
      * @return [GenreListResponseDto] containing all available genres.
      */
     @GET("genre/movie/list")
-    suspend fun getGenres(
-        @Query("language") language: String,
-    ): GenreListResponseDto
+    suspend fun getGenres(@Query("language") language: String): GenreListResponseDto
 }

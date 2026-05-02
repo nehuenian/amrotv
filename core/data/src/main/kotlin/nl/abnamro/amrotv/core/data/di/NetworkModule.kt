@@ -5,6 +5,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import nl.abnamro.amrotv.core.buildconfig.BuildConfigProvider
@@ -15,15 +16,12 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
-import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
-    @Provides
-    @Singleton
-    fun provideJson(): Json = Json { ignoreUnknownKeys = true }
+    @Provides @Singleton fun provideJson(): Json = Json { ignoreUnknownKeys = true }
 
     @Provides
     @Singleton
@@ -33,11 +31,12 @@ object NetworkModule {
     ): HttpLoggingInterceptor =
         HttpLoggingInterceptor { message -> logger.log(LogLevel.DEBUG, "OkHttp", message) }
             .apply {
-                level = if (buildConfigProvider.isDebug) {
-                    HttpLoggingInterceptor.Level.BODY
-                } else {
-                    HttpLoggingInterceptor.Level.NONE
-                }
+                level =
+                    if (buildConfigProvider.isDebug) {
+                        HttpLoggingInterceptor.Level.BODY
+                    } else {
+                        HttpLoggingInterceptor.Level.NONE
+                    }
             }
 
     @Provides
@@ -46,10 +45,11 @@ object NetworkModule {
     internal fun provideOkHttpClient(
         authInterceptor: AuthInterceptor,
         loggingInterceptor: HttpLoggingInterceptor,
-    ): OkHttpClient = OkHttpClient.Builder()
-        .addInterceptor(authInterceptor)
-        .addInterceptor(loggingInterceptor)
-        .build()
+    ): OkHttpClient =
+        OkHttpClient.Builder()
+            .addInterceptor(authInterceptor)
+            .addInterceptor(loggingInterceptor)
+            .build()
 
     @OptIn(ExperimentalSerializationApi::class)
     @Provides
@@ -57,5 +57,7 @@ object NetworkModule {
     fun provideRetrofitBuilder(okHttpClient: OkHttpClient, json: Json): Retrofit.Builder =
         Retrofit.Builder()
             .client(okHttpClient)
-            .addConverterFactory(json.asConverterFactory("application/json; charset=UTF-8".toMediaType()))
+            .addConverterFactory(
+                json.asConverterFactory("application/json; charset=UTF-8".toMediaType())
+            )
 }

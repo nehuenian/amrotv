@@ -3,9 +3,7 @@ plugins {
     alias(libs.plugins.amro.android.compose)
 }
 
-android {
-    namespace = "nl.abnamro.amrotv.core.ui"
-}
+android { namespace = "nl.abnamro.amrotv.core.ui" }
 
 dependencies {
     implementation(platform(libs.androidx.compose.bom))

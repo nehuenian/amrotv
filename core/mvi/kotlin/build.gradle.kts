@@ -1,7 +1,3 @@
-plugins {
-    alias(libs.plugins.amro.kotlin.library)
-}
+plugins { alias(libs.plugins.amro.kotlin.library) }
 
-dependencies {
-    implementation(libs.kotlinx.coroutines.core)
-}
+dependencies { implementation(libs.kotlinx.coroutines.core) }

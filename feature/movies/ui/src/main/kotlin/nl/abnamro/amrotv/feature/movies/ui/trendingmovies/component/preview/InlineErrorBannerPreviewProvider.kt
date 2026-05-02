@@ -7,8 +7,9 @@ import nl.abnamro.amrotv.feature.movies.presentation.api.MovieError
 
 internal class InlineErrorBannerPreviewProvider :
     PreviewParameterProvider<ImmutableList<MovieError>> {
-    override val values = sequenceOf(
-        persistentListOf(MovieError.GENRES_LOAD_FAILED),
-        persistentListOf(MovieError.GENRES_LOAD_FAILED, MovieError.MOVIES_LOAD_FAILED),
-    )
+    override val values =
+        sequenceOf(
+            persistentListOf(MovieError.GENRES_LOAD_FAILED),
+            persistentListOf(MovieError.GENRES_LOAD_FAILED, MovieError.MOVIES_LOAD_FAILED),
+        )
 }

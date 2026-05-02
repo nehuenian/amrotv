@@ -101,7 +101,14 @@ internal class MovieRepositoryImplTest {
             @DisplayName("THEN the error is logged at ERROR level")
             fun errorIsLogged() = runTest {
                 repository.getTrendingMovies()
-                verify(exactly = 1) { logger.log(LogLevel.ERROR, "MovieRepositoryImpl", "Failed to fetch trending movies", networkError) }
+                verify(exactly = 1) {
+                    logger.log(
+                        LogLevel.ERROR,
+                        "MovieRepositoryImpl",
+                        "Failed to fetch trending movies",
+                        networkError,
+                    )
+                }
             }
         }
     }
@@ -136,7 +143,14 @@ internal class MovieRepositoryImplTest {
             @DisplayName("THEN the error is logged at ERROR level")
             fun errorIsLogged() = runTest {
                 repository.getTrendingMovies()
-                verify(exactly = 1) { logger.log(LogLevel.ERROR, "MovieRepositoryImpl", "Failed to fetch trending movies", networkError) }
+                verify(exactly = 1) {
+                    logger.log(
+                        LogLevel.ERROR,
+                        "MovieRepositoryImpl",
+                        "Failed to fetch trending movies",
+                        networkError,
+                    )
+                }
             }
         }
     }
@@ -182,7 +196,10 @@ internal class MovieRepositoryImplTest {
             @Test
             @DisplayName("THEN the error cause is propagated")
             fun errorCausePropagated() = runTest {
-                assertEquals(networkError, repository.getMovieDetail(detail.id).requireError().cause)
+                assertEquals(
+                    networkError,
+                    repository.getMovieDetail(detail.id).requireError().cause,
+                )
             }
 
             @Test
@@ -195,7 +212,14 @@ internal class MovieRepositoryImplTest {
             @DisplayName("THEN the error is logged at ERROR level")
             fun errorIsLogged() = runTest {
                 repository.getMovieDetail(detail.id)
-                verify(exactly = 1) { logger.log(LogLevel.ERROR, "MovieRepositoryImpl", "Failed to fetch movie detail for id=${detail.id}", networkError) }
+                verify(exactly = 1) {
+                    logger.log(
+                        LogLevel.ERROR,
+                        "MovieRepositoryImpl",
+                        "Failed to fetch movie detail for id=${detail.id}",
+                        networkError,
+                    )
+                }
             }
         }
     }
@@ -262,7 +286,14 @@ internal class MovieRepositoryImplTest {
             @DisplayName("THEN the error is logged at ERROR level")
             fun errorIsLogged() = runTest {
                 repository.getGenres()
-                verify(exactly = 1) { logger.log(LogLevel.ERROR, "MovieRepositoryImpl", "Failed to fetch genres, checking cache", networkError) }
+                verify(exactly = 1) {
+                    logger.log(
+                        LogLevel.ERROR,
+                        "MovieRepositoryImpl",
+                        "Failed to fetch genres, checking cache",
+                        networkError,
+                    )
+                }
             }
         }
     }
@@ -289,19 +320,23 @@ internal class MovieRepositoryImplTest {
 
             @Test
             @DisplayName("THEN data is null")
-            fun dataIsNull() = runTest {
-                assertNull(repository.getGenres().requireError().data)
-            }
+            fun dataIsNull() = runTest { assertNull(repository.getGenres().requireError().data) }
 
             @Test
             @DisplayName("THEN the error is logged at ERROR level")
             fun errorIsLogged() = runTest {
                 repository.getGenres()
-                verify(exactly = 1) { logger.log(LogLevel.ERROR, "MovieRepositoryImpl", "Failed to fetch genres, checking cache", networkError) }
+                verify(exactly = 1) {
+                    logger.log(
+                        LogLevel.ERROR,
+                        "MovieRepositoryImpl",
+                        "Failed to fetch genres, checking cache",
+                        networkError,
+                    )
+                }
             }
         }
     }
 
     // endregion
 }
-

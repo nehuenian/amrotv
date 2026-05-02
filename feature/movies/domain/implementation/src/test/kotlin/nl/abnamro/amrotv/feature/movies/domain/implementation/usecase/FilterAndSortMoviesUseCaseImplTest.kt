@@ -30,7 +30,13 @@ class FilterAndSortMoviesUseCaseImplTest {
             @Test
             @DisplayName("THEN all movies are returned")
             fun allMoviesReturned() {
-                val result = useCase(MovieDomainMocks.Movies.all, null, SortOption.POPULARITY, SortOrder.DESC)
+                val result =
+                    useCase(
+                        MovieDomainMocks.Movies.all,
+                        null,
+                        SortOption.POPULARITY,
+                        SortOrder.DESC,
+                    )
                 assertEquals(3, result.size)
             }
         }
@@ -42,9 +48,18 @@ class FilterAndSortMoviesUseCaseImplTest {
             @Test
             @DisplayName("THEN only movies containing the action genre ID are returned")
             fun onlyActionMoviesReturned() {
-                val result = useCase(MovieDomainMocks.Movies.all, MovieDomainMocks.Movies.ACTION_GENRE_ID, SortOption.POPULARITY, SortOrder.DESC)
+                val result =
+                    useCase(
+                        MovieDomainMocks.Movies.all,
+                        MovieDomainMocks.Movies.ACTION_GENRE_ID,
+                        SortOption.POPULARITY,
+                        SortOrder.DESC,
+                    )
                 assertTrue(result.all { MovieDomainMocks.Movies.ACTION_GENRE_ID in it.genreIds })
-                assertEquals(listOf(MovieDomainMocks.Movies.actionComedy, MovieDomainMocks.Movies.action), result)
+                assertEquals(
+                    listOf(MovieDomainMocks.Movies.actionComedy, MovieDomainMocks.Movies.action),
+                    result,
+                )
             }
         }
 
@@ -55,7 +70,13 @@ class FilterAndSortMoviesUseCaseImplTest {
             @Test
             @DisplayName("THEN an empty list is returned")
             fun emptyListReturned() {
-                val result = useCase(MovieDomainMocks.Movies.all, MovieDomainMocks.Movies.UNKNOWN_GENRE_ID, SortOption.POPULARITY, SortOrder.DESC)
+                val result =
+                    useCase(
+                        MovieDomainMocks.Movies.all,
+                        MovieDomainMocks.Movies.UNKNOWN_GENRE_ID,
+                        SortOption.POPULARITY,
+                        SortOrder.DESC,
+                    )
                 assertTrue(result.isEmpty())
             }
         }
@@ -67,8 +88,21 @@ class FilterAndSortMoviesUseCaseImplTest {
             @Test
             @DisplayName("THEN movies are ordered by popularity descending")
             fun sortedByPopularityDesc() {
-                val result = useCase(MovieDomainMocks.Movies.all, null, SortOption.POPULARITY, SortOrder.DESC)
-                assertEquals(listOf(MovieDomainMocks.Movies.actionComedy, MovieDomainMocks.Movies.action, MovieDomainMocks.Movies.comedy), result)
+                val result =
+                    useCase(
+                        MovieDomainMocks.Movies.all,
+                        null,
+                        SortOption.POPULARITY,
+                        SortOrder.DESC,
+                    )
+                assertEquals(
+                    listOf(
+                        MovieDomainMocks.Movies.actionComedy,
+                        MovieDomainMocks.Movies.action,
+                        MovieDomainMocks.Movies.comedy,
+                    ),
+                    result,
+                )
             }
         }
 
@@ -79,8 +113,16 @@ class FilterAndSortMoviesUseCaseImplTest {
             @Test
             @DisplayName("THEN movies are ordered by popularity ascending")
             fun sortedByPopularityAsc() {
-                val result = useCase(MovieDomainMocks.Movies.all, null, SortOption.POPULARITY, SortOrder.ASC)
-                assertEquals(listOf(MovieDomainMocks.Movies.comedy, MovieDomainMocks.Movies.action, MovieDomainMocks.Movies.actionComedy), result)
+                val result =
+                    useCase(MovieDomainMocks.Movies.all, null, SortOption.POPULARITY, SortOrder.ASC)
+                assertEquals(
+                    listOf(
+                        MovieDomainMocks.Movies.comedy,
+                        MovieDomainMocks.Movies.action,
+                        MovieDomainMocks.Movies.actionComedy,
+                    ),
+                    result,
+                )
             }
         }
 
@@ -91,8 +133,16 @@ class FilterAndSortMoviesUseCaseImplTest {
             @Test
             @DisplayName("THEN movies are ordered by title descending")
             fun sortedByTitleDesc() {
-                val result = useCase(MovieDomainMocks.Movies.all, null, SortOption.TITLE, SortOrder.DESC)
-                assertEquals(listOf(MovieDomainMocks.Movies.actionComedy, MovieDomainMocks.Movies.comedy, MovieDomainMocks.Movies.action), result)
+                val result =
+                    useCase(MovieDomainMocks.Movies.all, null, SortOption.TITLE, SortOrder.DESC)
+                assertEquals(
+                    listOf(
+                        MovieDomainMocks.Movies.actionComedy,
+                        MovieDomainMocks.Movies.comedy,
+                        MovieDomainMocks.Movies.action,
+                    ),
+                    result,
+                )
             }
         }
 
@@ -103,8 +153,21 @@ class FilterAndSortMoviesUseCaseImplTest {
             @Test
             @DisplayName("THEN movies are ordered by release date ascending")
             fun sortedByReleaseDateAsc() {
-                val result = useCase(MovieDomainMocks.Movies.all, null, SortOption.RELEASE_DATE, SortOrder.ASC)
-                assertEquals(listOf(MovieDomainMocks.Movies.actionComedy, MovieDomainMocks.Movies.comedy, MovieDomainMocks.Movies.action), result)
+                val result =
+                    useCase(
+                        MovieDomainMocks.Movies.all,
+                        null,
+                        SortOption.RELEASE_DATE,
+                        SortOrder.ASC,
+                    )
+                assertEquals(
+                    listOf(
+                        MovieDomainMocks.Movies.actionComedy,
+                        MovieDomainMocks.Movies.comedy,
+                        MovieDomainMocks.Movies.action,
+                    ),
+                    result,
+                )
             }
         }
 
@@ -115,8 +178,17 @@ class FilterAndSortMoviesUseCaseImplTest {
             @Test
             @DisplayName("THEN only comedy movies are returned sorted by popularity ascending")
             fun filteredAndSorted() {
-                val result = useCase(MovieDomainMocks.Movies.all, MovieDomainMocks.Movies.COMEDY_GENRE_ID, SortOption.POPULARITY, SortOrder.ASC)
-                assertEquals(listOf(MovieDomainMocks.Movies.comedy, MovieDomainMocks.Movies.actionComedy), result)
+                val result =
+                    useCase(
+                        MovieDomainMocks.Movies.all,
+                        MovieDomainMocks.Movies.COMEDY_GENRE_ID,
+                        SortOption.POPULARITY,
+                        SortOrder.ASC,
+                    )
+                assertEquals(
+                    listOf(MovieDomainMocks.Movies.comedy, MovieDomainMocks.Movies.actionComedy),
+                    result,
+                )
             }
         }
     }
@@ -128,7 +200,13 @@ class FilterAndSortMoviesUseCaseImplTest {
         @Test
         @DisplayName("THEN an empty list is returned regardless of filter and sort parameters")
         fun emptyListReturned() {
-            val result = useCase(emptyList(), MovieDomainMocks.Movies.ACTION_GENRE_ID, SortOption.POPULARITY, SortOrder.DESC)
+            val result =
+                useCase(
+                    emptyList(),
+                    MovieDomainMocks.Movies.ACTION_GENRE_ID,
+                    SortOption.POPULARITY,
+                    SortOrder.DESC,
+                )
             assertTrue(result.isEmpty())
         }
     }

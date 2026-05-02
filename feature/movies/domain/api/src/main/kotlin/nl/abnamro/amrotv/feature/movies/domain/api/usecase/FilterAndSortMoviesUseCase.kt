@@ -4,9 +4,7 @@ import nl.abnamro.amrotv.feature.movies.domain.api.model.Movie
 import nl.abnamro.amrotv.feature.movies.domain.api.model.SortOption
 import nl.abnamro.amrotv.feature.movies.domain.api.model.SortOrder
 
-/**
- * Filters and sorts a list of [Movie] objects in memory without any I/O.
- */
+/** Filters and sorts a list of [Movie] objects in memory without any I/O. */
 fun interface FilterAndSortMoviesUseCase {
 
     /**

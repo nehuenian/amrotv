@@ -27,7 +27,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import nl.abnamro.amrotv.core.ui.preview.LightDarkPreview
+import nl.abnamro.amrotv.core.ui.preview.PreviewLightDark
 import nl.abnamro.amrotv.core.ui.theme.AmroTvColors
 import nl.abnamro.amrotv.core.ui.theme.AmroTvDimensions
 import nl.abnamro.amrotv.core.ui.theme.AmroTvTheme
@@ -42,92 +42,104 @@ fun FeaturedMovieBanner(
     onMovieClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    Box(modifier = modifier.fillMaxWidth().height(MoviesDimensions.featuredBannerHeight)) {
+        BannerBackground(movie = movie)
+        BannerContent(
+            movie = movie,
+            onMovieClick = onMovieClick,
+            modifier = Modifier.align(Alignment.BottomStart),
+        )
+    }
+}
+
+@Composable
+private fun BannerBackground(movie: MoviePresentationModel) {
     val context = LocalContext.current
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(MoviesDimensions.featuredBannerHeight),
-    ) {
+    Box(modifier = Modifier.fillMaxSize()) {
         AsyncImage(
-            model = ImageRequest.Builder(context)
-                .data(movie.backdropUrl ?: movie.posterUrl)
-                .crossfade(true)
-                .build(),
+            model =
+                ImageRequest.Builder(context)
+                    .data(movie.backdropUrl ?: movie.posterUrl)
+                    .crossfade(true)
+                    .build(),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize(),
         )
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        colorStops = arrayOf(
-                            0.0f to AmroTvColors.MediaScrimStart,
-                            0.5f to AmroTvColors.MediaScrimMid,
-                            1.0f to AmroTvColors.MediaScrimEnd,
-                        ),
-                    ),
-                ),
+            modifier =
+                Modifier.fillMaxSize()
+                    .background(
+                        Brush.verticalGradient(
+                            colorStops =
+                                arrayOf(
+                                    0.0f to AmroTvColors.MediaScrimStart,
+                                    0.5f to AmroTvColors.MediaScrimMid,
+                                    1.0f to AmroTvColors.MediaScrimEnd,
+                                )
+                        )
+                    )
         )
-        Column(
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-                .padding(
-                    horizontal = AmroTvDimensions.spacingMedium,
-                    vertical = AmroTvDimensions.spacingMedium,
+    }
+}
+
+@Composable
+private fun BannerContent(
+    movie: MoviePresentationModel,
+    onMovieClick: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier =
+            modifier.padding(
+                horizontal = AmroTvDimensions.spacingMedium,
+                vertical = AmroTvDimensions.spacingMedium,
+            ),
+        verticalArrangement = Arrangement.spacedBy(AmroTvDimensions.spacingExtraSmall),
+    ) {
+        Text(
+            text = movie.title,
+            style =
+                MaterialTheme.typography.headlineSmall.copy(
+                    shadow = AmroTvColors.OnMediaTextShadow
                 ),
-            verticalArrangement = Arrangement.spacedBy(AmroTvDimensions.spacingExtraSmall),
+            color = AmroTvColors.OnMediaPrimary,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(AmroTvDimensions.spacingMedium),
         ) {
             Text(
-                text = movie.title,
-                style = MaterialTheme.typography.headlineSmall.copy(shadow = AmroTvColors.OnMediaTextShadow),
-                color = AmroTvColors.OnMediaPrimary,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
+                text = stringResource(R.string.movie_rating_format, movie.formattedRating),
+                style =
+                    MaterialTheme.typography.bodyMedium.copy(
+                        shadow = AmroTvColors.OnMediaTextShadow
+                    ),
+                color = AmroTvColors.OnMediaSecondary,
             )
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(AmroTvDimensions.spacingMedium),
+            val movieContentDescription =
+                stringResource(R.string.featured_more_info_description, movie.title)
+            OutlinedButton(
+                onClick = { onMovieClick(movie.id) },
+                border =
+                    BorderStroke(MoviesDimensions.borderWidthDefault, AmroTvColors.OnMediaPrimary),
+                colors =
+                    ButtonDefaults.outlinedButtonColors(contentColor = AmroTvColors.OnMediaPrimary),
+                modifier =
+                    Modifier.clearAndSetSemantics { contentDescription = movieContentDescription },
             ) {
-                Text(
-                    text = stringResource(R.string.movie_rating_format, movie.formattedRating),
-                    style = MaterialTheme.typography.bodyMedium.copy(shadow = AmroTvColors.OnMediaTextShadow),
-                    color = AmroTvColors.OnMediaSecondary,
-                )
-                val movieContentDescription = stringResource(
-                    R.string.featured_more_info_description,
-                    movie.title,
-                )
-                OutlinedButton(
-                    onClick = { onMovieClick(movie.id) },
-                    border = BorderStroke(
-                        MoviesDimensions.borderWidthDefault,
-                        AmroTvColors.OnMediaPrimary
-                    ),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = AmroTvColors.OnMediaPrimary,
-                    ),
-                    modifier = Modifier.clearAndSetSemantics {
-                        contentDescription = movieContentDescription
-                    },
-                ) {
-                    Text(stringResource(R.string.featured_more_info))
-                }
+                Text(stringResource(R.string.featured_more_info))
             }
         }
     }
 }
 
-@LightDarkPreview
+@PreviewLightDark
 @Composable
 private fun FeaturedMovieBannerPreview(
-    @PreviewParameter(MoviePreviewProvider::class) movie: MoviePresentationModel,
+    @PreviewParameter(MoviePreviewProvider::class) movie: MoviePresentationModel
 ) {
-    AmroTvTheme {
-        FeaturedMovieBanner(
-            movie = movie,
-            onMovieClick = {},
-        )
-    }
+    AmroTvTheme { FeaturedMovieBanner(movie = movie, onMovieClick = {}) }
 }

@@ -6,9 +6,8 @@ class AmroKotlinLibraryConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             pluginManager.apply("org.jetbrains.kotlin.jvm")
-            extensions.configure(KotlinProjectExtension::class.java) {
-                jvmToolchain(11)
-            }
+            pluginManager.apply("amro.detekt")
+            extensions.configure(KotlinProjectExtension::class.java) { jvmToolchain(11) }
         }
     }
 }

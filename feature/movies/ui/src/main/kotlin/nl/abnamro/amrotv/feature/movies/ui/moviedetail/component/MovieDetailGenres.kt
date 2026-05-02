@@ -12,10 +12,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import kotlinx.collections.immutable.ImmutableList
+import nl.abnamro.amrotv.core.ui.preview.PreviewLightDark
 import nl.abnamro.amrotv.core.ui.theme.AmroTvDimensions
-import nl.abnamro.amrotv.feature.movies.presentation.api.model.GenrePresentationModel
-import nl.abnamro.amrotv.core.ui.preview.LightDarkPreview
 import nl.abnamro.amrotv.core.ui.theme.AmroTvTheme
+import nl.abnamro.amrotv.feature.movies.presentation.api.model.GenrePresentationModel
 import nl.abnamro.amrotv.feature.movies.ui.preview.UIPreviewData
 
 @Composable
@@ -28,28 +28,24 @@ internal fun MovieDetailGenres(
         horizontalArrangement = Arrangement.spacedBy(AmroTvDimensions.spacingSmall),
     ) {
         genres.forEach { genre ->
-            Surface(
-                shape = CircleShape,
-                color = MaterialTheme.colorScheme.secondaryContainer,
-            ) {
+            Surface(shape = CircleShape, color = MaterialTheme.colorScheme.secondaryContainer) {
                 Text(
                     text = genre.name,
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSecondaryContainer,
-                    modifier = Modifier.padding(
-                        horizontal = AmroTvDimensions.spacingSmall,
-                        vertical = AmroTvDimensions.spacingExtraSmall,
-                    ),
+                    modifier =
+                        Modifier.padding(
+                            horizontal = AmroTvDimensions.spacingSmall,
+                            vertical = AmroTvDimensions.spacingExtraSmall,
+                        ),
                 )
             }
         }
     }
 }
 
-@LightDarkPreview
+@PreviewLightDark
 @Composable
 private fun MovieDetailGenresPreview() {
-    AmroTvTheme {
-        MovieDetailGenres(genres = UIPreviewData.Genres.all)
-    }
+    AmroTvTheme { MovieDetailGenres(genres = UIPreviewData.Genres.all) }
 }

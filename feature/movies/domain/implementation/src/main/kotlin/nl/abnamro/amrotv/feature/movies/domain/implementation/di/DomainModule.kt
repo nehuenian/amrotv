@@ -21,24 +21,22 @@ internal abstract class DomainModule {
     @Binds
     @ViewModelScoped
     internal abstract fun bindGetTrendingMoviesUseCase(
-        impl: GetTrendingMoviesUseCaseImpl,
+        impl: GetTrendingMoviesUseCaseImpl
     ): GetTrendingMoviesUseCase
 
     @Binds
     @ViewModelScoped
     internal abstract fun bindGetMovieDetailUseCase(
-        impl: GetMovieDetailUseCaseImpl,
+        impl: GetMovieDetailUseCaseImpl
     ): GetMovieDetailUseCase
 
     @Binds
     @ViewModelScoped
-    internal abstract fun bindGetGenresUseCase(
-        impl: GetGenresUseCaseImpl,
-    ): GetGenresUseCase
+    internal abstract fun bindGetGenresUseCase(impl: GetGenresUseCaseImpl): GetGenresUseCase
 
     @Binds
     @ViewModelScoped
     internal abstract fun bindFilterAndSortMoviesUseCase(
-        impl: FilterAndSortMoviesUseCaseImpl,
+        impl: FilterAndSortMoviesUseCaseImpl
     ): FilterAndSortMoviesUseCase
 }

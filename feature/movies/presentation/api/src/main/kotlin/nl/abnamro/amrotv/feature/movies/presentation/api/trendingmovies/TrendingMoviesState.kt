@@ -5,7 +5,6 @@ import kotlinx.collections.immutable.persistentListOf
 import nl.abnamro.amrotv.core.mvi.MviState
 import nl.abnamro.amrotv.feature.movies.domain.api.model.SortOption
 import nl.abnamro.amrotv.feature.movies.domain.api.model.SortOrder
-
 import nl.abnamro.amrotv.feature.movies.presentation.api.MovieError
 import nl.abnamro.amrotv.feature.movies.presentation.api.model.GenrePresentationModel
 import nl.abnamro.amrotv.feature.movies.presentation.api.model.MoviePresentationModel

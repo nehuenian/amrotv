@@ -7,10 +7,10 @@ import nl.abnamro.amrotv.feature.movies.domain.api.model.MovieDetail
 /**
  * Contract for fetching movie data from a remote source.
  *
- * Implementations are responsible for all network communication, DTO mapping,
- * and pagination. The interface exposes only domain models — no DTOs cross this boundary.
- * Implementations throw on failure; callers are responsible for catching and converting
- * to the appropriate domain [nl.abnamro.amrotv.core.domain.model.Outcome].
+ * Implementations are responsible for all network communication, DTO mapping, and pagination. The
+ * interface exposes only domain models — no DTOs cross this boundary. Implementations throw on
+ * failure; callers are responsible for catching and converting to the appropriate domain
+ * [nl.abnamro.amrotv.core.domain.model.Outcome].
  */
 internal interface RemoteMovieDataSource {
 

@@ -9,9 +9,9 @@ import nl.abnamro.amrotv.core.ui.theme.AmroTvTheme
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-    enableEdgeToEdge()
-    setContent { AmroTvTheme { AmroNavHost() } }
-  }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        setContent { AmroTvTheme { AmroNavHost() } }
+    }
 }

@@ -1,3 +1,1 @@
-plugins {
-    alias(libs.plugins.amro.kotlin.library)
-}
+plugins { alias(libs.plugins.amro.kotlin.library) }
