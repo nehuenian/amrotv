@@ -2,6 +2,7 @@ package nl.abnamro.amrotv.feature.movies.presentation.api.trendingmovies
 
 import nl.abnamro.amrotv.core.mvi.MviIntent
 import nl.abnamro.amrotv.feature.movies.domain.api.model.SortOption
+import nl.abnamro.amrotv.feature.movies.domain.api.model.SortOrder
 
 /**
  * User intents for the Trending Movies screen.
@@ -20,8 +21,11 @@ sealed interface TrendingMoviesIntent : MviIntent {
     /** Changes the field used for sorting the movie list. */
     data class ChangeSortOption(val sortOption: SortOption) : TrendingMoviesIntent
 
-    /** Toggles the sort direction between ascending and descending. */
-    data object ToggleSortOrder : TrendingMoviesIntent
+    /** Selects the sort direction. No-op if [order] is already active. */
+    data class SelectSortOrder(val order: SortOrder) : TrendingMoviesIntent
+
+    /** Controls the visibility of the sort options bottom sheet. */
+    data class SetSortSheetVisible(val visible: Boolean) : TrendingMoviesIntent
 
     /** Requests navigation to the detail screen for the given [movieId]. */
     data class OpenMovieDetail(val movieId: Int) : TrendingMoviesIntent

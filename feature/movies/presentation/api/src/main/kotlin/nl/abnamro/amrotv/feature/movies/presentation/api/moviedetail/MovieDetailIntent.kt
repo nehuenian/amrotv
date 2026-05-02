@@ -13,6 +13,12 @@ sealed interface MovieDetailIntent : MviIntent {
     /** Requests the full detail for the given [movieId]. */
     data class LoadMovieDetail(val movieId: Int) : MovieDetailIntent
 
+    /** Requests navigation back to the previous screen. */
+    data object NavigateBack : MovieDetailIntent
+
+    /** Retries loading the movie detail after a failure. */
+    data object Retry : MovieDetailIntent
+
     /** Requests navigation to the IMDB page for the given [imdbId]. */
     data class OpenImdb(val imdbId: String) : MovieDetailIntent
 }

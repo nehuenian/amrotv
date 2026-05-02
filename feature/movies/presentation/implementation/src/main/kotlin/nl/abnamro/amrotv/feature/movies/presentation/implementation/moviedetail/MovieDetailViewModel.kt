@@ -3,9 +3,9 @@ package nl.abnamro.amrotv.feature.movies.presentation.implementation.moviedetail
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import nl.abnamro.amrotv.core.domain.model.Outcome
 import nl.abnamro.amrotv.core.mvi.BaseAmroTvViewModel
 import nl.abnamro.amrotv.core.mvi.reduceWith
-import nl.abnamro.amrotv.core.domain.model.Outcome
 import nl.abnamro.amrotv.feature.movies.domain.api.usecase.GetMovieDetailUseCase
 import nl.abnamro.amrotv.feature.movies.presentation.api.MovieError
 import nl.abnamro.amrotv.feature.movies.presentation.api.moviedetail.MovieDetailEffect
@@ -26,11 +26,22 @@ class MovieDetailViewModel @Inject constructor(
     initialState = stateReducers.initialState(),
 ) {
 
+    private var currentMovieId: Int? = null
+
     override fun handleIntent(intent: MovieDetailIntent) {
         when (intent) {
+            is MovieDetailIntent.NavigateBack -> sendEffect(MovieDetailEffect.NavigateBack)
+
             is MovieDetailIntent.LoadMovieDetail -> {
+                currentMovieId = intent.movieId
                 updateState { it.reduceWith(stateReducers.loading()) }
                 loadDetail(intent.movieId)
+            }
+
+            is MovieDetailIntent.Retry -> {
+                val movieId = currentMovieId ?: return
+                updateState { it.reduceWith(stateReducers.loading()) }
+                loadDetail(movieId)
             }
 
             is MovieDetailIntent.OpenImdb -> {
