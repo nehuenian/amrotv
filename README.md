@@ -134,35 +134,6 @@ if you cannot name the user action as a sealed subtype, the feature scope is unc
 
 ---
 
-## Technology Stack
-
-| Library | Version | Rationale |
-|---------|---------|-----------|
-| Kotlin | 2.3.21 | Language |
-| Android Gradle Plugin | 9.2.0 | Build tooling |
-| Jetpack Compose BOM | 2026.04.01 | UI toolkit — declarative, Kotlin-first |
-| Material 3 | (BOM) | Design tokens, adaptive colour scheme |
-| Navigation3 | 1.1.1 | Developer-owned back stack — more control than NavController for complex flows |
-| Lifecycle / ViewModel | 2.11.0-beta01 | StateFlow + `collectAsStateWithLifecycle` |
-| Dagger Hilt | 2.59.2 | Compile-time verified DI, first-class ViewModel support |
-| Retrofit | 3.0.0 | HTTP client for TMDB REST API |
-| OkHttp | 5.3.2 | Interceptor for Bearer-token auth + HTTP logging |
-| kotlinx.serialization | 1.11.0 | JSON parsing — KMP-friendly, no reflection |
-| kotlinx.coroutines | 1.10.2 | Structured concurrency for async data fetching |
-| kotlinx.collections.immutable | 0.4.0 | `ImmutableList` in state to avoid spurious recompositions |
-| Coil | 2.7.0 | Async image loading in Compose |
-| Timber | 5.0.1 | Tagged logging (behind the `Logger` abstraction) |
-| Room | 2.8.4 | Scaffolded for offline caching — not active in MVP (see Design Decisions) |
-| KSP | 2.3.6 | Annotation processor for Hilt + Room |
-| Detekt | 1.23.8 | Static analysis + Compose-specific rules |
-| Spotless | 8.4.0 | Code formatting |
-| JUnit 5 (Jupiter) | 6.0.3 | Unit test framework — `@Nested` + `@DisplayName` for readable output |
-| MockK | 1.14.9 | Kotlin-idiomatic mocking |
-| Turbine | 1.2.1 | Flow/StateFlow testing |
-| OkHttp MockWebServer | 5.3.2 | Real HTTP server for integration/E2E tests |
-
----
-
 ## Key Design Decisions
 
 ### 1. `Outcome<T>` — shared result type for the domain layer
