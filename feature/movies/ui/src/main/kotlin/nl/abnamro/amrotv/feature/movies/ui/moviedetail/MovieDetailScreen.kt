@@ -3,10 +3,13 @@ package nl.abnamro.amrotv.feature.movies.ui.moviedetail
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -96,8 +99,10 @@ fun MovieDetailContent(
                     detail = detail,
                     errors = state.errors,
                     onIntent = onIntent,
-                    // Only bottom padding: backdrop extends behind the transparent TopAppBar
-                    modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding()),
+                    // Only status bar inset: backdrop extends behind the transparent TopAppBar
+                    modifier = Modifier
+                        .windowInsetsPadding(WindowInsets.statusBars)
+                        .padding(bottom = innerPadding.calculateBottomPadding()),
                 )
             }
         }

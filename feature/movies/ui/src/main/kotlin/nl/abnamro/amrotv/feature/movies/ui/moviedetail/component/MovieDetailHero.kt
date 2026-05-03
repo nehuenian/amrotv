@@ -39,6 +39,7 @@ internal fun MovieDetailHero(detail: MovieDetailPresentationModel, modifier: Mod
             // Decorative: title and metadata are rendered as Text overlays above this image.
             contentDescription = null,
             contentScale = ContentScale.Crop,
+            alignment = Alignment.TopCenter,
             modifier = Modifier.fillMaxSize(),
         )
         Box(

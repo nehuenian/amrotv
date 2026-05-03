@@ -24,20 +24,19 @@ datasource/
   remote/
     RemoteMovieDataSource.kt          ← interface, returns domain models
     tmdb/
-      TmdbMovieDataSource.kt          ← Retrofit + DTO→domain (DTOs private here)
+      TmdbMovieDataSource.kt          ← Retrofit + DTO→domain mapping via Mapper classes
       TmdbApiService.kt
       dto/  (TrendingMoviesResponseDto, MovieDto, MovieDetailDto, GenreListResponseDto, GenreDto)
+            (GenreDataToDomainMapper, MovieDataToDomainMapper, MovieDetailDataToDomainMapper)
   local/
     LocalMovieDataSource.kt           ← interface, accepts/returns domain models
-    room/
-      RoomMovieDataSource.kt          ← Room calls + entity→domain (entities private here)
-      AmroDatabase.kt
-      MovieDao.kt / GenreDao.kt
-      entity/  (MovieEntity, GenreEntity)
+    NoOpLocalMovieDataSource.kt       ← active MVP binding (no-op stub)
+    room/                             ← planned, not yet implemented
+      (RoomMovieDataSource, AmroDatabase, DAOs, entities to be added here)
 repository/
   MovieRepositoryImpl.kt              ← orchestrates interfaces only, no mapping
 di/
-  DataModule.kt                       ← @Provides TmdbApiService, AmroDatabase, DAOs
+  DataModule.kt                       ← @Provides TmdbApiService
   DataBindingsModule.kt               ← @Binds impls → interfaces
 ```
 
@@ -64,10 +63,10 @@ interface LocalMovieDataSource {
 
 ## DTOs (kotlinx.serialization, inside `tmdb/dto/`)
 
-> DTOs will be created in Commit 8 at:
+> Read the DTO files at:
 > `feature/movies/data/src/main/kotlin/nl/abnamro/amrotv/feature/movies/data/datasource/remote/tmdb/dto/`
 >
-> See `plan.md` for the full field list. Key notes:
+> Key notes:
 > - `budget` and `revenue` are `Long` (TMDB returns `0` for unknown) — mapper converts `0` → `null` in domain
 > - `MovieDetailDto` has `genres` as full objects (`List<GenreDto>`), unlike `MovieDto` which has `genreIds: List<Int>`
 > - All fields have defaults to be resilient to missing JSON keys
@@ -76,20 +75,25 @@ interface LocalMovieDataSource {
 
 ## TmdbMovieDataSource — Dynamic Page Count
 
-> Read the implementation once created in Commit 8:
+> Read the implementation:
 > `feature/movies/data/src/main/kotlin/.../datasource/remote/tmdb/TmdbMovieDataSource.kt`
 >
-> Key requirement: page size is **not hardcoded** — derive `pagesNeeded` from the first-page response:
-> `pagesNeeded = ceil(100.0 / pageSize).toInt()`
-> Fetch remaining pages in parallel with `coroutineScope { (2..n).map { async { ... } }.awaitAll() }`.
+> Key behaviour: pages are fetched sequentially until 100 unique movies are collected.
+> Page 1 failure throws to the caller. Any subsequent page failure stops pagination early,
+> returning however many movies were collected — preventing cascading requests on rate limits
+> or auth errors. Duplicate IDs across pages are skipped.
 
 ---
 
 ## Room Entities (private to `room/entity/`)
 
-> Entities will be created in Commit 8 at `feature/movies/data/src/.../datasource/local/room/entity/`
+> **Room is scaffolded but not active in MVP.** `NoOpLocalMovieDataSource` is the current
+> active Hilt binding. The package layout below shows the planned structure for a future
+> implementation — the entities and DAOs are present but `RoomMovieDataSource` is not wired up.
+> Activating the cache requires implementing `RoomMovieDataSource` and swapping the `@Binds`
+> in `DataBindingsModule`.
 >
-> Key design choices:
+> Key design choices for the planned implementation:
 > - `genreIds` stored as a comma-separated string (e.g. `"28,12,878"`) — no join table needed for MVP
 > - `RoomMovieDataSource` maps `Movie ↔ MovieEntity` and `Genre ↔ GenreEntity` internally — entities never cross the `LocalMovieDataSource` boundary
 
@@ -97,7 +101,7 @@ interface LocalMovieDataSource {
 
 ## MovieRepositoryImpl — Orchestration Only
 
-> Read the implementation once created in Commit 8:
+> Read the implementation:
 > `feature/movies/data/src/main/kotlin/.../repository/MovieRepositoryImpl.kt`
 >
 > Key rule: **no mapping logic, no DTOs, no entities** — orchestrates data sources only.
@@ -124,6 +128,8 @@ class CompositeMovieDataSource @Inject constructor(
 
 ## Hilt Wiring (`DataBindingsModule`)
 
-> Standard `@Binds` pattern. Read an existing module (e.g. `core/network/`) for reference.
-> `DataBindingsModule` binds: `TmdbMovieDataSource → RemoteMovieDataSource`, `RoomMovieDataSource → LocalMovieDataSource`, `MovieRepositoryImpl → MovieRepository`.
+> Read `feature/movies/data/src/main/kotlin/.../di/DataBindingsModule.kt`.
+> `DataBindingsModule` binds: `TmdbMovieDataSource → RemoteMovieDataSource`,
+> `NoOpLocalMovieDataSource → LocalMovieDataSource` (active binding in MVP — swap to
+> `RoomMovieDataSource` to activate offline cache), `MovieRepositoryImpl → MovieRepository`.
 

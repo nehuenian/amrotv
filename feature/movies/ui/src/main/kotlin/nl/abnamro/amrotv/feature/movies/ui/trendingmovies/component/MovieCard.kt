@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -33,7 +34,7 @@ import nl.abnamro.amrotv.feature.movies.ui.trendingmovies.component.preview.Movi
 @Composable
 fun MovieCard(movie: MoviePresentationModel, onMovieClick: (Int) -> Unit, modifier: Modifier = Modifier) {
     val context = LocalContext.current
-    Card(onClick = { onMovieClick(movie.id) }, modifier = modifier.fillMaxWidth()) {
+    Card(onClick = { onMovieClick(movie.id) }, modifier = modifier.fillMaxWidth().testTag(MovieCardSemantics.TEST_TAG)) {
         Box(modifier = Modifier.fillMaxWidth().aspectRatio(2f / 3f)) {
             AsyncImage(
                 model = ImageRequest.Builder(context).data(movie.posterUrl).crossfade(true).build(),

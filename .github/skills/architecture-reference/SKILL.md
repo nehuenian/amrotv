@@ -37,32 +37,41 @@ user-invocable: true
 amrotv/
 ├── app/                                  # Android Application entry point
 ├── core/
-│   ├── mvi/                              # MVI base classes (MviViewModel, interfaces) — Android library (needs androidx.lifecycle:viewmodel-ktx)
-│   ├── network/                          # Retrofit/OkHttp setup, AuthInterceptor, NetworkResult
-│   └── ui/                              # AmroTheme, shared Compose components
+│   ├── mvi/
+│   │   ├── android/                      # BaseAmroTvViewModel (needs androidx.lifecycle:viewmodel-ktx)
+│   │   └── kotlin/                       # MviState/Intent/Effect, StateReducer, Mapper<I,O> — pure Kotlin
+│   ├── domain/                           # Outcome<T> sealed class (shared across features)
+│   ├── data/                             # NetworkModule: Retrofit/OkHttp setup, AuthInterceptor
+│   ├── build-config/                     # BuildConfigProvider interface (decouples API token from modules)
+│   ├── testing/                          # Robot DSL for E2E instrumented tests
+│   └── ui/                              # AmroTheme, shared Compose components, @LightDarkPreview
 ├── libraries/
 │   └── logger/
 │       ├── api/                          # Logger interface (no Android deps — pure Kotlin)
 │       └── implementation/               # TimberLogger + Hilt binding
 └── feature/
     └── movies/
-        ├── data/                         # TmdbApiService, DTOs, mappers, MovieRepositoryImpl
+        ├── nav/                          # MoviesNavKey sealed interface, moviesEntry (Navigation3 wiring)
+        ├── data/                         # TmdbApiService, DTOs, Mapper classes, MovieRepositoryImpl
         ├── domain/
         │   ├── api/                      # Domain models, MovieRepository interface, UseCase interfaces
         │   └── implementation/           # UseCase implementations
-        └── presentation/
-            ├── api/                      # MVI State, Intent, Effect for each screen
-            ├── implementation/           # ViewModels
-            └── ui/                       # Composable screens and components
+        ├── presentation/
+        │   ├── api/                      # MVI State, Intent, Effect for each screen
+        │   └── implementation/           # ViewModels + StateReducers
+        └── ui/                           # Composable screens and components
 ```
 
 ### Gradle Module IDs (settings.gradle.kts)
 
 ```kotlin
 include(":app")
+include(":core:domain")
+include(":core:testing")
 include(":core:mvi:kotlin")
 include(":core:mvi:android")
-include(":core:network")
+include(":core:data")
+include(":core:build-config")
 include(":core:ui")
 include(":libraries:logger:api")
 include(":libraries:logger:implementation")
@@ -72,6 +81,7 @@ include(":feature:movies:data")
 include(":feature:movies:presentation:api")
 include(":feature:movies:presentation:implementation")
 include(":feature:movies:ui")
+include(":feature:movies:nav")
 ```
 
 > Always use type-safe project accessors (`projects.*`) for inter-module dependencies. Enable with `enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")` in `settings.gradle.kts`.
@@ -80,24 +90,25 @@ include(":feature:movies:ui")
 
 ```
 :app
-  └── :feature:movies:ui
-        └── :feature:movies:presentation:api
+  └── :feature:movies:nav          ← single entry point; :app has no other feature deps
+        ├── :feature:movies:ui
+        │     └── :feature:movies:presentation:api
+        │           └── :feature:movies:domain:api
+        ├── :feature:movies:presentation:implementation
+        │     ├── :feature:movies:presentation:api
+        │     ├── :feature:movies:domain:api
+        │     └── :core:mvi:android
+        ├── :feature:movies:data
+        │     ├── :feature:movies:domain:api
+        │     ├── :core:data
+        │     ├── :core:mvi:kotlin
+        │     └── :libraries:logger:api
+        └── :feature:movies:domain:implementation
               └── :feature:movies:domain:api
-  └── :feature:movies:presentation:implementation
-        ├── :feature:movies:presentation:api
-        ├── :feature:movies:domain:api
-        └── :core:mvi:android
-  └── :feature:movies:data
-        ├── :feature:movies:domain:api
-        ├── :core:network
-        └── :libraries:logger:api
-  └── :feature:movies:domain:implementation
-        └── :feature:movies:domain:api
-  └── :core:ui
-  └── :libraries:logger:implementation
-        └── :libraries:logger:api
-:core:network
+:core:data
   └── :libraries:logger:api
+:core:mvi:android
+  └── :core:mvi:kotlin
 ```
 
 ---
@@ -280,10 +291,10 @@ Rules:
 |-------|--------------|---------------|
 | `domain:api` | Kotlin stdlib + coroutines only | Android, Hilt, Retrofit, Room |
 | `domain:implementation` | `domain:api`, Hilt | Android UI, Retrofit, Room |
-| `data` | `domain:api`, `core:network`, `libraries:logger:api`, Hilt | `presentation:*` |
+| `data` | `domain:api`, `core:data`, `core:mvi:kotlin`, `libraries:logger:api`, Hilt | `presentation:*` |
 | `presentation:api` | `domain:api`, `core:mvi:kotlin` | ViewModels, Android UI |
 | `presentation:implementation` | `presentation:api`, `domain:api`, `core:mvi:android`, `core:mvi:kotlin`, `libraries:logger:api`, Hilt | Compose, NavController |
-| `ui` | `presentation:api`, `core:ui`, Compose | `domain:*` directly; use `hiltViewModel()` |
+| `ui` | `presentation:api`, `core:ui`, Compose | `domain:*` directly; receives `AmroTvViewModel` as a constructor parameter — `hiltViewModel()` is called in `:feature:movies:nav` (entry builder), not in `:ui` |
 
 Key rules:
 - **DTOs never cross layer boundaries** — each data source maps its own DTOs to domain models internally.
@@ -325,16 +336,23 @@ class MyViewModel @Inject constructor(val dep: Dep) : MviViewModel<...>(...)
 
 **Library: Navigation3 1.1.1** — developer-owned back stack (`SnapshotStateList<Any>`).
 
+Navigation keys are defined as a `@Serializable` sealed interface in `:feature:movies:nav`:
+
 ```kotlin
-@Serializable data object TrendingMovies
-@Serializable data class MovieDetail(val movieId: Int)
+// feature/movies/nav/src/.../MoviesNavKey.kt
+sealed interface MoviesNavKey {
+    @Serializable data object TrendingMovies : MoviesNavKey
+    @Serializable data class MovieDetail(val movieId: Int) : MoviesNavKey
+}
 ```
 
-> `AmroNavHost.kt` does not exist yet — it will be created in Commit 11. Until then, use the navigation rules below as the source of truth.
+> Read `app/src/main/kotlin/nl/abnamro/amrotv/AmroNavHost.kt` — the `NavDisplay` setup.
+> Read `feature/movies/nav/src/main/kotlin/.../MoviesEntryBuilder.kt` — the `moviesEntry` function.
 
 Rules:
-- Routes: `@Serializable data object` or `data class` in `:app`.
-- Navigate forward: `backStack.add(SomeRoute(...))`.
+- Nav keys (`MoviesNavKey`) live in `:feature:movies:nav`, not in `:app`.
+- `:app` depends on `:feature:movies:nav` as its sole feature dependency.
+- Navigate forward: `backStack.add(MoviesNavKey.MovieDetail(movieId))`.
 - Navigate back: `backStack.removeLastOrNull()`.
 - Screens receive navigation as **lambda parameters** — never import `NavDisplay` or touch `backStack`.
 - `hiltViewModel()` works inside `NavEntry` via `rememberViewModelStoreNavEntryDecorator()`.
@@ -345,7 +363,9 @@ Rules:
 
 ### Screen structure
 
-> `TrendingMoviesScreen.kt` does not exist yet — it will be created in Commit 10. Until then, use the screen rules below as the source of truth.
+> Read `feature/movies/ui/src/main/kotlin/.../trendingmovies/TrendingMoviesScreen.kt`
+> and `feature/movies/ui/src/main/kotlin/.../moviedetail/MovieDetailScreen.kt`
+> for canonical examples of the Screen/Content split.
 
 Rules:
 - Always split into `Screen` (stateful) and `Content` (stateless + previewable).
@@ -371,18 +391,71 @@ AsyncImage(
 
 ---
 
+## Mappers
+
+All model conversions implement the `Mapper<I, O>` interface from `:core:mvi:kotlin`:
+
+```kotlin
+// core/mvi/kotlin/src/.../Mapper.kt
+interface Mapper<I, O> {
+    fun map(input: I): O
+}
+```
+
+Rules:
+- **Always implement `Mapper<I, O>`** — never use extension functions for data transformation.
+- **Always use constructor injection** — mapper dependencies (e.g. a genre mapper inside a
+  movie-detail mapper) are injected, not created inline.
+- **Naming**: `{Model}{SourceLayer}To{TargetLayer}Mapper` — layer names are `Data`, `Domain`,
+  `Presentation`.
+- **Placement**: keep mappers in the same package as the types they map *from*.
+  - `data` layer mappers (`*DataToDomainMapper`) live in `tmdb/dto/`
+  - `presentation` layer mappers (`*DomainToPresentationMapper`) live in `presentation/implementation/mapper/`
+
+```kotlin
+// Example — data layer mapper
+internal class GenreDataToDomainMapper @Inject constructor() : Mapper<GenreDto, Genre> {
+    override fun map(input: GenreDto) = Genre(id = input.id, name = input.name)
+}
+
+// Example — composite mapper (injects collaborator)
+internal class MovieDetailDataToDomainMapper @Inject constructor(
+    private val genreMapper: GenreDataToDomainMapper,
+) : Mapper<MovieDetailDto, MovieDetail> {
+    override fun map(input: MovieDetailDto) = MovieDetail(
+        genres = input.genres.map { genreMapper.map(it) },
+        // ...
+    )
+}
+```
+
+> Read existing mappers:
+> - `feature/movies/data/src/.../tmdb/dto/GenreDataToDomainMapper.kt`
+> - `feature/movies/data/src/.../tmdb/dto/MovieDataToDomainMapper.kt`
+> - `feature/movies/data/src/.../tmdb/dto/MovieDetailDataToDomainMapper.kt`
+> - `feature/movies/presentation/implementation/src/.../mapper/MovieDomainToPresentationMapper.kt`
+
+---
+
 ## Logging
 
 ```kotlin
 // Always inject Logger — never call Timber or Log directly
 class SomeClass @Inject constructor(private val logger: Logger) {
     fun doSomething() {
-        logger.d("SomeClass", "Doing something")
+        logger.log(LogLevel.DEBUG, "SomeClass", "Doing something")
     }
 }
 ```
 
-`Logger` interface (`libraries:api`): `fun d/i/w/e(tag: String, message: String, throwable: Throwable? = null)`
+`Logger` interface (`libraries:logger:api`) has a single method:
+```kotlin
+fun log(level: LogLevel, tag: String, message: String, throwable: Throwable? = null)
+```
+
+`LogLevel` is an enum: `DEBUG`, `INFO`, `WARN`, `ERROR`.
+
+> Read `libraries/logger/api/src/main/kotlin/nl/abnamro/amrotv/libraries/logger/api/Logger.kt`
 
 ---
 
@@ -398,7 +471,7 @@ class SomeClass @Inject constructor(private val logger: Logger) {
 | Use case impl | `Get{Thing}UseCaseImpl` | `GetTrendingMoviesUseCaseImpl` |
 | Repository interface | `{Thing}Repository` | `MovieRepository` |
 | Repository impl | `{Thing}RepositoryImpl` | `MovieRepositoryImpl` |
-| API service | `{Source}ApiService` | `TmdbApiService` |
+| Mapper | `{Model}{SourceLayer}To{TargetLayer}Mapper` | `GenreDataToDomainMapper`, `MovieDomainToPresentationMapper` |
 | DTO | `{Thing}Dto` | `MovieDto`, `TrendingMoviesResponseDto` |
 | Hilt module | `{Layer}Module` | `DataModule`, `DomainModule`, `NetworkModule` |
 | Screen composable | `{Screen}Screen` | `TrendingMoviesScreen` |
@@ -445,7 +518,7 @@ KDoc is **required** on interfaces, abstract classes, and domain model propertie
 > Read real KDoc examples in:
 > - `core/mvi/android/src/main/kotlin/nl/abnamro/amrotv/core/mvi/BaseAmroTvViewModel.kt` — abstract class with type-param docs
 > - `core/mvi/kotlin/src/main/kotlin/nl/abnamro/amrotv/core/mvi/StateReducer.kt` — interface with member KDoc
-> - `core/network/src/main/kotlin/nl/abnamro/amrotv/core/network/NetworkResult.kt` — sealed class with property docs
+> - `core/domain/src/main/kotlin/nl/abnamro/amrotv/core/domain/model/Outcome.kt` — sealed class with property docs
 
 ### Anti-patterns
 
