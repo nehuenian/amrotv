@@ -9,6 +9,7 @@ data class MoviePresentationModel(
     val backdropUrl: String?,
     val genreIds: ImmutableList<Int>,
     val popularity: Double,
-    val releaseYear: String?,
+    val releaseDate: String?,
     val formattedRating: String,
+    val isReleased: Boolean,
 )

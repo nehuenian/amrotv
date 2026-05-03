@@ -39,7 +39,7 @@ internal fun MovieDetailStats(detail: MovieDetailPresentationModel, modifier: Mo
                 value = stringResource(R.string.movie_runtime_value_format, it),
             )
         }
-        detail.releaseYear?.let {
+        detail.releaseDate?.let {
             LabeledInfo(
                 label = stringResource(R.string.movie_release_date_label),
                 // TODO: Replace with i18n date formatting library to localise release date display

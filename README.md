@@ -246,7 +246,7 @@ TMDB_READ_ACCESS_TOKEN=eyJhbGciOiJIUzI1NiJ9...
 ./gradlew build
 ```
 
-Minimum requirements: **Android 7.0 (API 24)**, target **API 37**.
+Minimum requirements: **Android 8.0 (API 26)**, target **API 37**.
 
 ---
 

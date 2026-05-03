@@ -11,8 +11,8 @@ class AmroAndroidLibraryConventionPlugin : Plugin<Project> {
             pluginManager.apply("com.android.library")
             pluginManager.apply("amro.detekt")
             (extensions.getByName("android") as LibraryExtension).apply {
-                compileSdk = 36
-                defaultConfig { minSdk = 24 }
+                compileSdk = 37
+                defaultConfig { minSdk = 26 }
                 compileOptions {
                     sourceCompatibility = JavaVersion.VERSION_11
                     targetCompatibility = JavaVersion.VERSION_11

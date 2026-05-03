@@ -1,6 +1,7 @@
 package nl.abnamro.amrotv.feature.movies.presentation.implementation.mapper
 
 import java.text.NumberFormat
+import java.time.LocalDate
 import java.util.Locale
 import kotlinx.collections.immutable.persistentListOf
 import nl.abnamro.amrotv.core.mvi.Mapper
@@ -44,7 +45,7 @@ class MovieDetailDomainToPresentationMapperTest {
                 imdbId = "tt0468569",
                 status = "Released",
                 runtimeInMinutes = 152,
-                releaseDate = "2008-07-18",
+                releaseDate = LocalDate.of(2008, 7, 18),
             )
 
         @Nested
@@ -144,9 +145,9 @@ class MovieDetailDomainToPresentationMapperTest {
             }
 
             @Test
-            @DisplayName("THEN releaseYear is extracted from releaseDate")
-            fun releaseYearExtractedFromReleaseDate() {
-                assertEquals("2008", mapper.map(movieDetail).releaseYear)
+            @DisplayName("THEN releaseDate is formatted as MMM d, yyyy")
+            fun releaseDateIsFormatted() {
+                assertEquals("Jul 18, 2008", mapper.map(movieDetail).releaseDate)
             }
         }
     }
@@ -171,7 +172,7 @@ class MovieDetailDomainToPresentationMapperTest {
                 imdbId = null,
                 status = "Released",
                 runtimeInMinutes = null,
-                releaseDate = "2020-01-01",
+                releaseDate = LocalDate.of(2020, 1, 1),
             )
 
         @Nested
@@ -232,13 +233,13 @@ class MovieDetailDomainToPresentationMapperTest {
     }
 
     @Nested
-    @DisplayName("GIVEN a movie detail with a malformed releaseDate")
-    inner class GivenMovieDetailWithMalformedReleaseDate {
+    @DisplayName("GIVEN a movie detail with null releaseDate")
+    inner class GivenMovieDetailWithNullReleaseDate {
 
         private val movieDetail =
             MovieDetail(
                 id = 99,
-                title = "Bad Date Movie",
+                title = "No Date Movie",
                 tagline = null,
                 posterUrl = null,
                 backdropUrl = null,
@@ -251,7 +252,7 @@ class MovieDetailDomainToPresentationMapperTest {
                 imdbId = null,
                 status = "Unknown",
                 runtimeInMinutes = null,
-                releaseDate = "not-a-date",
+                releaseDate = null,
             )
 
         @Nested
@@ -259,9 +260,9 @@ class MovieDetailDomainToPresentationMapperTest {
         inner class WhenMapped {
 
             @Test
-            @DisplayName("THEN releaseYear is null")
-            fun releaseYearIsNullForMalformedDate() {
-                assertNull(mapper.map(movieDetail).releaseYear)
+            @DisplayName("THEN releaseDate is null")
+            fun releaseDateIsNullWhenInputIsNull() {
+                assertNull(mapper.map(movieDetail).releaseDate)
             }
         }
     }
@@ -286,7 +287,7 @@ class MovieDetailDomainToPresentationMapperTest {
                 imdbId = null,
                 status = "Released",
                 runtimeInMinutes = null,
-                releaseDate = "2000-01-01",
+                releaseDate = LocalDate.of(2000, 1, 1),
             )
 
         @Nested

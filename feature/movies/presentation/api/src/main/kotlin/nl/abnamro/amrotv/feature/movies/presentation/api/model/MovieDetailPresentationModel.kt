@@ -17,5 +17,5 @@ data class MovieDetailPresentationModel(
     val imdbId: String?,
     val status: String,
     val runtimeInMinutes: Int?,
-    val releaseYear: String?,
+    val releaseDate: String?,
 )

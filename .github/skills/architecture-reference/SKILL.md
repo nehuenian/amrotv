@@ -27,7 +27,7 @@ user-invocable: true
 
 **Root package**: `nl.abnamro.amrotv`
 
-**Min SDK**: 24 | **Target SDK**: 36
+**SDK**: Min SDK: 26, Compile/Target SDK: 37
 
 ---
 
@@ -409,7 +409,7 @@ Rules:
 - **Naming**: `{Model}{SourceLayer}To{TargetLayer}Mapper` — layer names are `Data`, `Domain`,
   `Presentation`.
 - **Placement**: keep mappers in the same package as the types they map *from*.
-  - `data` layer mappers (`*DataToDomainMapper`) live in `tmdb/dto/`
+  - `data` layer mappers (`*DataToDomainMapper`) live in `tmdb/mapper/`
   - `presentation` layer mappers (`*DomainToPresentationMapper`) live in `presentation/implementation/mapper/`
 
 ```kotlin
@@ -430,9 +430,9 @@ internal class MovieDetailDataToDomainMapper @Inject constructor(
 ```
 
 > Read existing mappers:
-> - `feature/movies/data/src/.../tmdb/dto/GenreDataToDomainMapper.kt`
-> - `feature/movies/data/src/.../tmdb/dto/MovieDataToDomainMapper.kt`
-> - `feature/movies/data/src/.../tmdb/dto/MovieDetailDataToDomainMapper.kt`
+> - `feature/movies/data/src/.../tmdb/mapper/GenreDataToDomainMapper.kt`
+> - `feature/movies/data/src/.../tmdb/mapper/MovieDataToDomainMapper.kt`
+> - `feature/movies/data/src/.../tmdb/mapper/MovieDetailDataToDomainMapper.kt`
 > - `feature/movies/presentation/implementation/src/.../mapper/MovieDomainToPresentationMapper.kt`
 
 ---

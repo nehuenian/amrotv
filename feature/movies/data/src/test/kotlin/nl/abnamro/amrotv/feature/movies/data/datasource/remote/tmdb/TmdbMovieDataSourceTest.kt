@@ -8,9 +8,9 @@ import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import nl.abnamro.amrotv.feature.movies.data.MovieDataMocks.Dtos
 import nl.abnamro.amrotv.feature.movies.data.datasource.remote.RemoteMovieDataSource
-import nl.abnamro.amrotv.feature.movies.data.datasource.remote.tmdb.dto.GenreDataToDomainMapper
-import nl.abnamro.amrotv.feature.movies.data.datasource.remote.tmdb.dto.MovieDataToDomainMapper
-import nl.abnamro.amrotv.feature.movies.data.datasource.remote.tmdb.dto.MovieDetailDataToDomainMapper
+import nl.abnamro.amrotv.feature.movies.data.datasource.remote.tmdb.mapper.GenreDataToDomainMapper
+import nl.abnamro.amrotv.feature.movies.data.datasource.remote.tmdb.mapper.MovieDataToDomainMapper
+import nl.abnamro.amrotv.feature.movies.data.datasource.remote.tmdb.mapper.MovieDetailDataToDomainMapper
 import nl.abnamro.amrotv.feature.movies.data.datasource.remote.tmdb.dto.TrendingMoviesResponseDto
 import nl.abnamro.amrotv.libraries.logger.api.LogLevel
 import nl.abnamro.amrotv.libraries.logger.api.Logger

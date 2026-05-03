@@ -44,6 +44,7 @@ class TrendingMoviesRobot(
         fun genreFilterAllChipVisible()
         fun featuredBannerVisible()
         fun atLeastOneMovieVisible()
+        fun releasedTagVisible()
         fun movieVisible(title: String)
         fun movieNotVisible(title: String)
     }
@@ -132,6 +133,12 @@ class TrendingMoviesRobot(
                     val nodes = rule.onAllNodes(hasTestTag(MovieCardSemantics.TEST_TAG))
                         .fetchSemanticsNodes()
                     assertTrue("Expected at least one movie card to be visible", nodes.isNotEmpty())
+                }
+
+                override fun releasedTagVisible() {
+                    val nodes = rule.onAllNodes(hasText(E2ETestData.TAG_RELEASED))
+                        .fetchSemanticsNodes()
+                    assertTrue("Expected at least one 'Released' tag to be visible", nodes.isNotEmpty())
                 }
 
                 override fun movieVisible(title: String) {

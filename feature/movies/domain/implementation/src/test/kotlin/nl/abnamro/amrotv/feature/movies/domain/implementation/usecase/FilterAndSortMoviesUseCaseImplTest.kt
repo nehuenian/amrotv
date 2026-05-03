@@ -172,6 +172,31 @@ class FilterAndSortMoviesUseCaseImplTest {
         }
 
         @Nested
+        @DisplayName("WHEN sorting by RELEASE_DATE DESC")
+        inner class WhenSortingByReleaseDateDesc {
+
+            @Test
+            @DisplayName("THEN movies are ordered by release date descending")
+            fun sortedByReleaseDateDesc() {
+                val result =
+                    useCase(
+                        MovieDomainMocks.Movies.all.reversed(),
+                        null,
+                        SortOption.RELEASE_DATE,
+                        SortOrder.DESC,
+                    )
+                assertEquals(
+                    listOf(
+                        MovieDomainMocks.Movies.action,
+                        MovieDomainMocks.Movies.comedy,
+                        MovieDomainMocks.Movies.actionComedy,
+                    ),
+                    result,
+                )
+            }
+        }
+
+        @Nested
         @DisplayName("WHEN filtering by comedy and sorting by POPULARITY ASC")
         inner class WhenFilterAndSortCombined {
 
@@ -208,6 +233,47 @@ class FilterAndSortMoviesUseCaseImplTest {
                     SortOrder.DESC,
                 )
             assertTrue(result.isEmpty())
+        }
+    }
+
+    @Nested
+    @DisplayName("GIVEN a list that includes a movie with no release date")
+    inner class GivenListWithNullReleaseDateMovie {
+
+        @Nested
+        @DisplayName("WHEN sorting by RELEASE_DATE ASC")
+        inner class WhenSortingByReleaseDateAsc {
+
+            @Test
+            @DisplayName("THEN the movie with no release date sorts last")
+            fun nullReleaseDateSortsLast() {
+                val result =
+                    useCase(
+                        listOf(MovieDomainMocks.Movies.noReleaseDate) + MovieDomainMocks.Movies.all,
+                        null,
+                        SortOption.RELEASE_DATE,
+                        SortOrder.ASC,
+                    )
+                assertEquals(MovieDomainMocks.Movies.noReleaseDate, result.last())
+            }
+        }
+
+        @Nested
+        @DisplayName("WHEN sorting by RELEASE_DATE DESC")
+        inner class WhenSortingByReleaseDateDesc {
+
+            @Test
+            @DisplayName("THEN the movie with no release date still sorts last")
+            fun nullReleaseDateSortsLastInDesc() {
+                val result =
+                    useCase(
+                        listOf(MovieDomainMocks.Movies.noReleaseDate) + MovieDomainMocks.Movies.all,
+                        null,
+                        SortOption.RELEASE_DATE,
+                        SortOrder.DESC,
+                    )
+                assertEquals(MovieDomainMocks.Movies.noReleaseDate, result.last())
+            }
         }
     }
 }

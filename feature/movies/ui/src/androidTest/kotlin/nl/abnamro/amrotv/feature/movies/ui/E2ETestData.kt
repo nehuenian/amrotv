@@ -3,6 +3,10 @@ package nl.abnamro.amrotv.feature.movies.ui
 internal object E2ETestData {
     const val SCIENCE_FICTION_GENRE_NAME = "Science Fiction"
 
+    // Movie card tags
+    const val TAG_RELEASED = "Released"
+    const val TAG_UPCOMING = "Upcoming"
+
     // UI labels
     const val VIEW_ON_IMDB_LABEL = "View on IMDb"
     const val FEATURED_BANNER_CONTENT_DESC_PREFIX = "More info about"

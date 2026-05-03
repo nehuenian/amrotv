@@ -1,5 +1,6 @@
 package nl.abnamro.amrotv.feature.movies.data
 
+import java.time.LocalDate
 import nl.abnamro.amrotv.feature.movies.data.datasource.remote.tmdb.dto.GenreDto
 import nl.abnamro.amrotv.feature.movies.data.datasource.remote.tmdb.dto.GenreListResponseDto
 import nl.abnamro.amrotv.feature.movies.data.datasource.remote.tmdb.dto.MovieDetailDto
@@ -22,7 +23,7 @@ internal object MovieDataMocks {
                 backdropUrl = "https://image.tmdb.org/t/p/w500/backdrop.jpg",
                 genreIds = listOf(28, 35),
                 popularity = 100.0,
-                releaseDate = "2024-01-01",
+                releaseDate = LocalDate.of(2024, 1, 1),
                 voteAverage = 7.5,
             )
         val movies = listOf(movie)
@@ -43,7 +44,7 @@ internal object MovieDataMocks {
                 imdbId = "tt1234567",
                 status = "Released",
                 runtimeInMinutes = 120,
-                releaseDate = "2024-06-15",
+                releaseDate = LocalDate.of(2024, 6, 15),
             )
     }
 

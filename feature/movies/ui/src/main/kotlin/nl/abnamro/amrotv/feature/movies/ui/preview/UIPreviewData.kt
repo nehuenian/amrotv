@@ -27,8 +27,9 @@ internal object UIPreviewData {
                 backdropUrl = null,
                 genreIds = persistentListOf(Genres.action.id, Genres.crime.id),
                 popularity = 100.0,
-                releaseYear = "2008",
+                releaseDate = "Jul 18, 2008",
                 formattedRating = "9.0",
+                isReleased = true,
             )
         val inception =
             MoviePresentationModel(
@@ -38,8 +39,9 @@ internal object UIPreviewData {
                 backdropUrl = null,
                 genreIds = persistentListOf(Genres.action.id, Genres.sciFi.id),
                 popularity = 90.0,
-                releaseYear = "2010",
+                releaseDate = "Jul 16, 2010",
                 formattedRating = "8.8",
+                isReleased = true,
             )
         val interstellar =
             MoviePresentationModel(
@@ -49,8 +51,9 @@ internal object UIPreviewData {
                 backdropUrl = null,
                 genreIds = persistentListOf(Genres.sciFi.id, Genres.drama.id),
                 popularity = 88.0,
-                releaseYear = "2014",
+                releaseDate = "Nov 7, 2014",
                 formattedRating = "8.6",
+                isReleased = true,
             )
         val shawshankRedemption =
             MoviePresentationModel(
@@ -60,8 +63,9 @@ internal object UIPreviewData {
                 backdropUrl = null,
                 genreIds = persistentListOf(Genres.drama.id),
                 popularity = 85.0,
-                releaseYear = "1994",
+                releaseDate = "Sep 23, 1994",
                 formattedRating = "9.3",
+                isReleased = true,
             )
         val pulpFiction =
             MoviePresentationModel(
@@ -71,8 +75,9 @@ internal object UIPreviewData {
                 backdropUrl = null,
                 genreIds = persistentListOf(Genres.crime.id, Genres.thriller.id),
                 popularity = 82.0,
-                releaseYear = "1994",
+                releaseDate = "Oct 14, 1994",
                 formattedRating = "8.9",
+                isReleased = true,
             )
         val theMatrix =
             MoviePresentationModel(
@@ -82,8 +87,9 @@ internal object UIPreviewData {
                 backdropUrl = null,
                 genreIds = persistentListOf(Genres.action.id, Genres.sciFi.id),
                 popularity = 80.0,
-                releaseYear = "1999",
+                releaseDate = "Mar 31, 1999",
                 formattedRating = "8.7",
+                isReleased = true,
             )
         val goodfellas =
             MoviePresentationModel(
@@ -93,8 +99,9 @@ internal object UIPreviewData {
                 backdropUrl = null,
                 genreIds = persistentListOf(Genres.crime.id, Genres.drama.id),
                 popularity = 78.0,
-                releaseYear = "1990",
+                releaseDate = "Sep 19, 1990",
                 formattedRating = "8.7",
+                isReleased = true,
             )
         val oppenheimer =
             MoviePresentationModel(
@@ -104,8 +111,9 @@ internal object UIPreviewData {
                 backdropUrl = null,
                 genreIds = persistentListOf(Genres.drama.id, Genres.history.id),
                 popularity = 76.0,
-                releaseYear = "2023",
+                releaseDate = "Jul 21, 2023",
                 formattedRating = "8.3",
+                isReleased = true,
             )
         val dunePartTwo =
             MoviePresentationModel(
@@ -115,8 +123,9 @@ internal object UIPreviewData {
                 backdropUrl = null,
                 genreIds = persistentListOf(Genres.sciFi.id, Genres.adventure.id),
                 popularity = 74.0,
-                releaseYear = "2024",
+                releaseDate = "Mar 1, 2024",
                 formattedRating = "8.5",
+                isReleased = true,
             )
         val everythingEverywhereAllAtOnce =
             MoviePresentationModel(
@@ -126,8 +135,21 @@ internal object UIPreviewData {
                 backdropUrl = null,
                 genreIds = persistentListOf(Genres.action.id, Genres.adventure.id, Genres.sciFi.id),
                 popularity = 72.0,
-                releaseYear = "2022",
+                releaseDate = "Mar 25, 2022",
                 formattedRating = "7.8",
+                isReleased = true,
+            )
+        val upcoming =
+            MoviePresentationModel(
+                id = 11,
+                title = "Avatar: Fire and Ash",
+                posterUrl = null,
+                backdropUrl = null,
+                genreIds = persistentListOf(Genres.sciFi.id, Genres.adventure.id),
+                popularity = 70.0,
+                releaseDate = null,
+                formattedRating = "N/A",
+                isReleased = false,
             )
         val all =
             persistentListOf(
@@ -194,7 +216,7 @@ internal object UIPreviewData {
                 imdbId = "tt0468569",
                 status = "Released",
                 runtimeInMinutes = 152,
-                releaseYear = "2008",
+                releaseDate = "Jul 18, 2008",
             )
         val interstellar =
             MovieDetailPresentationModel(
@@ -241,7 +263,7 @@ internal object UIPreviewData {
                 imdbId = "tt0816692",
                 status = "Released",
                 runtimeInMinutes = 169,
-                releaseYear = "2014",
+                releaseDate = "Nov 7, 2014",
             )
     }
 }

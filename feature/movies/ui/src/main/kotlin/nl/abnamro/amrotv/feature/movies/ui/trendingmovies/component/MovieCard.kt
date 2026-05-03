@@ -18,6 +18,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import coil.compose.AsyncImage
@@ -53,6 +55,29 @@ fun MovieCard(movie: MoviePresentationModel, onMovieClick: (Int) -> Unit, modifi
                             )
                         )
             )
+            val tagLabel =
+                if (movie.isReleased) stringResource(R.string.tag_released)
+                else stringResource(R.string.tag_upcoming)
+            val tagStatusDescription = stringResource(R.string.tag_status_description, tagLabel)
+            Text(
+                text = tagLabel,
+                style = MaterialTheme.typography.labelSmall,
+                color = AmroTvColors.OnMediaPrimary,
+                modifier =
+                    Modifier.align(Alignment.TopEnd)
+                        .padding(AmroTvDimensions.spacingExtraSmall)
+                        .background(
+                            color =
+                                if (movie.isReleased) AmroTvColors.PrimaryGreen
+                                else AmroTvColors.TertiaryGray,
+                            shape = MaterialTheme.shapes.extraSmall,
+                        )
+                        .padding(
+                            horizontal = AmroTvDimensions.spacingExtraSmall,
+                            vertical = AmroTvDimensions.spacingExtraSmall,
+                        )
+                        .semantics { contentDescription = tagStatusDescription },
+            )
             Column(modifier = Modifier.align(Alignment.BottomStart).padding(AmroTvDimensions.spacingSmall)) {
                 Text(
                     text = movie.title,
@@ -66,6 +91,13 @@ fun MovieCard(movie: MoviePresentationModel, onMovieClick: (Int) -> Unit, modifi
                     style = MaterialTheme.typography.bodySmall.copy(shadow = AmroTvColors.OnMediaTextShadow),
                     color = AmroTvColors.OnMediaSecondary,
                 )
+                movie.releaseDate?.let { date ->
+                    Text(
+                        text = date,
+                        style = MaterialTheme.typography.bodySmall.copy(shadow = AmroTvColors.OnMediaTextShadow),
+                        color = AmroTvColors.OnMediaSecondary,
+                    )
+                }
             }
         }
     }

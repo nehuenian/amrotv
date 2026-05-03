@@ -1,11 +1,14 @@
 package nl.abnamro.amrotv.feature.movies.presentation.implementation.mapper
 
+import java.time.LocalDate
 import kotlinx.collections.immutable.persistentListOf
 import nl.abnamro.amrotv.core.mvi.Mapper
 import nl.abnamro.amrotv.feature.movies.domain.api.model.Movie
 import nl.abnamro.amrotv.feature.movies.presentation.api.model.MoviePresentationModel
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -32,7 +35,7 @@ class MovieDomainToPresentationMapperTest {
                 backdropUrl = "https://example.com/backdrop.jpg",
                 genreIds = listOf(28, 80, 53),
                 popularity = 92.5,
-                releaseDate = "2008-07-18",
+                releaseDate = LocalDate.of(2008, 7, 18),
                 voteAverage = 9.0,
             )
 
@@ -83,9 +86,15 @@ class MovieDomainToPresentationMapperTest {
             }
 
             @Test
-            @DisplayName("THEN releaseYear is extracted from releaseDate")
-            fun releaseYearExtractedFromReleaseDate() {
-                assertEquals("2008", mapper.map(movie).releaseYear)
+            @DisplayName("THEN releaseDate is formatted as MMM d, yyyy")
+            fun releaseDateIsFormatted() {
+                assertEquals("Jul 18, 2008", mapper.map(movie).releaseDate)
+            }
+
+            @Test
+            @DisplayName("THEN isReleased is true for a past release date")
+            fun isReleasedIsTrueForPastDate() {
+                assertTrue(mapper.map(movie).isReleased)
             }
         }
     }
@@ -102,7 +111,7 @@ class MovieDomainToPresentationMapperTest {
                 backdropUrl = null,
                 genreIds = emptyList(),
                 popularity = 0.0,
-                releaseDate = "2020-01-01",
+                releaseDate = LocalDate.of(2020, 1, 1),
                 voteAverage = 0.0,
             )
 
@@ -131,18 +140,18 @@ class MovieDomainToPresentationMapperTest {
     }
 
     @Nested
-    @DisplayName("GIVEN a movie whose releaseDate contains only the year")
-    inner class GivenAMovieWithYearOnlyReleaseDate {
+    @DisplayName("GIVEN a movie with no release date (null)")
+    inner class GivenAMovieWithNullReleaseDate {
 
         private val movie =
             Movie(
                 id = 3,
-                title = "Year Only",
+                title = "Unknown Date",
                 posterUrl = null,
                 backdropUrl = null,
                 genreIds = emptyList(),
                 popularity = 0.0,
-                releaseDate = "2015",
+                releaseDate = null,
                 voteAverage = 0.0,
             )
 
@@ -151,26 +160,32 @@ class MovieDomainToPresentationMapperTest {
         inner class WhenMapped {
 
             @Test
-            @DisplayName("THEN releaseYear equals the full releaseDate value")
-            fun releaseYearEqualsReleaseDate() {
-                assertEquals("2015", mapper.map(movie).releaseYear)
+            @DisplayName("THEN releaseDate is null")
+            fun releaseDateIsNull() {
+                assertNull(mapper.map(movie).releaseDate)
+            }
+
+            @Test
+            @DisplayName("THEN isReleased is false")
+            fun isReleasedIsFalse() {
+                assertFalse(mapper.map(movie).isReleased)
             }
         }
     }
 
     @Nested
-    @DisplayName("GIVEN a movie with a malformed releaseDate")
-    inner class GivenAMovieWithMalformedReleaseDate {
+    @DisplayName("GIVEN a movie with a future release date")
+    inner class GivenAMovieWithFutureReleaseDate {
 
         private val movie =
             Movie(
                 id = 4,
-                title = "Bad Date",
+                title = "Upcoming Movie",
                 posterUrl = null,
                 backdropUrl = null,
                 genreIds = emptyList(),
                 popularity = 0.0,
-                releaseDate = "not-a-date",
+                releaseDate = LocalDate.of(2099, 1, 1),
                 voteAverage = 0.0,
             )
 
@@ -179,37 +194,9 @@ class MovieDomainToPresentationMapperTest {
         inner class WhenMapped {
 
             @Test
-            @DisplayName("THEN releaseYear is null")
-            fun releaseYearIsNullForMalformedDate() {
-                assertNull(mapper.map(movie).releaseYear)
-            }
-        }
-    }
-
-    @Nested
-    @DisplayName("GIVEN a movie with an empty releaseDate")
-    inner class GivenAMovieWithEmptyReleaseDate {
-
-        private val movie =
-            Movie(
-                id = 5,
-                title = "No Date",
-                posterUrl = null,
-                backdropUrl = null,
-                genreIds = emptyList(),
-                popularity = 0.0,
-                releaseDate = "",
-                voteAverage = 0.0,
-            )
-
-        @Nested
-        @DisplayName("WHEN mapped to presentation model")
-        inner class WhenMapped {
-
-            @Test
-            @DisplayName("THEN releaseYear is null")
-            fun releaseYearIsNullForEmptyDate() {
-                assertNull(mapper.map(movie).releaseYear)
+            @DisplayName("THEN isReleased is false")
+            fun isReleasedIsFalse() {
+                assertFalse(mapper.map(movie).isReleased)
             }
         }
     }

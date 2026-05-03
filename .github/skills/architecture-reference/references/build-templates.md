@@ -8,7 +8,7 @@ Each module picks only the plugins it needs — they compose cleanly.
 | Plugin ID | Purpose |
 |-----------|---------|
 | `amro.kotlin.library` | Pure Kotlin JVM module — applies `kotlin.jvm`, sets `jvmToolchain(11)` |
-| `amro.android.library` | Base Android library — applies `com.android.library`, sets `compileSdk=36`, `minSdk=24`, `compileOptions`, jvmTarget=11 |
+| `amro.android.library` | Base Android library — applies `com.android.library`, sets `compileSdk`, `minSdk`, `compileOptions`, jvmTarget |
 | `amro.android.hilt` | Hilt DI — applies `hilt` + `ksp` plugins |
 | `amro.android.compose` | Jetpack Compose — applies `kotlin.compose`, enables `buildFeatures.compose` |
 

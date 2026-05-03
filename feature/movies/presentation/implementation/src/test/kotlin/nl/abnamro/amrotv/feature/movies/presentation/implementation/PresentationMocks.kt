@@ -1,5 +1,6 @@
 package nl.abnamro.amrotv.feature.movies.presentation.implementation
 
+import java.time.LocalDate
 import kotlinx.collections.immutable.persistentListOf
 import nl.abnamro.amrotv.feature.movies.domain.api.model.Genre
 import nl.abnamro.amrotv.feature.movies.domain.api.model.Movie
@@ -19,7 +20,7 @@ object PresentationMocks {
                 title = "Alpha",
                 genreIds = listOf(ACTION_GENRE_ID),
                 popularity = 80.0,
-                releaseDate = "2024-01-01",
+                releaseDate = LocalDate.of(2024, 1, 1),
                 posterUrl = null,
                 backdropUrl = null,
                 voteAverage = 0.0,
@@ -30,7 +31,7 @@ object PresentationMocks {
                 title = "Beta",
                 genreIds = listOf(COMEDY_GENRE_ID),
                 popularity = 50.0,
-                releaseDate = "2023-06-15",
+                releaseDate = LocalDate.of(2023, 6, 15),
                 posterUrl = null,
                 backdropUrl = null,
                 voteAverage = 0.0,
@@ -51,10 +52,11 @@ object PresentationMocks {
                 title = "Alpha",
                 genreIds = persistentListOf(Movies.ACTION_GENRE_ID),
                 popularity = 80.0,
-                releaseYear = "2024",
                 posterUrl = null,
                 backdropUrl = null,
+                releaseDate = "Jan 1, 2024",
                 formattedRating = "0.0",
+                isReleased = true,
             )
         val comedy =
             MoviePresentationModel(
@@ -62,10 +64,11 @@ object PresentationMocks {
                 title = "Beta",
                 genreIds = persistentListOf(Movies.COMEDY_GENRE_ID),
                 popularity = 50.0,
-                releaseYear = "2023",
+                releaseDate = "Jun 15, 2023",
                 posterUrl = null,
                 backdropUrl = null,
                 formattedRating = "0.0",
+                isReleased = true,
             )
         val all = listOf(action, comedy)
     }
@@ -96,7 +99,7 @@ object PresentationMocks {
                 imdbId = IMDB_ID,
                 status = "Released",
                 runtimeInMinutes = 120,
-                releaseDate = "2024-01-01",
+                releaseDate = LocalDate.of(2024, 1, 1),
             )
     }
 }

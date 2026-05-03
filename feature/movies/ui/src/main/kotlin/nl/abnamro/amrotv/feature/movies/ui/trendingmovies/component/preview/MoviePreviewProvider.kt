@@ -8,7 +8,6 @@ internal class MoviePreviewProvider : PreviewParameterProvider<MoviePresentation
     override val values =
         sequenceOf(
             UIPreviewData.Movies.darkKnight,
-            UIPreviewData.Movies.inception,
-            UIPreviewData.Movies.interstellar,
+            UIPreviewData.Movies.upcoming,
         )
 }
