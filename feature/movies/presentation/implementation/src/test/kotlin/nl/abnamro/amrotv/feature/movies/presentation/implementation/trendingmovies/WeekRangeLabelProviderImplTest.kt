@@ -1,11 +1,11 @@
 package nl.abnamro.amrotv.feature.movies.presentation.implementation.trendingmovies
 
+import java.util.Calendar
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import java.util.Calendar
 
 class WeekRangeLabelProviderImplTest {
 
@@ -24,10 +24,13 @@ class WeekRangeLabelProviderImplTest {
 
         @BeforeEach
         fun setUp() {
-            nowMillis = Calendar.getInstance().apply {
-                clear()
-                set(2025, Calendar.MAY, 7)
-            }.timeInMillis
+            nowMillis =
+                Calendar.getInstance()
+                    .apply {
+                        clear()
+                        set(2025, Calendar.MAY, 7)
+                    }
+                    .timeInMillis
         }
 
         @Nested

@@ -1,8 +1,8 @@
 package nl.abnamro.amrotv.libraries.logger.implementation
 
+import javax.inject.Inject
 import nl.abnamro.amrotv.libraries.logger.api.LogLevel
 import timber.log.Timber
-import javax.inject.Inject
 
 internal class TimberLogDataSource @Inject constructor() : LogDataSource {
 

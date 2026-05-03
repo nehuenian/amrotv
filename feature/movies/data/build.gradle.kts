@@ -4,9 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
-android {
-    namespace = "nl.abnamro.amrotv.feature.movies.data"
-}
+android { namespace = "nl.abnamro.amrotv.feature.movies.data" }
 
 dependencies {
     implementation(projects.feature.movies.domain.api)
@@ -29,6 +27,4 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
 }
 
-tasks.withType<Test> {
-    useJUnitPlatform()
-}
+tasks.withType<Test> { useJUnitPlatform() }

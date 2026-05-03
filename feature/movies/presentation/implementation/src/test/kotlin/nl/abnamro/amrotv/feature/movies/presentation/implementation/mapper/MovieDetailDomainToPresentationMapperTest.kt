@@ -1,5 +1,7 @@
 package nl.abnamro.amrotv.feature.movies.presentation.implementation.mapper
 
+import java.text.NumberFormat
+import java.util.Locale
 import kotlinx.collections.immutable.persistentListOf
 import nl.abnamro.amrotv.core.mvi.Mapper
 import nl.abnamro.amrotv.feature.movies.domain.api.model.Genre
@@ -12,8 +14,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import java.text.NumberFormat
-import java.util.Locale
 
 class MovieDetailDomainToPresentationMapperTest {
 
@@ -28,23 +28,24 @@ class MovieDetailDomainToPresentationMapperTest {
     @DisplayName("GIVEN a fully populated movie detail with genres and a valid ISO release date")
     inner class GivenFullyPopulatedMovieDetail {
 
-        private val movieDetail = MovieDetail(
-            id = 155,
-            title = "The Dark Knight",
-            tagline = "Why so serious?",
-            posterUrl = "https://example.com/poster.jpg",
-            backdropUrl = "https://example.com/backdrop.jpg",
-            genres = listOf(Genre(28, "Action"), Genre(80, "Crime"), Genre(53, "Thriller")),
-            overview = "Batman faces the Joker.",
-            voteAverage = 9.0,
-            voteCount = 30_455,
-            budget = 185_000_000L,
-            revenue = 1_004_934_033L,
-            imdbId = "tt0468569",
-            status = "Released",
-            runtimeInMinutes = 152,
-            releaseDate = "2008-07-18",
-        )
+        private val movieDetail =
+            MovieDetail(
+                id = 155,
+                title = "The Dark Knight",
+                tagline = "Why so serious?",
+                posterUrl = "https://example.com/poster.jpg",
+                backdropUrl = "https://example.com/backdrop.jpg",
+                genres = listOf(Genre(28, "Action"), Genre(80, "Crime"), Genre(53, "Thriller")),
+                overview = "Batman faces the Joker.",
+                voteAverage = 9.0,
+                voteCount = 30_455,
+                budget = 185_000_000L,
+                revenue = 1_004_934_033L,
+                imdbId = "tt0468569",
+                status = "Released",
+                runtimeInMinutes = 152,
+                releaseDate = "2008-07-18",
+            )
 
         @Nested
         @DisplayName("WHEN mapped to presentation model")
@@ -83,11 +84,12 @@ class MovieDetailDomainToPresentationMapperTest {
             @Test
             @DisplayName("THEN genres are mapped to GenrePresentationModel ImmutableList")
             fun genresMappedToImmutableList() {
-                val expected = persistentListOf(
-                    GenrePresentationModel(28, "Action"),
-                    GenrePresentationModel(80, "Crime"),
-                    GenrePresentationModel(53, "Thriller"),
-                )
+                val expected =
+                    persistentListOf(
+                        GenrePresentationModel(28, "Action"),
+                        GenrePresentationModel(80, "Crime"),
+                        GenrePresentationModel(53, "Thriller"),
+                    )
                 assertEquals(expected, mapper.map(movieDetail).genres)
             }
 
@@ -153,23 +155,24 @@ class MovieDetailDomainToPresentationMapperTest {
     @DisplayName("GIVEN a movie detail with all nullable fields set to null")
     inner class GivenMovieDetailWithNullableFieldsNull {
 
-        private val movieDetail = MovieDetail(
-            id = 42,
-            title = "Minimal Movie",
-            tagline = null,
-            posterUrl = null,
-            backdropUrl = null,
-            genres = emptyList(),
-            overview = "Short overview.",
-            voteAverage = 5.0,
-            voteCount = 10,
-            budget = null,
-            revenue = null,
-            imdbId = null,
-            status = "Released",
-            runtimeInMinutes = null,
-            releaseDate = "2020-01-01",
-        )
+        private val movieDetail =
+            MovieDetail(
+                id = 42,
+                title = "Minimal Movie",
+                tagline = null,
+                posterUrl = null,
+                backdropUrl = null,
+                genres = emptyList(),
+                overview = "Short overview.",
+                voteAverage = 5.0,
+                voteCount = 10,
+                budget = null,
+                revenue = null,
+                imdbId = null,
+                status = "Released",
+                runtimeInMinutes = null,
+                releaseDate = "2020-01-01",
+            )
 
         @Nested
         @DisplayName("WHEN mapped to presentation model")
@@ -196,7 +199,10 @@ class MovieDetailDomainToPresentationMapperTest {
             @Test
             @DisplayName("THEN genres list is empty")
             fun genresIsEmpty() {
-                assertEquals(persistentListOf<GenrePresentationModel>(), mapper.map(movieDetail).genres)
+                assertEquals(
+                    persistentListOf<GenrePresentationModel>(),
+                    mapper.map(movieDetail).genres,
+                )
             }
 
             @Test
@@ -229,23 +235,24 @@ class MovieDetailDomainToPresentationMapperTest {
     @DisplayName("GIVEN a movie detail with a malformed releaseDate")
     inner class GivenMovieDetailWithMalformedReleaseDate {
 
-        private val movieDetail = MovieDetail(
-            id = 99,
-            title = "Bad Date Movie",
-            tagline = null,
-            posterUrl = null,
-            backdropUrl = null,
-            genres = emptyList(),
-            overview = "Overview.",
-            voteAverage = 0.0,
-            voteCount = 0,
-            budget = null,
-            revenue = null,
-            imdbId = null,
-            status = "Unknown",
-            runtimeInMinutes = null,
-            releaseDate = "not-a-date",
-        )
+        private val movieDetail =
+            MovieDetail(
+                id = 99,
+                title = "Bad Date Movie",
+                tagline = null,
+                posterUrl = null,
+                backdropUrl = null,
+                genres = emptyList(),
+                overview = "Overview.",
+                voteAverage = 0.0,
+                voteCount = 0,
+                budget = null,
+                revenue = null,
+                imdbId = null,
+                status = "Unknown",
+                runtimeInMinutes = null,
+                releaseDate = "not-a-date",
+            )
 
         @Nested
         @DisplayName("WHEN mapped to presentation model")
@@ -263,23 +270,24 @@ class MovieDetailDomainToPresentationMapperTest {
     @DisplayName("GIVEN a movie detail with budget and revenue equal to zero")
     inner class GivenMovieDetailWithZeroBudgetAndRevenue {
 
-        private val movieDetail = MovieDetail(
-            id = 1,
-            title = "Zero Budget Film",
-            tagline = null,
-            posterUrl = null,
-            backdropUrl = null,
-            genres = emptyList(),
-            overview = "Overview.",
-            voteAverage = 5.0,
-            voteCount = 1,
-            budget = 0L,
-            revenue = 0L,
-            imdbId = null,
-            status = "Released",
-            runtimeInMinutes = null,
-            releaseDate = "2000-01-01",
-        )
+        private val movieDetail =
+            MovieDetail(
+                id = 1,
+                title = "Zero Budget Film",
+                tagline = null,
+                posterUrl = null,
+                backdropUrl = null,
+                genres = emptyList(),
+                overview = "Overview.",
+                voteAverage = 5.0,
+                voteCount = 1,
+                budget = 0L,
+                revenue = 0L,
+                imdbId = null,
+                status = "Released",
+                runtimeInMinutes = null,
+                releaseDate = "2000-01-01",
+            )
 
         @Nested
         @DisplayName("WHEN mapped to presentation model")

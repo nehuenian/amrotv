@@ -12,8 +12,12 @@ internal data class GenreFilterRowPreviewState(
 
 internal class GenreFilterRowPreviewProvider :
     PreviewParameterProvider<GenreFilterRowPreviewState> {
-    override val values = sequenceOf(
-        GenreFilterRowPreviewState(UIPreviewData.Genres.all, UIPreviewData.Genres.all.first().id),
-        GenreFilterRowPreviewState(UIPreviewData.Genres.all, null),
-    )
+    override val values =
+        sequenceOf(
+            GenreFilterRowPreviewState(
+                UIPreviewData.Genres.all,
+                UIPreviewData.Genres.all.first().id,
+            ),
+            GenreFilterRowPreviewState(UIPreviewData.Genres.all, null),
+        )
 }

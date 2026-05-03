@@ -24,16 +24,17 @@ class MovieDomainToPresentationMapperTest {
     @DisplayName("GIVEN a movie with all fields populated and a valid ISO release date")
     inner class GivenAMovieWithAllFieldsAndValidReleaseDate {
 
-        private val movie = Movie(
-            id = 1,
-            title = "The Dark Knight",
-            posterUrl = "https://example.com/poster.jpg",
-            backdropUrl = "https://example.com/backdrop.jpg",
-            genreIds = listOf(28, 80, 53),
-            popularity = 92.5,
-            releaseDate = "2008-07-18",
-            voteAverage = 9.0,
-        )
+        private val movie =
+            Movie(
+                id = 1,
+                title = "The Dark Knight",
+                posterUrl = "https://example.com/poster.jpg",
+                backdropUrl = "https://example.com/backdrop.jpg",
+                genreIds = listOf(28, 80, 53),
+                popularity = 92.5,
+                releaseDate = "2008-07-18",
+                voteAverage = 9.0,
+            )
 
         @Nested
         @DisplayName("WHEN mapped to presentation model")
@@ -93,16 +94,17 @@ class MovieDomainToPresentationMapperTest {
     @DisplayName("GIVEN a movie with null optional fields")
     inner class GivenAMovieWithNullOptionalFields {
 
-        private val movie = Movie(
-            id = 2,
-            title = "Unknown",
-            posterUrl = null,
-            backdropUrl = null,
-            genreIds = emptyList(),
-            popularity = 0.0,
-            releaseDate = "2020-01-01",
-            voteAverage = 0.0,
-        )
+        private val movie =
+            Movie(
+                id = 2,
+                title = "Unknown",
+                posterUrl = null,
+                backdropUrl = null,
+                genreIds = emptyList(),
+                popularity = 0.0,
+                releaseDate = "2020-01-01",
+                voteAverage = 0.0,
+            )
 
         @Nested
         @DisplayName("WHEN mapped to presentation model")
@@ -132,16 +134,17 @@ class MovieDomainToPresentationMapperTest {
     @DisplayName("GIVEN a movie whose releaseDate contains only the year")
     inner class GivenAMovieWithYearOnlyReleaseDate {
 
-        private val movie = Movie(
-            id = 3,
-            title = "Year Only",
-            posterUrl = null,
-            backdropUrl = null,
-            genreIds = emptyList(),
-            popularity = 0.0,
-            releaseDate = "2015",
-            voteAverage = 0.0,
-        )
+        private val movie =
+            Movie(
+                id = 3,
+                title = "Year Only",
+                posterUrl = null,
+                backdropUrl = null,
+                genreIds = emptyList(),
+                popularity = 0.0,
+                releaseDate = "2015",
+                voteAverage = 0.0,
+            )
 
         @Nested
         @DisplayName("WHEN mapped to presentation model")
@@ -159,16 +162,17 @@ class MovieDomainToPresentationMapperTest {
     @DisplayName("GIVEN a movie with a malformed releaseDate")
     inner class GivenAMovieWithMalformedReleaseDate {
 
-        private val movie = Movie(
-            id = 4,
-            title = "Bad Date",
-            posterUrl = null,
-            backdropUrl = null,
-            genreIds = emptyList(),
-            popularity = 0.0,
-            releaseDate = "not-a-date",
-            voteAverage = 0.0,
-        )
+        private val movie =
+            Movie(
+                id = 4,
+                title = "Bad Date",
+                posterUrl = null,
+                backdropUrl = null,
+                genreIds = emptyList(),
+                popularity = 0.0,
+                releaseDate = "not-a-date",
+                voteAverage = 0.0,
+            )
 
         @Nested
         @DisplayName("WHEN mapped to presentation model")
@@ -186,16 +190,17 @@ class MovieDomainToPresentationMapperTest {
     @DisplayName("GIVEN a movie with an empty releaseDate")
     inner class GivenAMovieWithEmptyReleaseDate {
 
-        private val movie = Movie(
-            id = 5,
-            title = "No Date",
-            posterUrl = null,
-            backdropUrl = null,
-            genreIds = emptyList(),
-            popularity = 0.0,
-            releaseDate = "",
-            voteAverage = 0.0,
-        )
+        private val movie =
+            Movie(
+                id = 5,
+                title = "No Date",
+                posterUrl = null,
+                backdropUrl = null,
+                genreIds = emptyList(),
+                popularity = 0.0,
+                releaseDate = "",
+                voteAverage = 0.0,
+            )
 
         @Nested
         @DisplayName("WHEN mapped to presentation model")

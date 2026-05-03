@@ -5,9 +5,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material3.Icon
@@ -32,11 +32,7 @@ import nl.abnamro.amrotv.core.ui.theme.AmroTvTheme
  * @param subtitle Optional subtitle text for empty state
  */
 @Composable
-fun AmroTvEmptyView(
-    title: String,
-    modifier: Modifier = Modifier,
-    subtitle: String? = null,
-) {
+fun AmroTvEmptyView(title: String, modifier: Modifier = Modifier, subtitle: String? = null) {
     Column(
         modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -46,8 +42,7 @@ fun AmroTvEmptyView(
             imageVector = Icons.Default.FolderOpen,
             contentDescription = stringResource(R.string.core_ui_empty_icon_content_desc),
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier
-                .size(AmroTvDimensions.emptyStateIconSize),
+            modifier = Modifier.size(AmroTvDimensions.emptyStateIconSize),
         )
 
         Spacer(modifier = Modifier.height(AmroTvDimensions.spacingMedium))
@@ -65,9 +60,9 @@ fun AmroTvEmptyView(
                 text = subtitle,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier
-                    .fillMaxWidth(0.8f)
-                    .padding(horizontal = AmroTvDimensions.spacingMedium),
+                modifier =
+                    Modifier.fillMaxWidth(SUBTITLE_MAX_WIDTH)
+                        .padding(horizontal = AmroTvDimensions.spacingMedium),
             )
         }
     }
@@ -76,17 +71,13 @@ fun AmroTvEmptyView(
 @Preview(showBackground = true, name = "Light Mode")
 @Composable
 private fun AmroTvEmptyViewLightPreview() {
-    AmroTvTheme(darkTheme = false) {
-        AmroTvEmptyView(title = "No movies found")
-    }
+    AmroTvTheme(darkTheme = false) { AmroTvEmptyView(title = "No movies found") }
 }
 
 @Preview(showBackground = true, name = "Dark Mode")
 @Composable
 private fun AmroTvEmptyViewDarkPreview() {
-    AmroTvTheme(darkTheme = true) {
-        AmroTvEmptyView(title = "No movies found")
-    }
+    AmroTvTheme(darkTheme = true) { AmroTvEmptyView(title = "No movies found") }
 }
 
 @Preview(showBackground = true, name = "Light Mode - With Subtitle")
@@ -110,3 +101,5 @@ private fun AmroTvEmptyViewWithSubtitleDarkPreview() {
         )
     }
 }
+
+private const val SUBTITLE_MAX_WIDTH = 0.8f

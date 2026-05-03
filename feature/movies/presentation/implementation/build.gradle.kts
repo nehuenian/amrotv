@@ -3,9 +3,7 @@ plugins {
     alias(libs.plugins.amro.android.hilt)
 }
 
-android {
-    namespace = "nl.abnamro.amrotv.feature.movies.presentation.implementation"
-}
+android { namespace = "nl.abnamro.amrotv.feature.movies.presentation.implementation" }
 
 dependencies {
     implementation(projects.feature.movies.presentation.api)
@@ -28,6 +26,4 @@ dependencies {
     testImplementation(libs.turbine)
 }
 
-tasks.withType<Test> {
-    useJUnitPlatform()
-}
+tasks.withType<Test> { useJUnitPlatform() }

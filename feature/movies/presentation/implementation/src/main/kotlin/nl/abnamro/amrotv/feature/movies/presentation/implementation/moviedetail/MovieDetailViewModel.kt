@@ -30,58 +30,64 @@ constructor(
     private val logger: Logger,
 ) :
     BaseAmroTvViewModel<MovieDetailState, MovieDetailIntent, MovieDetailEffect>(
-        initialState = stateReducers.initialState(),
+        initialState = stateReducers.initialState()
     ) {
 
-  @AssistedFactory
-  interface Factory {
-    fun create(movieId: Int): MovieDetailViewModel
-  }
-
-  init {
-    handleIntent(MovieDetailIntent.Load)
-  }
-
-  override fun handleIntent(intent: MovieDetailIntent) {
-    when (intent) {
-      is MovieDetailIntent.Load -> {
-        updateState { it.reduceWith(stateReducers.loading()) }
-        loadDetail(movieId)
-      }
-
-      is MovieDetailIntent.Retry -> handleIntent(MovieDetailIntent.Load)
-
-      is MovieDetailIntent.NavigateBack -> sendEffect(MovieDetailEffect.NavigateBack)
-
-      is MovieDetailIntent.OpenImdb -> {
-        sendEffect(MovieDetailEffect.OpenUrl("$IMDB_TITLE_BASE_URL${intent.imdbId}/"))
-      }
+    @AssistedFactory
+    interface Factory {
+        fun create(movieId: Int): MovieDetailViewModel
     }
-  }
 
-  private var loadJob: Job? = null
+    init {
+        handleIntent(MovieDetailIntent.Load)
+    }
 
-  private fun loadDetail(movieId: Int) {
-    loadJob?.cancel()
-    loadJob = viewModelScope.launch {
-      when (val result = getMovieDetailUseCase(movieId)) {
-        is Outcome.Success -> updateState { it.reduceWith(stateReducers.detailLoaded(result.data)) }
-        is Outcome.Error -> {
-          logger.log(
-              LogLevel.ERROR,
-              TAG,
-              "Failed to load movie detail for id=$movieId: ${result.cause.message}",
-              result.cause,
-          )
-          updateState {
-            it.reduceWith(stateReducers.loadFailed(listOf(MovieError.MOVIE_DETAIL_LOAD_FAILED)))
-          }
+    override fun handleIntent(intent: MovieDetailIntent) {
+        when (intent) {
+            is MovieDetailIntent.Load -> {
+                updateState { it.reduceWith(stateReducers.loading()) }
+                loadDetail(movieId)
+            }
+
+            is MovieDetailIntent.Retry -> handleIntent(MovieDetailIntent.Load)
+
+            is MovieDetailIntent.NavigateBack -> sendEffect(MovieDetailEffect.NavigateBack)
+
+            is MovieDetailIntent.OpenImdb -> {
+                sendEffect(MovieDetailEffect.OpenUrl("$IMDB_TITLE_BASE_URL${intent.imdbId}/"))
+            }
         }
-      }
     }
-  }
 
-  private companion object {
-    const val TAG = "MovieDetailViewModel"
-  }
+    private var loadJob: Job? = null
+
+    private fun loadDetail(movieId: Int) {
+        loadJob?.cancel()
+        loadJob =
+            viewModelScope.launch {
+                when (val result = getMovieDetailUseCase(movieId)) {
+                    is Outcome.Success ->
+                        updateState { it.reduceWith(stateReducers.detailLoaded(result.data)) }
+                    is Outcome.Error -> {
+                        logger.log(
+                            LogLevel.ERROR,
+                            TAG,
+                            "Failed to load movie detail for id=$movieId: ${result.cause.message}",
+                            result.cause,
+                        )
+                        updateState {
+                            it.reduceWith(
+                                stateReducers.loadFailed(
+                                    listOf(MovieError.MOVIE_DETAIL_LOAD_FAILED)
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+    }
+
+    private companion object {
+        const val TAG = "MovieDetailViewModel"
+    }
 }

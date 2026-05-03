@@ -7,8 +7,8 @@ import nl.abnamro.amrotv.feature.movies.domain.api.model.SortOrder
 /**
  * User intents for the Trending Movies screen.
  *
- * Each subtype represents a distinct user action. Implementations must dispatch
- * these via [nl.abnamro.amrotv.core.mvi.AmroTvViewModel.handleIntent].
+ * Each subtype represents a distinct user action. Implementations must dispatch these via
+ * [nl.abnamro.amrotv.core.mvi.AmroTvViewModel.handleIntent].
  */
 sealed interface TrendingMoviesIntent : MviIntent {
 

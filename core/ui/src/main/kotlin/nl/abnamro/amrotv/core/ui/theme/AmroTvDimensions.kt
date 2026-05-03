@@ -5,12 +5,12 @@ import androidx.compose.ui.unit.dp
 /**
  * Dimension values for the AMRO TV app.
  *
- * Centralized spacing, padding, and corner radius definitions used throughout the theme
- * and component hierarchy. All hardcoded dimensions should reference these values.
+ * Centralized spacing, padding, and corner radius definitions used throughout the theme and
+ * component hierarchy. All hardcoded dimensions should reference these values.
  *
- * Per Material Design principles, these dimensions are kept consistent across all device
- * sizes (phone, tablet, large screen). Layout adaptation (single column → multi-column)
- * is handled by composable structure, not dimension scaling.
+ * Per Material Design principles, these dimensions are kept consistent across all device sizes
+ * (phone, tablet, large screen). Layout adaptation (single column → multi-column) is handled by
+ * composable structure, not dimension scaling.
  */
 object AmroTvDimensions {
     // Corner radii

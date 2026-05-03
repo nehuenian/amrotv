@@ -14,7 +14,7 @@ fun interface GetTrendingMoviesUseCase {
      * Fetches the complete trending movies list from the data source.
      *
      * @return [Outcome.Success] with the full unfiltered movie list, or [Outcome.Error] on failure.
-     * [Outcome.Error] may carry stale cached data.
+     *   [Outcome.Error] may carry stale cached data.
      */
     suspend operator fun invoke(): Outcome<List<Movie>>
 }

@@ -10,26 +10,25 @@ import androidx.compose.runtime.remember
  *
  * Applies ABN Amro palette (green, gold, gray) with light/dark mode support.
  *
- * Dimensions are kept consistent across all device sizes per Material Design principles.
- * Layout adaptation (single column → multi-column) is handled at the composable level.
+ * Dimensions are kept consistent across all device sizes per Material Design principles. Layout
+ * adaptation (single column → multi-column) is handled at the composable level.
  *
- * @param darkTheme Whether to use dark color scheme. If null, uses system setting (isSystemInDarkTheme).
+ * @param darkTheme Whether to use dark color scheme. If null, uses system setting
+ *   (isSystemInDarkTheme).
  * @param content Composable content to theme
  */
 @Composable
-fun AmroTvTheme(
-    darkTheme: Boolean? = null,
-    content: @Composable () -> Unit,
-) {
+fun AmroTvTheme(darkTheme: Boolean? = null, content: @Composable () -> Unit) {
     val useDarkTheme = darkTheme ?: isSystemInDarkTheme()
-    
-    val colorScheme = remember(useDarkTheme) {
-        if (useDarkTheme) {
-            AmroTvColors.darkColorScheme()
-        } else {
-            AmroTvColors.lightColorScheme()
+
+    val colorScheme =
+        remember(useDarkTheme) {
+            if (useDarkTheme) {
+                AmroTvColors.darkColorScheme()
+            } else {
+                AmroTvColors.lightColorScheme()
+            }
         }
-    }
     val typography = remember { amroTvTypography() }
     val shapes = remember { amroTvShapes() }
 

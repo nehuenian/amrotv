@@ -13,11 +13,11 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import nl.abnamro.amrotv.core.ui.preview.PreviewLightDark
 import nl.abnamro.amrotv.core.ui.theme.AmroTvColors
-import nl.abnamro.amrotv.feature.movies.ui.R
-import nl.abnamro.amrotv.core.ui.preview.LightDarkPreview
 import nl.abnamro.amrotv.core.ui.theme.AmroTvTheme
 import nl.abnamro.amrotv.feature.movies.presentation.api.moviedetail.MovieDetailIntent
+import nl.abnamro.amrotv.feature.movies.ui.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -31,8 +31,8 @@ internal fun MovieDetailTopBar(
         navigationIcon = {
             IconButton(
                 onClick = { onIntent(MovieDetailIntent.NavigateBack) },
-                modifier = Modifier
-                    .background(
+                modifier =
+                    Modifier.background(
                         color = AmroTvColors.MediaNavIconBackground,
                         shape = CircleShape,
                     ),
@@ -43,15 +43,16 @@ internal fun MovieDetailTopBar(
                 )
             }
         },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = AmroTvColors.MediaScrimTransparent,
-            scrolledContainerColor = MaterialTheme.colorScheme.primary,
-            navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
-        ),
+        colors =
+            TopAppBarDefaults.topAppBarColors(
+                containerColor = AmroTvColors.MediaScrimTransparent,
+                scrolledContainerColor = MaterialTheme.colorScheme.primary,
+                navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+            ),
     )
 }
 
-@LightDarkPreview
+@PreviewLightDark
 @Composable
 private fun MovieDetailTopBarPreview() {
     AmroTvTheme { MovieDetailTopBar(onIntent = {}) }

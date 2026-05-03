@@ -1,8 +1,10 @@
 package nl.abnamro.amrotv.feature.movies.presentation.implementation.mapper
 
 // TODO: Replace with a proper i18n date library for locale-aware year extraction
+private const val RELEASE_YEAR_LENGTH = 4
+
 internal fun extractReleaseYear(releaseDate: String): String? =
-    releaseDate.split("-").firstOrNull()?.takeIf { it.length == 4 }
+    releaseDate.split("-").firstOrNull()?.takeIf { it.length == RELEASE_YEAR_LENGTH }
 
 // TODO: Replace with a locale-aware number formatter from an i18n library
 internal fun formatRating(voteAverage: Double): String =

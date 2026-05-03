@@ -1,0 +1,70 @@
+build:
+  maxIssues: 0
+  excludeCorrectable: false
+
+config:
+  validation: true
+  warningsAsErrors: false
+
+processors:
+  exclude:
+    - 'DetektProgressListener'
+
+console-reports:
+  exclude:
+    - 'ProjectStatisticsReport'
+    - 'ComplexityReport'
+    - 'NotificationReport'
+
+complexity:
+  TooManyFunctions:
+    ignorePrivate: true
+    ignoreOverridden: true
+    thresholdInClasses: 20
+    thresholdInInterfaces: 20
+    thresholdInObjects: 20
+    thresholdInEnums: 20
+    thresholdInFiles: 30
+  LongMethod:
+    threshold: 60
+  LongParameterList:
+    functionThreshold: 9
+    constructorThreshold: 9
+    ignoreAnnotated:
+      - 'Composable'
+
+naming:
+  FunctionNaming:
+    # Enforce lowerCamelCase for regular functions.
+    # @Composable functions are fully exempted via ignoreAnnotated since
+    # Compose requires PascalCase for composable function names.
+    functionPattern: '[a-z][a-zA-Z0-9]*'
+    ignoreAnnotated:
+      - 'Composable'
+
+style:
+  MagicNumber:
+    # Magic numbers are common in Compose UI (dp, sp, weights, alpha values)
+    ignoreAnnotated:
+      - 'Composable'
+      - 'Preview'
+      - 'PreviewLightDark'
+  MaxLineLength:
+    maxLineLength: 120
+    excludeCommentStatements: true
+  WildcardImport:
+    active: false
+  UnnecessaryAbstractClass:
+    active: false
+  ForbiddenComment:
+    # Allow TODO markers — they represent intentional future-work notes
+    active: false
+  UnusedPrivateMember:
+    # Preview composable functions appear unused to the compiler but are used by the IDE
+    ignoreAnnotated:
+      - 'PreviewLightDark'
+      - 'Preview'
+
+exceptions:
+  TooGenericExceptionCaught:
+    active: false

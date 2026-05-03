@@ -2,6 +2,7 @@ package nl.abnamro.amrotv.feature.movies.presentation.implementation.trendingmov
 
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -11,8 +12,6 @@ import nl.abnamro.amrotv.core.mvi.BaseAmroTvViewModel
 import nl.abnamro.amrotv.core.mvi.reduceWith
 import nl.abnamro.amrotv.feature.movies.domain.api.model.Genre
 import nl.abnamro.amrotv.feature.movies.domain.api.model.Movie
-import nl.abnamro.amrotv.feature.movies.domain.api.model.SortOption
-import nl.abnamro.amrotv.feature.movies.domain.api.model.SortOrder
 import nl.abnamro.amrotv.feature.movies.domain.api.usecase.FilterAndSortMoviesUseCase
 import nl.abnamro.amrotv.feature.movies.domain.api.usecase.GetGenresUseCase
 import nl.abnamro.amrotv.feature.movies.domain.api.usecase.GetTrendingMoviesUseCase
@@ -22,18 +21,20 @@ import nl.abnamro.amrotv.feature.movies.presentation.api.trendingmovies.Trending
 import nl.abnamro.amrotv.feature.movies.presentation.api.trendingmovies.TrendingMoviesState
 import nl.abnamro.amrotv.libraries.logger.api.LogLevel
 import nl.abnamro.amrotv.libraries.logger.api.Logger
-import javax.inject.Inject
 
 @HiltViewModel
-class TrendingMoviesViewModel @Inject constructor(
+class TrendingMoviesViewModel
+@Inject
+constructor(
     private val getTrendingMoviesUseCase: GetTrendingMoviesUseCase,
     private val getGenresUseCase: GetGenresUseCase,
     private val stateReducers: TrendingMoviesStateReducers,
     private val filterAndSortMoviesUseCase: FilterAndSortMoviesUseCase,
     private val logger: Logger,
-) : BaseAmroTvViewModel<TrendingMoviesState, TrendingMoviesIntent, TrendingMoviesEffect>(
-    initialState = stateReducers.initialState(),
-) {
+) :
+    BaseAmroTvViewModel<TrendingMoviesState, TrendingMoviesIntent, TrendingMoviesEffect>(
+        initialState = stateReducers.initialState()
+    ) {
 
     private var allMovies: List<Movie> = emptyList()
     private var loadJob: Job? = null
@@ -51,37 +52,43 @@ class TrendingMoviesViewModel @Inject constructor(
 
             is TrendingMoviesIntent.FilterByGenre -> {
                 updateState { currentState ->
-                    val filtered = filterAndSortMoviesUseCase(
-                        allMovies,
-                        intent.genreId,
-                        currentState.selectedSortOption,
-                        currentState.selectedSortOrder,
-                    )
+                    val filtered =
+                        filterAndSortMoviesUseCase(
+                            allMovies,
+                            intent.genreId,
+                            currentState.selectedSortOption,
+                            currentState.selectedSortOrder,
+                        )
                     currentState.reduceWith(stateReducers.filterByGenre(intent.genreId, filtered))
                 }
             }
 
             is TrendingMoviesIntent.ChangeSortOption -> {
                 updateState { currentState ->
-                    val sorted = filterAndSortMoviesUseCase(
-                        allMovies,
-                        currentState.selectedGenreId,
-                        intent.sortOption,
-                        currentState.selectedSortOrder,
+                    val sorted =
+                        filterAndSortMoviesUseCase(
+                            allMovies,
+                            currentState.selectedGenreId,
+                            intent.sortOption,
+                            currentState.selectedSortOrder,
+                        )
+                    currentState.reduceWith(
+                        stateReducers.changeSortOption(intent.sortOption, sorted)
                     )
-                    currentState.reduceWith(stateReducers.changeSortOption(intent.sortOption, sorted))
                 }
             }
 
             is TrendingMoviesIntent.SelectSortOrder -> {
                 updateState { currentState ->
-                    if (currentState.selectedSortOrder == intent.order) return@updateState currentState
-                    val sorted = filterAndSortMoviesUseCase(
-                        allMovies,
-                        currentState.selectedGenreId,
-                        currentState.selectedSortOption,
-                        intent.order,
-                    )
+                    if (currentState.selectedSortOrder == intent.order)
+                        return@updateState currentState
+                    val sorted =
+                        filterAndSortMoviesUseCase(
+                            allMovies,
+                            currentState.selectedGenreId,
+                            currentState.selectedSortOption,
+                            intent.order,
+                        )
                     currentState.reduceWith(stateReducers.selectSortOrder(intent.order, sorted))
                 }
             }
@@ -96,82 +103,84 @@ class TrendingMoviesViewModel @Inject constructor(
 
     private fun loadData() {
         loadJob?.cancel()
-        loadJob = viewModelScope.launch {
-            coroutineScope {
-                val moviesDeferred = async {
-                    getTrendingMoviesUseCase()
-                }
+        loadJob =
+            viewModelScope.launch {
+                coroutineScope {
+                    val moviesDeferred = async { getTrendingMoviesUseCase() }
 
-                val genresResult = getGenresUseCase()
-                val genres: List<Genre> = when (genresResult) {
-                    is Outcome.Success -> genresResult.data
-                    is Outcome.Error -> {
-                        logger.log(
-                            LogLevel.ERROR,
-                            TAG,
-                            "Failed to load genres: ${genresResult.cause.message}",
-                            genresResult.cause
-                        )
-                        genresResult.data.orEmpty()
-                    }
-                }
-
-                when (val moviesResult = moviesDeferred.await()) {
-                    is Outcome.Success -> {
-                        val errors = buildList {
-                            if (genresResult is Outcome.Error) add(MovieError.GENRES_LOAD_FAILED)
+                    val genresResult = getGenresUseCase()
+                    val genres: List<Genre> =
+                        when (genresResult) {
+                            is Outcome.Success -> genresResult.data
+                            is Outcome.Error -> {
+                                logger.log(
+                                    LogLevel.ERROR,
+                                    TAG,
+                                    "Failed to load genres: ${genresResult.cause.message}",
+                                    genresResult.cause,
+                                )
+                                genresResult.data.orEmpty()
+                            }
                         }
-                        allMovies = moviesResult.data
-                        updateState { currentState ->
-                            val movies = filterAndSortMoviesUseCase(
+
+                    handleMoviesResult(moviesDeferred.await(), genresResult, genres)
+                }
+            }
+    }
+
+    private fun handleMoviesResult(
+        moviesResult: Outcome<List<Movie>>,
+        genresResult: Outcome<List<Genre>>,
+        genres: List<Genre>,
+    ) {
+        when (moviesResult) {
+            is Outcome.Success -> {
+                val errors = buildList {
+                    if (genresResult is Outcome.Error) add(MovieError.GENRES_LOAD_FAILED)
+                }
+                allMovies = moviesResult.data
+                updateState { currentState ->
+                    val movies =
+                        filterAndSortMoviesUseCase(
+                            allMovies,
+                            currentState.selectedGenreId,
+                            currentState.selectedSortOption,
+                            currentState.selectedSortOrder,
+                        )
+                    currentState.reduceWith(
+                        stateReducers.contentLoaded(movies, genres, errors = errors)
+                    )
+                }
+            }
+
+            is Outcome.Error -> {
+                logger.log(
+                    LogLevel.ERROR,
+                    TAG,
+                    "Failed to load movies: ${moviesResult.cause.message}",
+                    moviesResult.cause,
+                )
+                val errors = buildList {
+                    add(MovieError.MOVIES_LOAD_FAILED)
+                    if (genresResult is Outcome.Error) add(MovieError.GENRES_LOAD_FAILED)
+                }
+                val staleMovies = moviesResult.data
+                if (staleMovies != null) {
+                    allMovies = staleMovies
+                    updateState { currentState ->
+                        val movies =
+                            filterAndSortMoviesUseCase(
                                 allMovies,
                                 currentState.selectedGenreId,
                                 currentState.selectedSortOption,
                                 currentState.selectedSortOrder,
                             )
-                            currentState.reduceWith(
-                                stateReducers.contentLoaded(
-                                    movies,
-                                    genres,
-                                    errors = errors
-                                )
-                            )
-                        }
-                    }
-
-                    is Outcome.Error -> {
-                        logger.log(
-                            LogLevel.ERROR,
-                            TAG,
-                            "Failed to load movies: ${moviesResult.cause.message}",
-                            moviesResult.cause
+                        currentState.reduceWith(
+                            stateReducers.contentLoaded(movies, genres, errors = errors)
                         )
-                        val errors = buildList {
-                            add(MovieError.MOVIES_LOAD_FAILED)
-                            if (genresResult is Outcome.Error) add(MovieError.GENRES_LOAD_FAILED)
-                        }
-                        val staleMovies = moviesResult.data
-                        if (staleMovies != null) {
-                            allMovies = staleMovies
-                            updateState { currentState ->
-                                val movies = filterAndSortMoviesUseCase(
-                                    allMovies,
-                                    currentState.selectedGenreId,
-                                    currentState.selectedSortOption,
-                                    currentState.selectedSortOrder,
-                                )
-                                currentState.reduceWith(
-                                    stateReducers.contentLoaded(
-                                        movies,
-                                        genres,
-                                        errors = errors
-                                    )
-                                )
-                            }
-                        } else {
-                            updateState { it.reduceWith(stateReducers.loadFailed(errors)) }
-                        }
                     }
+                } else {
+                    updateState { it.reduceWith(stateReducers.loadFailed(errors)) }
                 }
             }
         }

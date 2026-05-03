@@ -3,9 +3,7 @@ plugins {
     alias(libs.plugins.amro.android.hilt)
 }
 
-android {
-    namespace = "nl.abnamro.amrotv.libraries.logger.implementation"
-}
+android { namespace = "nl.abnamro.amrotv.libraries.logger.implementation" }
 
 dependencies {
     implementation(projects.libraries.logger.api)

@@ -19,7 +19,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import nl.abnamro.amrotv.core.ui.preview.LightDarkPreview
+import nl.abnamro.amrotv.core.ui.preview.PreviewLightDark
 import nl.abnamro.amrotv.core.ui.theme.AmroTvColors
 import nl.abnamro.amrotv.core.ui.theme.AmroTvDimensions
 import nl.abnamro.amrotv.core.ui.theme.AmroTvTheme
@@ -28,55 +28,56 @@ import nl.abnamro.amrotv.feature.movies.ui.moviedetail.component.preview.MovieDe
 import nl.abnamro.amrotv.feature.movies.ui.theme.MoviesDimensions
 
 @Composable
-internal fun MovieDetailHero(
-    detail: MovieDetailPresentationModel,
-    modifier: Modifier = Modifier,
-) {
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(MoviesDimensions.backdropImageHeight),
-    ) {
+internal fun MovieDetailHero(detail: MovieDetailPresentationModel, modifier: Modifier = Modifier) {
+    Box(modifier = modifier.fillMaxWidth().height(MoviesDimensions.backdropImageHeight)) {
         AsyncImage(
-            model = ImageRequest.Builder(context = LocalContext.current)
-                .data(detail.backdropUrl ?: detail.posterUrl)
-                .crossfade(true)
-                .build(),
+            model =
+                ImageRequest.Builder(context = LocalContext.current)
+                    .data(detail.backdropUrl ?: detail.posterUrl)
+                    .crossfade(true)
+                    .build(),
             // Decorative: title and metadata are rendered as Text overlays above this image.
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize(),
         )
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        colorStops = arrayOf(
-                            0.0f to AmroTvColors.MediaScrimDetailStart,
-                            0.45f to AmroTvColors.MediaScrimDetailMid,
-                            1.0f to AmroTvColors.MediaScrimEnd,
-                        ),
-                    ),
-                ),
+            modifier =
+                Modifier.fillMaxSize()
+                    .background(
+                        Brush.verticalGradient(
+                            colorStops =
+                                arrayOf(
+                                    0.0f to AmroTvColors.MediaScrimDetailStart,
+                                    0.45f to AmroTvColors.MediaScrimDetailMid,
+                                    1.0f to AmroTvColors.MediaScrimEnd,
+                                )
+                        )
+                    )
         )
         Column(
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-                .padding(all = AmroTvDimensions.spacingMedium)
-                .padding(bottom = AmroTvDimensions.spacingSmall),
+            modifier =
+                Modifier.align(Alignment.BottomStart)
+                    .padding(all = AmroTvDimensions.spacingMedium)
+                    .padding(bottom = AmroTvDimensions.spacingSmall),
             verticalArrangement = Arrangement.spacedBy(AmroTvDimensions.spacingExtraSmall),
         ) {
             Text(
                 text = detail.title,
-                style = MaterialTheme.typography.headlineMedium.copy(shadow = AmroTvColors.OnMediaTextShadow),
+                style =
+                    MaterialTheme.typography.headlineMedium.copy(
+                        shadow = AmroTvColors.OnMediaTextShadow
+                    ),
                 color = AmroTvColors.OnMediaPrimary,
                 maxLines = 2,
             )
             detail.releaseYear?.let {
                 Text(
                     text = it,
-                    style = MaterialTheme.typography.bodyMedium.copy(shadow = AmroTvColors.OnMediaTextShadow),
+                    style =
+                        MaterialTheme.typography.bodyMedium.copy(
+                            shadow = AmroTvColors.OnMediaTextShadow
+                        ),
                     color = AmroTvColors.OnMediaTertiary,
                     modifier = Modifier.padding(bottom = AmroTvDimensions.spacingSmall),
                 )
@@ -85,12 +86,11 @@ internal fun MovieDetailHero(
     }
 }
 
-@LightDarkPreview
+@PreviewLightDark
 @Composable
 private fun MovieDetailHeroPreview(
-    @PreviewParameter(MovieDetailPresentationModelPreviewProvider::class) detail: MovieDetailPresentationModel,
+    @PreviewParameter(MovieDetailPresentationModelPreviewProvider::class)
+    detail: MovieDetailPresentationModel
 ) {
-    AmroTvTheme {
-        MovieDetailHero(detail = detail)
-    }
+    AmroTvTheme { MovieDetailHero(detail = detail) }
 }

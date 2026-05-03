@@ -11,15 +11,15 @@ import nl.abnamro.amrotv.feature.movies.nav.moviesEntry
 
 @Composable
 fun AmroNavHost() {
-  val backStack = rememberNavBackStack(MoviesNavKey.TrendingMovies)
-  NavDisplay(
-      backStack = backStack,
-      onBack = { if (backStack.size > 1) backStack.removeLastOrNull() },
-      entryDecorators =
-          listOf(
-              rememberSaveableStateHolderNavEntryDecorator(),
-              rememberViewModelStoreNavEntryDecorator(),
-          ),
-      entryProvider = entryProvider { moviesEntry(backStack) },
-  )
+    val backStack = rememberNavBackStack(MoviesNavKey.TrendingMovies)
+    NavDisplay(
+        backStack = backStack,
+        onBack = { if (backStack.size > 1) backStack.removeLastOrNull() },
+        entryDecorators =
+            listOf(
+                rememberSaveableStateHolderNavEntryDecorator(),
+                rememberViewModelStoreNavEntryDecorator(),
+            ),
+        entryProvider = entryProvider { moviesEntry(backStack) },
+    )
 }

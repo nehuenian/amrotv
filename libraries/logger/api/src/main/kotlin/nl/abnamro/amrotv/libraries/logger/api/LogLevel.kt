@@ -1,8 +1,6 @@
 package nl.abnamro.amrotv.libraries.logger.api
 
-/**
- * Severity levels used by [Logger.log] to control filtering and routing of log entries.
- */
+/** Severity levels used by [Logger.log] to control filtering and routing of log entries. */
 enum class LogLevel {
     /** Fine-grained diagnostic information, useful during development. */
     DEBUG,
