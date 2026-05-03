@@ -35,26 +35,23 @@ import org.junit.jupiter.api.extension.RegisterExtension
 @OptIn(ExperimentalCoroutinesApi::class)
 class TrendingMoviesViewModelTest {
 
-    @JvmField
-    @RegisterExtension
-    val mainExtension = MainDispatcherExtension()
+    @JvmField @RegisterExtension val mainExtension = MainDispatcherExtension()
 
-    @MockK
-    private lateinit var getTrendingMoviesUseCase: GetTrendingMoviesUseCase
+    @MockK private lateinit var getTrendingMoviesUseCase: GetTrendingMoviesUseCase
 
-    @MockK
-    private lateinit var getGenresUseCase: GetGenresUseCase
+    @MockK private lateinit var getGenresUseCase: GetGenresUseCase
 
-    @MockK
-    private lateinit var logger: Logger
+    @MockK private lateinit var logger: Logger
 
     private lateinit var filterAndSortMoviesUseCase: FilterAndSortMoviesUseCase
 
-    private lateinit var viewModel: AmroTvViewModel<TrendingMoviesState, TrendingMoviesIntent, TrendingMoviesEffect>
+    private lateinit var viewModel:
+        AmroTvViewModel<TrendingMoviesState, TrendingMoviesIntent, TrendingMoviesEffect>
 
-    private val fakeWeekRangeLabelProvider = object : WeekRangeLabelProvider {
-        override fun currentWeekRangeLabel(nowMillis: Long): String = "Jan 1 – Jan 7"
-    }
+    private val fakeWeekRangeLabelProvider =
+        object : WeekRangeLabelProvider {
+            override fun currentWeekRangeLabel(nowMillis: Long): String = "Jan 1 – Jan 7"
+        }
 
     @BeforeEach
     fun setUp() {
@@ -70,17 +67,21 @@ class TrendingMoviesViewModelTest {
 
         @BeforeEach
         fun setUp() {
-            coEvery {
-                getTrendingMoviesUseCase()
-            } returns Outcome.Success(PresentationMocks.Movies.all)
+            coEvery { getTrendingMoviesUseCase() } returns
+                Outcome.Success(PresentationMocks.Movies.all)
             coEvery { getGenresUseCase() } returns Outcome.Success(PresentationMocks.Genres.all)
-            viewModel = TrendingMoviesViewModel(
-                getTrendingMoviesUseCase,
-                getGenresUseCase,
-                TrendingMoviesStateReducers(MovieDomainToPresentationMapper(), GenreDomainToPresentationMapper(), fakeWeekRangeLabelProvider),
-                filterAndSortMoviesUseCase,
-                logger,
-            )
+            viewModel =
+                TrendingMoviesViewModel(
+                    getTrendingMoviesUseCase,
+                    getGenresUseCase,
+                    TrendingMoviesStateReducers(
+                        MovieDomainToPresentationMapper(),
+                        GenreDomainToPresentationMapper(),
+                        fakeWeekRangeLabelProvider,
+                    ),
+                    filterAndSortMoviesUseCase,
+                    logger,
+                )
         }
 
         @Nested
@@ -89,18 +90,25 @@ class TrendingMoviesViewModelTest {
 
             @Test
             @DisplayName("THEN state transitions through loading to loaded with movies and genres")
-            fun stateTransitionsToLoaded() = runTest(mainExtension.testDispatcher) {
-                viewModel.state.test {
-                    val loading = awaitItem()
-                    assertTrue(loading.isLoading)
-                    advanceUntilIdle()
-                    val loaded = awaitItem()
-                    assertFalse(loaded.isLoading)
-                    assertTrue(loaded.errors.isEmpty())
-                    assertEquals(PresentationMocks.PresentationMovies.all.toPersistentList(), loaded.movies)
-                    assertEquals(PresentationMocks.PresentationGenres.all.toPersistentList(), loaded.genres)
+            fun stateTransitionsToLoaded() =
+                runTest(mainExtension.testDispatcher) {
+                    viewModel.state.test {
+                        val loading = awaitItem()
+                        assertTrue(loading.isLoading)
+                        advanceUntilIdle()
+                        val loaded = awaitItem()
+                        assertFalse(loaded.isLoading)
+                        assertTrue(loaded.errors.isEmpty())
+                        assertEquals(
+                            PresentationMocks.PresentationMovies.all.toPersistentList(),
+                            loaded.movies,
+                        )
+                        assertEquals(
+                            PresentationMocks.PresentationGenres.all.toPersistentList(),
+                            loaded.genres,
+                        )
+                    }
                 }
-            }
         }
 
         @Nested
@@ -109,13 +117,16 @@ class TrendingMoviesViewModelTest {
 
             @Test
             @DisplayName("THEN movies are filtered to the selected genre")
-            fun filtersMoviesInMemory() = runTest(mainExtension.testDispatcher) {
-                advanceUntilIdle()
-                viewModel.handleIntent(TrendingMoviesIntent.FilterByGenre(PresentationMocks.Movies.ACTION_GENRE_ID))
-                val state = viewModel.state.value
-                assertEquals(PresentationMocks.Movies.ACTION_GENRE_ID, state.selectedGenreId)
-                assertEquals(listOf(PresentationMocks.PresentationMovies.action), state.movies)
-            }
+            fun filtersMoviesInMemory() =
+                runTest(mainExtension.testDispatcher) {
+                    advanceUntilIdle()
+                    viewModel.handleIntent(
+                        TrendingMoviesIntent.FilterByGenre(PresentationMocks.Movies.ACTION_GENRE_ID)
+                    )
+                    val state = viewModel.state.value
+                    assertEquals(PresentationMocks.Movies.ACTION_GENRE_ID, state.selectedGenreId)
+                    assertEquals(listOf(PresentationMocks.PresentationMovies.action), state.movies)
+                }
         }
 
         @Nested
@@ -124,12 +135,13 @@ class TrendingMoviesViewModelTest {
 
             @Test
             @DisplayName("THEN title becomes the active sort option")
-            fun updatesSortOptionInMemory() = runTest(mainExtension.testDispatcher) {
-                advanceUntilIdle()
-                viewModel.handleIntent(TrendingMoviesIntent.ChangeSortOption(SortOption.TITLE))
-                val state = viewModel.state.value
-                assertEquals(SortOption.TITLE, state.selectedSortOption)
-            }
+            fun updatesSortOptionInMemory() =
+                runTest(mainExtension.testDispatcher) {
+                    advanceUntilIdle()
+                    viewModel.handleIntent(TrendingMoviesIntent.ChangeSortOption(SortOption.TITLE))
+                    val state = viewModel.state.value
+                    assertEquals(SortOption.TITLE, state.selectedSortOption)
+                }
         }
 
         @Nested
@@ -138,12 +150,13 @@ class TrendingMoviesViewModelTest {
 
             @Test
             @DisplayName("THEN ascending becomes the active sort order")
-            fun selectsSortOrderInMemory() = runTest(mainExtension.testDispatcher) {
-                advanceUntilIdle()
-                viewModel.handleIntent(TrendingMoviesIntent.SelectSortOrder(SortOrder.ASC))
-                val state = viewModel.state.value
-                assertEquals(SortOrder.ASC, state.selectedSortOrder)
-            }
+            fun selectsSortOrderInMemory() =
+                runTest(mainExtension.testDispatcher) {
+                    advanceUntilIdle()
+                    viewModel.handleIntent(TrendingMoviesIntent.SelectSortOrder(SortOrder.ASC))
+                    val state = viewModel.state.value
+                    assertEquals(SortOrder.ASC, state.selectedSortOrder)
+                }
         }
 
         @Nested
@@ -152,12 +165,13 @@ class TrendingMoviesViewModelTest {
 
             @Test
             @DisplayName("THEN selected sort order remains DESC")
-            fun selectingAlreadyActiveOrderIsNoOp() = runTest(mainExtension.testDispatcher) {
-                advanceUntilIdle()
-                viewModel.handleIntent(TrendingMoviesIntent.SelectSortOrder(SortOrder.DESC))
-                val state = viewModel.state.value
-                assertEquals(SortOrder.DESC, state.selectedSortOrder)
-            }
+            fun selectingAlreadyActiveOrderIsNoOp() =
+                runTest(mainExtension.testDispatcher) {
+                    advanceUntilIdle()
+                    viewModel.handleIntent(TrendingMoviesIntent.SelectSortOrder(SortOrder.DESC))
+                    val state = viewModel.state.value
+                    assertEquals(SortOrder.DESC, state.selectedSortOrder)
+                }
         }
 
         @Nested
@@ -166,15 +180,23 @@ class TrendingMoviesViewModelTest {
 
             @Test
             @DisplayName("THEN the NavigateToMovieDetail effect is emitted for the selected movie")
-            fun emitsNavigateToMovieDetailEffect() = runTest(mainExtension.testDispatcher) {
-                advanceUntilIdle()
-                viewModel.effects.test {
-                    viewModel.handleIntent(TrendingMoviesIntent.OpenMovieDetail(movieId = PresentationMocks.Movies.action.id))
-                    val effect = awaitItem()
-                    assertTrue(effect is TrendingMoviesEffect.NavigateToMovieDetail)
-                    assertEquals(PresentationMocks.Movies.action.id, (effect as TrendingMoviesEffect.NavigateToMovieDetail).movieId)
+            fun emitsNavigateToMovieDetailEffect() =
+                runTest(mainExtension.testDispatcher) {
+                    advanceUntilIdle()
+                    viewModel.effects.test {
+                        viewModel.handleIntent(
+                            TrendingMoviesIntent.OpenMovieDetail(
+                                movieId = PresentationMocks.Movies.action.id
+                            )
+                        )
+                        val effect = awaitItem()
+                        assertTrue(effect is TrendingMoviesEffect.NavigateToMovieDetail)
+                        assertEquals(
+                            PresentationMocks.Movies.action.id,
+                            (effect as TrendingMoviesEffect.NavigateToMovieDetail).movieId,
+                        )
+                    }
                 }
-            }
         }
 
         @Nested
@@ -183,11 +205,12 @@ class TrendingMoviesViewModelTest {
 
             @Test
             @DisplayName("THEN showSortSheet becomes true")
-            fun showsSortSheet() = runTest(mainExtension.testDispatcher) {
-                advanceUntilIdle()
-                viewModel.handleIntent(TrendingMoviesIntent.SetSortSheetVisible(visible = true))
-                assertTrue(viewModel.state.value.showSortSheet)
-            }
+            fun showsSortSheet() =
+                runTest(mainExtension.testDispatcher) {
+                    advanceUntilIdle()
+                    viewModel.handleIntent(TrendingMoviesIntent.SetSortSheetVisible(visible = true))
+                    assertTrue(viewModel.state.value.showSortSheet)
+                }
         }
     }
 
@@ -197,15 +220,21 @@ class TrendingMoviesViewModelTest {
 
         @BeforeEach
         fun setUp() {
-            coEvery { getTrendingMoviesUseCase() } returns Outcome.Success(PresentationMocks.Movies.all)
+            coEvery { getTrendingMoviesUseCase() } returns
+                Outcome.Success(PresentationMocks.Movies.all)
             coEvery { getGenresUseCase() } returns Outcome.Success(PresentationMocks.Genres.all)
-            viewModel = TrendingMoviesViewModel(
-                getTrendingMoviesUseCase,
-                getGenresUseCase,
-                TrendingMoviesStateReducers(MovieDomainToPresentationMapper(), GenreDomainToPresentationMapper(), fakeWeekRangeLabelProvider),
-                filterAndSortMoviesUseCase,
-                logger,
-            )
+            viewModel =
+                TrendingMoviesViewModel(
+                    getTrendingMoviesUseCase,
+                    getGenresUseCase,
+                    TrendingMoviesStateReducers(
+                        MovieDomainToPresentationMapper(),
+                        GenreDomainToPresentationMapper(),
+                        fakeWeekRangeLabelProvider,
+                    ),
+                    filterAndSortMoviesUseCase,
+                    logger,
+                )
             runTest(mainExtension.testDispatcher) {
                 advanceUntilIdle()
                 viewModel.handleIntent(TrendingMoviesIntent.SetSortSheetVisible(visible = true))
@@ -218,10 +247,13 @@ class TrendingMoviesViewModelTest {
 
             @Test
             @DisplayName("THEN showSortSheet becomes false")
-            fun hidesSortSheet() = runTest(mainExtension.testDispatcher) {
-                viewModel.handleIntent(TrendingMoviesIntent.SetSortSheetVisible(visible = false))
-                assertFalse(viewModel.state.value.showSortSheet)
-            }
+            fun hidesSortSheet() =
+                runTest(mainExtension.testDispatcher) {
+                    viewModel.handleIntent(
+                        TrendingMoviesIntent.SetSortSheetVisible(visible = false)
+                    )
+                    assertFalse(viewModel.state.value.showSortSheet)
+                }
         }
     }
 
@@ -231,17 +263,21 @@ class TrendingMoviesViewModelTest {
 
         @BeforeEach
         fun setUp() {
-            coEvery {
-                getTrendingMoviesUseCase()
-            } returns Outcome.Error(RuntimeException("network error"))
+            coEvery { getTrendingMoviesUseCase() } returns
+                Outcome.Error(RuntimeException("network error"))
             coEvery { getGenresUseCase() } returns Outcome.Success(emptyList())
-            viewModel = TrendingMoviesViewModel(
-                getTrendingMoviesUseCase,
-                getGenresUseCase,
-                TrendingMoviesStateReducers(MovieDomainToPresentationMapper(), GenreDomainToPresentationMapper(), fakeWeekRangeLabelProvider),
-                filterAndSortMoviesUseCase,
-                logger,
-            )
+            viewModel =
+                TrendingMoviesViewModel(
+                    getTrendingMoviesUseCase,
+                    getGenresUseCase,
+                    TrendingMoviesStateReducers(
+                        MovieDomainToPresentationMapper(),
+                        GenreDomainToPresentationMapper(),
+                        fakeWeekRangeLabelProvider,
+                    ),
+                    filterAndSortMoviesUseCase,
+                    logger,
+                )
         }
 
         @Nested
@@ -250,16 +286,17 @@ class TrendingMoviesViewModelTest {
 
             @Test
             @DisplayName("THEN state has an error and isLoading is false")
-            fun stateHasError() = runTest(mainExtension.testDispatcher) {
-                viewModel.state.test {
-                    val loading = awaitItem()
-                    assertTrue(loading.isLoading)
-                    advanceUntilIdle()
-                    val state = awaitItem()
-                    assertFalse(state.isLoading)
-                    assertTrue(state.errors.isNotEmpty())
+            fun stateHasError() =
+                runTest(mainExtension.testDispatcher) {
+                    viewModel.state.test {
+                        val loading = awaitItem()
+                        assertTrue(loading.isLoading)
+                        advanceUntilIdle()
+                        val state = awaitItem()
+                        assertFalse(state.isLoading)
+                        assertTrue(state.errors.isNotEmpty())
+                    }
                 }
-            }
         }
     }
 
@@ -269,17 +306,21 @@ class TrendingMoviesViewModelTest {
 
         @BeforeEach
         fun setUp() {
-            coEvery {
-                getTrendingMoviesUseCase()
-            } returns Outcome.Success(PresentationMocks.Movies.all)
+            coEvery { getTrendingMoviesUseCase() } returns
+                Outcome.Success(PresentationMocks.Movies.all)
             coEvery { getGenresUseCase() } returns Outcome.Error(RuntimeException("genres error"))
-            viewModel = TrendingMoviesViewModel(
-                getTrendingMoviesUseCase,
-                getGenresUseCase,
-                TrendingMoviesStateReducers(MovieDomainToPresentationMapper(), GenreDomainToPresentationMapper(), fakeWeekRangeLabelProvider),
-                filterAndSortMoviesUseCase,
-                logger,
-            )
+            viewModel =
+                TrendingMoviesViewModel(
+                    getTrendingMoviesUseCase,
+                    getGenresUseCase,
+                    TrendingMoviesStateReducers(
+                        MovieDomainToPresentationMapper(),
+                        GenreDomainToPresentationMapper(),
+                        fakeWeekRangeLabelProvider,
+                    ),
+                    filterAndSortMoviesUseCase,
+                    logger,
+                )
         }
 
         @Nested
@@ -288,17 +329,21 @@ class TrendingMoviesViewModelTest {
 
             @Test
             @DisplayName("THEN movies are shown alongside an error")
-            fun moviesShownWithError() = runTest(mainExtension.testDispatcher) {
-                viewModel.state.test {
-                    val loading = awaitItem()
-                    assertTrue(loading.isLoading)
-                    advanceUntilIdle()
-                    val state = awaitItem()
-                    assertFalse(state.isLoading)
-                    assertEquals(PresentationMocks.PresentationMovies.all.toPersistentList(), state.movies)
-                    assertTrue(state.errors.isNotEmpty())
+            fun moviesShownWithError() =
+                runTest(mainExtension.testDispatcher) {
+                    viewModel.state.test {
+                        val loading = awaitItem()
+                        assertTrue(loading.isLoading)
+                        advanceUntilIdle()
+                        val state = awaitItem()
+                        assertFalse(state.isLoading)
+                        assertEquals(
+                            PresentationMocks.PresentationMovies.all.toPersistentList(),
+                            state.movies,
+                        )
+                        assertTrue(state.errors.isNotEmpty())
+                    }
                 }
-            }
         }
     }
 
@@ -308,17 +353,21 @@ class TrendingMoviesViewModelTest {
 
         @BeforeEach
         fun setUp() {
-            coEvery {
-                getTrendingMoviesUseCase()
-            } returns Outcome.Error(RuntimeException("refresh failed"), PresentationMocks.Movies.all)
+            coEvery { getTrendingMoviesUseCase() } returns
+                Outcome.Error(RuntimeException("refresh failed"), PresentationMocks.Movies.all)
             coEvery { getGenresUseCase() } returns Outcome.Success(PresentationMocks.Genres.all)
-            viewModel = TrendingMoviesViewModel(
-                getTrendingMoviesUseCase,
-                getGenresUseCase,
-                TrendingMoviesStateReducers(MovieDomainToPresentationMapper(), GenreDomainToPresentationMapper(), fakeWeekRangeLabelProvider),
-                filterAndSortMoviesUseCase,
-                logger,
-            )
+            viewModel =
+                TrendingMoviesViewModel(
+                    getTrendingMoviesUseCase,
+                    getGenresUseCase,
+                    TrendingMoviesStateReducers(
+                        MovieDomainToPresentationMapper(),
+                        GenreDomainToPresentationMapper(),
+                        fakeWeekRangeLabelProvider,
+                    ),
+                    filterAndSortMoviesUseCase,
+                    logger,
+                )
         }
 
         @Nested
@@ -327,17 +376,21 @@ class TrendingMoviesViewModelTest {
 
             @Test
             @DisplayName("THEN stale movies are shown alongside an error")
-            fun staleMoviesShownWithError() = runTest(mainExtension.testDispatcher) {
-                viewModel.state.test {
-                    val loading = awaitItem()
-                    assertTrue(loading.isLoading)
-                    advanceUntilIdle()
-                    val state = awaitItem()
-                    assertFalse(state.isLoading)
-                    assertEquals(PresentationMocks.PresentationMovies.all.toPersistentList(), state.movies)
-                    assertTrue(state.errors.isNotEmpty())
+            fun staleMoviesShownWithError() =
+                runTest(mainExtension.testDispatcher) {
+                    viewModel.state.test {
+                        val loading = awaitItem()
+                        assertTrue(loading.isLoading)
+                        advanceUntilIdle()
+                        val state = awaitItem()
+                        assertFalse(state.isLoading)
+                        assertEquals(
+                            PresentationMocks.PresentationMovies.all.toPersistentList(),
+                            state.movies,
+                        )
+                        assertTrue(state.errors.isNotEmpty())
+                    }
                 }
-            }
         }
     }
 }

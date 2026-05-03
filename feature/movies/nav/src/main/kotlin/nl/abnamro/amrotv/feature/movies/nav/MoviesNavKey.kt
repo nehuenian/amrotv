@@ -13,13 +13,13 @@ import kotlinx.serialization.Serializable
 @Serializable
 sealed interface MoviesNavKey : NavKey {
 
-  /** Destination for the trending movies list screen. */
-  @Serializable data object TrendingMovies : MoviesNavKey
+    /** Destination for the trending movies list screen. */
+    @Serializable data object TrendingMovies : MoviesNavKey
 
-  /**
-   * Destination for the movie detail screen.
-   *
-   * @param movieId the TMDB identifier of the movie to display.
-   */
-  @Serializable data class MovieDetail(val movieId: Int) : MoviesNavKey
+    /**
+     * Destination for the movie detail screen.
+     *
+     * @param movieId the TMDB identifier of the movie to display.
+     */
+    @Serializable data class MovieDetail(val movieId: Int) : MoviesNavKey
 }

@@ -1,10 +1,6 @@
-plugins {
-    alias(libs.plugins.amro.android.library)
-}
+plugins { alias(libs.plugins.amro.android.library) }
 
-android {
-    namespace = "nl.abnamro.amrotv.core.mvi"
-}
+android { namespace = "nl.abnamro.amrotv.core.mvi" }
 
 dependencies {
     implementation(projects.core.mvi.kotlin)

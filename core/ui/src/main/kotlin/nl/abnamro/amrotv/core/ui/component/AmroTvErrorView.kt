@@ -5,9 +5,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material3.Button
@@ -39,12 +39,13 @@ fun AmroTvErrorView(
     onRetry: (() -> Unit)? = null,
 ) {
     Column(
-        modifier = modifier
-            .background(
-                color = MaterialTheme.colorScheme.errorContainer,
-                shape = MaterialTheme.shapes.medium,
-            )
-            .padding(AmroTvDimensions.spacingLarge),
+        modifier =
+            modifier
+                .background(
+                    color = MaterialTheme.colorScheme.errorContainer,
+                    shape = MaterialTheme.shapes.medium,
+                )
+                .padding(AmroTvDimensions.spacingLarge),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
@@ -52,8 +53,7 @@ fun AmroTvErrorView(
             imageVector = Icons.Default.ErrorOutline,
             contentDescription = stringResource(R.string.core_ui_error_icon_content_desc),
             tint = MaterialTheme.colorScheme.onErrorContainer,
-            modifier = Modifier
-                .size(AmroTvDimensions.errorIconSize),
+            modifier = Modifier.size(AmroTvDimensions.errorIconSize),
         )
 
         Spacer(modifier = Modifier.height(AmroTvDimensions.spacingMedium))
@@ -75,10 +75,7 @@ fun AmroTvErrorView(
         if (onRetry != null) {
             Spacer(modifier = Modifier.height(AmroTvDimensions.spacingMedium))
 
-            Button(
-                onClick = onRetry,
-                modifier = Modifier.fillMaxWidth(0.75f),
-            ) {
+            Button(onClick = onRetry, modifier = Modifier.fillMaxWidth(0.75f)) {
                 Text(stringResource(R.string.core_ui_error_retry_button))
             }
         }
@@ -111,9 +108,7 @@ private fun AmroTvErrorViewDarkPreview() {
 @Composable
 private fun AmroTvErrorViewNoRetryLightPreview() {
     AmroTvTheme(darkTheme = false) {
-        AmroTvErrorView(
-            message = "Failed to load movies. Please try again later.",
-        )
+        AmroTvErrorView(message = "Failed to load movies. Please try again later.")
     }
 }
 
@@ -121,8 +116,6 @@ private fun AmroTvErrorViewNoRetryLightPreview() {
 @Composable
 private fun AmroTvErrorViewNoRetryDarkPreview() {
     AmroTvTheme(darkTheme = true) {
-        AmroTvErrorView(
-            message = "Failed to load movies. Please try again later.",
-        )
+        AmroTvErrorView(message = "Failed to load movies. Please try again later.")
     }
 }

@@ -15,18 +15,17 @@ import kotlinx.coroutines.launch
  * Base ViewModel for all MVI screens.
  *
  * Implements [AmroTvViewModel] and delegates state transitions to injectable
- * `{Screen}StateReducers` factory classes via [updateState]. Each state transition
- * is expressed as a [StateReducer] lambda returned by a named factory method,
- * keeping pure state logic isolated and testable without coroutines or a ViewModel.
+ * `{Screen}StateReducers` factory classes via [updateState]. Each state transition is expressed as
+ * a [StateReducer] lambda returned by a named factory method, keeping pure state logic isolated and
+ * testable without coroutines or a ViewModel.
  *
- * Subclasses override [handleIntent] to orchestrate async work, call [updateState]
- * for each state transition, and dispatch one-time commands via [sendEffect].
+ * Subclasses override [handleIntent] to orchestrate async work, call [updateState] for each state
+ * transition, and dispatch one-time commands via [sendEffect].
  *
  * @param initialState the state emitted before any intent is processed.
  */
-abstract class BaseAmroTvViewModel<S : MviState, I : MviIntent, E : MviEffect>(
-    initialState: S,
-) : ViewModel(), AmroTvViewModel<S, I, E> {
+abstract class BaseAmroTvViewModel<S : MviState, I : MviIntent, E : MviEffect>(initialState: S) :
+    ViewModel(), AmroTvViewModel<S, I, E> {
 
     private val _state = MutableStateFlow(initialState)
     override val state: StateFlow<S> = _state.asStateFlow()
@@ -37,8 +36,8 @@ abstract class BaseAmroTvViewModel<S : MviState, I : MviIntent, E : MviEffect>(
     /**
      * Applies [block] to the current state atomically and emits the result.
      *
-     * Use this inside [handleIntent] or private async functions to apply a
-     * [StateReducer] from the screen's `{Screen}StateReducers` factory.
+     * Use this inside [handleIntent] or private async functions to apply a [StateReducer] from the
+     * screen's `{Screen}StateReducers` factory.
      *
      * @param block a pure function that transforms the current state into the next state.
      */
@@ -50,4 +49,3 @@ abstract class BaseAmroTvViewModel<S : MviState, I : MviIntent, E : MviEffect>(
         viewModelScope.launch { _effects.send(effect) }
     }
 }
-

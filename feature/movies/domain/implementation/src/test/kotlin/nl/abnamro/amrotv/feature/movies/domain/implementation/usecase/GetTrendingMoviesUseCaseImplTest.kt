@@ -18,8 +18,7 @@ import org.junit.jupiter.api.Test
 
 class GetTrendingMoviesUseCaseImplTest {
 
-    @MockK
-    lateinit var repository: MovieRepository
+    @MockK lateinit var repository: MovieRepository
 
     private lateinit var useCase: GetTrendingMoviesUseCase
 
@@ -90,7 +89,8 @@ class GetTrendingMoviesUseCaseImplTest {
 
         @BeforeEach
         fun setUp() {
-            coEvery { repository.getTrendingMovies() } returns Outcome.Error(networkError, Movies.all)
+            coEvery { repository.getTrendingMovies() } returns
+                Outcome.Error(networkError, Movies.all)
         }
 
         @Nested
@@ -114,12 +114,14 @@ class GetTrendingMoviesUseCaseImplTest {
     }
 }
 
-private fun Outcome<List<Movie>>.requireSuccess(): List<Movie> = when (this) {
-    is Outcome.Success -> data
-    is Outcome.Error -> error("Expected Outcome.Success but got Outcome.Error: $cause")
-}
+private fun Outcome<List<Movie>>.requireSuccess(): List<Movie> =
+    when (this) {
+        is Outcome.Success -> data
+        is Outcome.Error -> error("Expected Outcome.Success but got Outcome.Error: $cause")
+    }
 
-private fun Outcome<List<Movie>>.requireError(): Outcome.Error<List<Movie>> = when (this) {
-    is Outcome.Error -> this
-    is Outcome.Success -> error("Expected Outcome.Error but got Outcome.Success")
-}
+private fun Outcome<List<Movie>>.requireError(): Outcome.Error<List<Movie>> =
+    when (this) {
+        is Outcome.Error -> this
+        is Outcome.Success -> error("Expected Outcome.Error but got Outcome.Success")
+    }

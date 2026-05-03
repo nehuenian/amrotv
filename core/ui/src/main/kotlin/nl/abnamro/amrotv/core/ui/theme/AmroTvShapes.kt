@@ -8,10 +8,11 @@ import androidx.compose.material3.Shapes
  *
  * Uses corner radius values from [AmroTvDimensions] for consistent spacing.
  */
-fun amroTvShapes(): Shapes = Shapes(
-    extraSmall = RoundedCornerShape(AmroTvDimensions.cornerRadiusExtraSmall),
-    small = RoundedCornerShape(AmroTvDimensions.cornerRadiusSmall),
-    medium = RoundedCornerShape(AmroTvDimensions.cornerRadiusMedium),
-    large = RoundedCornerShape(AmroTvDimensions.cornerRadiusLarge),
-    extraLarge = RoundedCornerShape(AmroTvDimensions.cornerRadiusExtraLarge),
-)
+fun amroTvShapes(): Shapes =
+    Shapes(
+        extraSmall = RoundedCornerShape(AmroTvDimensions.cornerRadiusExtraSmall),
+        small = RoundedCornerShape(AmroTvDimensions.cornerRadiusSmall),
+        medium = RoundedCornerShape(AmroTvDimensions.cornerRadiusMedium),
+        large = RoundedCornerShape(AmroTvDimensions.cornerRadiusLarge),
+        extraLarge = RoundedCornerShape(AmroTvDimensions.cornerRadiusExtraLarge),
+    )

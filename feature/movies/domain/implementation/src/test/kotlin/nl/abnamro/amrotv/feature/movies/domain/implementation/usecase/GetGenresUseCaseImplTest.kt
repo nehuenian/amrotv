@@ -16,8 +16,7 @@ import org.junit.jupiter.api.Test
 
 class GetGenresUseCaseImplTest {
 
-    @MockK
-    lateinit var repository: MovieRepository
+    @MockK lateinit var repository: MovieRepository
 
     private lateinit var useCase: GetGenresUseCase
 

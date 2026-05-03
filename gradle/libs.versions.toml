@@ -22,6 +22,9 @@ kotlinxCoroutines = "1.10.2"
 kotlinxCollectionsImmutable = "0.4.0"
 junitJupiter = "6.0.3"
 junitPlatform = "6.0.3"
+detekt = "1.23.8"
+detektComposeRules = "0.4.28"
+spotless = "8.4.0"
 mockk = "1.14.9"
 turbine = "1.2.1"
 mannodermausJunit5 = "2.0.1"
@@ -73,6 +76,8 @@ junit-platform-launcher = { group = "org.junit.platform", name = "junit-platform
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 mockk-android = { group = "io.mockk", name = "mockk-android", version.ref = "mockk" }
 turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
+detekt-gradlePlugin = { group = "io.gitlab.arturbosch.detekt", name = "detekt-gradle-plugin", version.ref = "detekt" }
+detekt-compose-rules = { group = "io.nlopez.compose.rules", name = "detekt", version.ref = "detektComposeRules" }
 # Gradle plugin artifacts — used as compileOnly deps in build-logic only
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
 kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -88,6 +93,8 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 mannodermaus-android-junit5 = { id = "de.mannodermaus.android-junit5", version.ref = "mannodermausJunit5" }
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 # Convention plugins — from build-logic included build (no version needed)
 # Convention plugin → build-logic/src/main/kotlin/AmroKotlinLibraryConventionPlugin.kt
 amro-kotlin-library = { id = "amro.kotlin.library" }
@@ -97,4 +104,6 @@ amro-android-library = { id = "amro.android.library" }
 amro-android-hilt = { id = "amro.android.hilt" }
 # Convention plugin → build-logic/src/main/kotlin/AmroAndroidComposeConventionPlugin.kt
 amro-android-compose = { id = "amro.android.compose" }
+# Convention plugin → build-logic/src/main/kotlin/AmroDetektConventionPlugin.kt
+amro-detekt = { id = "amro.detekt" }
 

@@ -20,11 +20,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import kotlinx.collections.immutable.ImmutableList
+import nl.abnamro.amrotv.core.ui.preview.PreviewLightDark
 import nl.abnamro.amrotv.core.ui.theme.AmroTvDimensions
 import nl.abnamro.amrotv.core.ui.theme.AmroTvTheme
 import nl.abnamro.amrotv.feature.movies.presentation.api.MovieError
 import nl.abnamro.amrotv.feature.movies.ui.R
-import nl.abnamro.amrotv.core.ui.preview.LightDarkPreview
 import nl.abnamro.amrotv.feature.movies.ui.theme.MoviesDimensions
 import nl.abnamro.amrotv.feature.movies.ui.trendingmovies.component.preview.InlineErrorBannerPreviewProvider
 import nl.abnamro.amrotv.feature.movies.ui.util.toStringResId
@@ -35,20 +35,18 @@ internal fun InlineErrorBanner(
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    AnimatedVisibility(
-        visible = errors.isNotEmpty(),
-        modifier = modifier,
-    ) {
+    AnimatedVisibility(visible = errors.isNotEmpty(), modifier = modifier) {
         Surface(
             color = MaterialTheme.colorScheme.errorContainer,
             shape = MaterialTheme.shapes.medium,
             modifier = Modifier.fillMaxWidth(),
         ) {
             Row(
-                modifier = Modifier.padding(
-                    horizontal = AmroTvDimensions.spacingMedium,
-                    vertical = AmroTvDimensions.spacingSmall,
-                ),
+                modifier =
+                    Modifier.padding(
+                        horizontal = AmroTvDimensions.spacingMedium,
+                        vertical = AmroTvDimensions.spacingSmall,
+                    ),
                 horizontalArrangement = Arrangement.spacedBy(AmroTvDimensions.spacingSmall),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -78,15 +76,10 @@ internal fun InlineErrorBanner(
     }
 }
 
-@LightDarkPreview
+@PreviewLightDark
 @Composable
 private fun InlineErrorBannerPreview(
-    @PreviewParameter(InlineErrorBannerPreviewProvider::class) errors: ImmutableList<MovieError>,
+    @PreviewParameter(InlineErrorBannerPreviewProvider::class) errors: ImmutableList<MovieError>
 ) {
-    AmroTvTheme {
-        InlineErrorBanner(
-            errors = errors,
-            onRetry = {},
-        )
-    }
+    AmroTvTheme { InlineErrorBanner(errors = errors, onRetry = {}) }
 }

@@ -6,8 +6,8 @@ import nl.abnamro.amrotv.feature.movies.domain.api.model.Movie
 /**
  * Contract for persisting and retrieving movie data from a local store.
  *
- * Implementations handle all entity mapping internally. The interface exposes only
- * domain models — no persistence details cross this boundary.
+ * Implementations handle all entity mapping internally. The interface exposes only domain models —
+ * no persistence details cross this boundary.
  */
 internal interface LocalMovieDataSource {
 
@@ -18,9 +18,7 @@ internal interface LocalMovieDataSource {
      */
     suspend fun saveMovies(movies: List<Movie>)
 
-    /**
-     * Returns all locally cached movies, or an empty list if no cache exists.
-     */
+    /** Returns all locally cached movies, or an empty list if no cache exists. */
     suspend fun getCachedMovies(): List<Movie>
 
     /**
@@ -30,8 +28,6 @@ internal interface LocalMovieDataSource {
      */
     suspend fun saveGenres(genres: List<Genre>)
 
-    /**
-     * Returns all locally cached genres, or an empty list if no cache exists.
-     */
+    /** Returns all locally cached genres, or an empty list if no cache exists. */
     suspend fun getCachedGenres(): List<Genre>
 }

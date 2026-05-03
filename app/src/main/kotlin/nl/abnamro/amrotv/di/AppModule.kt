@@ -11,7 +11,7 @@ import nl.abnamro.amrotv.core.buildconfig.BuildConfigProvider
 @InstallIn(SingletonComponent::class)
 abstract class AppModule {
 
-  @Binds
-  @Singleton
-  abstract fun bindBuildConfigProvider(impl: BuildConfigProviderImpl): BuildConfigProvider
+    @Binds
+    @Singleton
+    abstract fun bindBuildConfigProvider(impl: BuildConfigProviderImpl): BuildConfigProvider
 }

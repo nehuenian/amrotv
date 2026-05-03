@@ -14,16 +14,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
-import nl.abnamro.amrotv.feature.movies.ui.R
-import nl.abnamro.amrotv.core.ui.preview.LightDarkPreview
+import nl.abnamro.amrotv.core.ui.preview.PreviewLightDark
 import nl.abnamro.amrotv.core.ui.theme.AmroTvTheme
+import nl.abnamro.amrotv.feature.movies.ui.R
 import nl.abnamro.amrotv.feature.movies.ui.preview.UIPreviewData
 
 @Composable
-internal fun MovieDetailOverview(
-    overview: String,
-    modifier: Modifier = Modifier,
-) {
+internal fun MovieDetailOverview(overview: String, modifier: Modifier = Modifier) {
     Column(modifier = modifier) {
         var overviewExpanded by rememberSaveable { mutableStateOf(false) }
         var overviewOverflows by rememberSaveable { mutableStateOf(false) }
@@ -44,17 +41,15 @@ internal fun MovieDetailOverview(
             ) {
                 Text(
                     if (overviewExpanded) stringResource(R.string.show_less)
-                    else stringResource(R.string.show_more),
+                    else stringResource(R.string.show_more)
                 )
             }
         }
     }
 }
 
-@LightDarkPreview
+@PreviewLightDark
 @Composable
 private fun MovieDetailOverviewPreview() {
-    AmroTvTheme {
-        MovieDetailOverview(overview = UIPreviewData.MovieDetails.darkKnight.overview)
-    }
+    AmroTvTheme { MovieDetailOverview(overview = UIPreviewData.MovieDetails.darkKnight.overview) }
 }

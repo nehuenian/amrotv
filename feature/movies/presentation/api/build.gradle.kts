@@ -1,10 +1,6 @@
-plugins {
-    alias(libs.plugins.amro.android.library)
-}
+plugins { alias(libs.plugins.amro.android.library) }
 
-android {
-    namespace = "nl.abnamro.amrotv.feature.movies.presentation.api"
-}
+android { namespace = "nl.abnamro.amrotv.feature.movies.presentation.api" }
 
 dependencies {
     // api() — not implementation() — because :ui consumes SortOption/SortOrder from domain:api

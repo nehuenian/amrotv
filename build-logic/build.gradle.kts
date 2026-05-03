@@ -1,6 +1,4 @@
-plugins {
-    `kotlin-dsl`
-}
+plugins { `kotlin-dsl` }
 
 group = "nl.abnamro.amrotv.buildlogic"
 
@@ -9,6 +7,7 @@ dependencies {
     compileOnly(libs.android.gradleApi)
     compileOnly(libs.kotlin.gradlePlugin)
     compileOnly(libs.ksp.gradlePlugin)
+    compileOnly(libs.detekt.gradlePlugin)
 }
 
 gradlePlugin {
@@ -28,6 +27,10 @@ gradlePlugin {
         register("amroAndroidCompose") {
             id = "amro.android.compose"
             implementationClass = "AmroAndroidComposeConventionPlugin"
+        }
+        register("amroDetekt") {
+            id = "amro.detekt"
+            implementationClass = "AmroDetektConventionPlugin"
         }
     }
 }

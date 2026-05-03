@@ -9,6 +9,7 @@ class AmroAndroidLibraryConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             pluginManager.apply("com.android.library")
+            pluginManager.apply("amro.detekt")
             (extensions.getByName("android") as LibraryExtension).apply {
                 compileSdk = 36
                 defaultConfig { minSdk = 24 }
@@ -18,9 +19,7 @@ class AmroAndroidLibraryConventionPlugin : Plugin<Project> {
                 }
             }
             tasks.withType(KotlinJvmCompile::class.java).configureEach {
-                compilerOptions {
-                    jvmTarget.set(JvmTarget.JVM_11)
-                }
+                compilerOptions { jvmTarget.set(JvmTarget.JVM_11) }
             }
         }
     }

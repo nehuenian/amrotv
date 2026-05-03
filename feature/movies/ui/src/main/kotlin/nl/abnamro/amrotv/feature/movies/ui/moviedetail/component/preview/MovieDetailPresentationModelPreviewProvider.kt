@@ -6,8 +6,6 @@ import nl.abnamro.amrotv.feature.movies.ui.preview.UIPreviewData
 
 internal class MovieDetailPresentationModelPreviewProvider :
     PreviewParameterProvider<MovieDetailPresentationModel> {
-    override val values = sequenceOf(
-        UIPreviewData.MovieDetails.darkKnight,
-        UIPreviewData.MovieDetails.interstellar,
-    )
+    override val values =
+        sequenceOf(UIPreviewData.MovieDetails.darkKnight, UIPreviewData.MovieDetails.interstellar)
 }

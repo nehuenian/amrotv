@@ -21,8 +21,8 @@ fun interface StateReducer<S : MviState> {
     /**
      * Computes the next state from [currentState].
      *
-     * Must be a pure function: same input always produces the same output,
-     * with no observable side effects.
+     * Must be a pure function: same input always produces the same output, with no observable side
+     * effects.
      *
      * @param currentState the state before this transition is applied.
      * @return the next state after applying this transition.
@@ -30,9 +30,7 @@ fun interface StateReducer<S : MviState> {
     fun transform(currentState: S): S
 }
 
-/**
- * Applies [reducer] to this state and returns the result.
- */
+/** Applies [reducer] to this state and returns the result. */
 fun <S : MviState> S.reduceWith(reducer: StateReducer<S>): S = reducer.transform(this)
 
 /**

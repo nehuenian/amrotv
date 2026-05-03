@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
@@ -18,7 +19,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -36,7 +36,7 @@ import nl.abnamro.amrotv.core.mvi.AmroTvViewModel
 import nl.abnamro.amrotv.core.ui.component.AmroTvEmptyView
 import nl.abnamro.amrotv.core.ui.component.AmroTvErrorView
 import nl.abnamro.amrotv.core.ui.component.AmroTvLoadingView
-import nl.abnamro.amrotv.core.ui.preview.LightDarkPreview
+import nl.abnamro.amrotv.core.ui.preview.PreviewLightDark
 import nl.abnamro.amrotv.core.ui.theme.AmroTvDimensions
 import nl.abnamro.amrotv.core.ui.theme.AmroTvTheme
 import nl.abnamro.amrotv.feature.movies.presentation.api.MovieError
@@ -71,10 +71,7 @@ fun TrendingMoviesScreen(
         }
     }
 
-    TrendingMoviesContent(
-        state = state,
-        onIntent = viewModel::handleIntent,
-    )
+    TrendingMoviesContent(state = state, onIntent = viewModel::handleIntent)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -112,7 +109,7 @@ fun TrendingMoviesContent(
                     GenreFilterRow(
                         genres = state.genres,
                         selectedGenreId = state.selectedGenreId,
-                        onGenreSelected = { onIntent(TrendingMoviesIntent.FilterByGenre(it)) },
+                        onGenreSelect = { onIntent(TrendingMoviesIntent.FilterByGenre(it)) },
                     )
                     AmroTvEmptyView(
                         title = stringResource(R.string.empty_no_movies_found),
@@ -143,109 +140,146 @@ private fun TrendingMoviesMovieList(
     onIntent: (TrendingMoviesIntent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val featuredMovie = movies.firstOrNull()
     val gridState = rememberLazyGridState()
     val genreFilterScrollState: ScrollState = rememberScrollState()
     // Tracks whether the scrollable GenreFilterRow item is currently visible in the grid.
     // When it scrolls out of view, the sticky GenreFilterRow overlay (below) takes over
     // so the genre filter remains accessible without scrolling back up.
-    val isGenreFilterVisible by remember(gridState) {
-        derivedStateOf {
-            gridState.layoutInfo.visibleItemsInfo.any { it.key == "genre_filter" }
+    val isGenreFilterVisible by
+        remember(gridState) {
+            derivedStateOf {
+                gridState.layoutInfo.visibleItemsInfo.any { it.key == "genre_filter" }
+            }
         }
-    }
     val bleedModifier = remember {
         Modifier.layout { measurable, constraints ->
             val bleedPx = AmroTvDimensions.spacingMedium.roundToPx()
             val expandedWidth = constraints.maxWidth + bleedPx * 2
-            val placeable = measurable.measure(
-                constraints.copy(minWidth = expandedWidth, maxWidth = expandedWidth),
-            )
-            layout(constraints.maxWidth, placeable.height) {
-                placeable.place(-bleedPx, 0)
-            }
+            val placeable =
+                measurable.measure(
+                    constraints.copy(minWidth = expandedWidth, maxWidth = expandedWidth)
+                )
+            layout(constraints.maxWidth, placeable.height) { placeable.place(-bleedPx, 0) }
         }
     }
     Box(modifier = modifier) {
         LazyVerticalGrid(
             state = gridState,
             columns = GridCells.Adaptive(minSize = MoviesDimensions.movieCardMinWidth),
-            contentPadding = PaddingValues(
-                start = AmroTvDimensions.spacingMedium,
-                end = AmroTvDimensions.spacingMedium,
-                bottom = AmroTvDimensions.spacingMedium,
-            ),
+            contentPadding =
+                PaddingValues(
+                    start = AmroTvDimensions.spacingMedium,
+                    end = AmroTvDimensions.spacingMedium,
+                    bottom = AmroTvDimensions.spacingMedium,
+                ),
             horizontalArrangement = Arrangement.spacedBy(AmroTvDimensions.spacingSmall),
             verticalArrangement = Arrangement.spacedBy(AmroTvDimensions.spacingSmall),
             modifier = Modifier.fillMaxSize(),
         ) {
-            if (featuredMovie != null) {
-                item(span = { GridItemSpan(maxLineSpan) }) {
-                    FeaturedMovieBanner(
-                        movie = featuredMovie,
-                        onMovieClick = { id -> onIntent(TrendingMoviesIntent.OpenMovieDetail(id)) },
-                        modifier = bleedModifier.graphicsLayer {
-                            val bannerInfo = gridState.layoutInfo.visibleItemsInfo.firstOrNull { it.index == 0 }
-                            alpha = if (bannerInfo == null) {
-                                0f
-                            } else {
-                                val visibleHeight = (bannerInfo.size.height + bannerInfo.offset.y).coerceAtLeast(0)
-                                (visibleHeight.toFloat() / bannerInfo.size.height).coerceIn(0f, 1f)
-                            }
-                        },
-                    )
-                }
-            }
-            // Primary (scrollable) GenreFilterRow — hidden by the sticky overlay once it scrolls out of view.
-            item(key = "genre_filter", span = { GridItemSpan(maxLineSpan) }) {
-                GenreFilterRow(
-                    genres = genres,
-                    selectedGenreId = selectedGenreId,
-                    onGenreSelected = { id -> onIntent(TrendingMoviesIntent.FilterByGenre(id)) },
-                    scrollState = genreFilterScrollState,
-                    modifier = bleedModifier.padding(vertical = AmroTvDimensions.spacingSmall),
-                )
-            }
-            item(span = { GridItemSpan(maxLineSpan) }) {
-                InlineErrorBanner(
-                    errors = errors,
-                    onRetry = { onIntent(TrendingMoviesIntent.LoadMovies) },
-                )
-            }
-            items(movies.drop(1), key = { it.id }) { movie ->
-                MovieCard(movie = movie, onMovieClick = { id -> onIntent(TrendingMoviesIntent.OpenMovieDetail(id)) })
-            }
+            movieGridItems(
+                movies = movies,
+                genres = genres,
+                selectedGenreId = selectedGenreId,
+                errors = errors,
+                onIntent = onIntent,
+                bleedModifier = bleedModifier,
+                gridState = gridState,
+                genreFilterScrollState = genreFilterScrollState,
+            )
         }
         // Sticky GenreFilterRow — shown only when the scrollable one has scrolled out of view,
         // keeping genre filtering accessible at all scroll positions.
         if (!isGenreFilterVisible) {
-            Surface(
-                color = MaterialTheme.colorScheme.surface,
-                shadowElevation = AmroTvDimensions.elevationSmall,
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                GenreFilterRow(
-                    genres = genres,
-                    selectedGenreId = selectedGenreId,
-                    onGenreSelected = { id -> onIntent(TrendingMoviesIntent.FilterByGenre(id)) },
-                    scrollState = genreFilterScrollState,
-                    modifier = Modifier.padding(vertical = AmroTvDimensions.spacingSmall),
-                )
-            }
+            StickyGenreFilterOverlay(
+                genres = genres,
+                selectedGenreId = selectedGenreId,
+                onIntent = onIntent,
+                scrollState = genreFilterScrollState,
+            )
         }
     }
 }
 
-@LightDarkPreview
 @Composable
-private fun TrendingMoviesContentPreview(
-    @PreviewParameter(TrendingMoviesStateProvider::class) state: TrendingMoviesState,
+private fun StickyGenreFilterOverlay(
+    genres: ImmutableList<GenrePresentationModel>,
+    selectedGenreId: Int?,
+    onIntent: (TrendingMoviesIntent) -> Unit,
+    scrollState: ScrollState,
 ) {
-    AmroTvTheme {
-        TrendingMoviesContent(
-            state = state,
-            onIntent = {},
+    Surface(
+        color = MaterialTheme.colorScheme.surface,
+        shadowElevation = AmroTvDimensions.elevationSmall,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        GenreFilterRow(
+            genres = genres,
+            selectedGenreId = selectedGenreId,
+            onGenreSelect = { id -> onIntent(TrendingMoviesIntent.FilterByGenre(id)) },
+            scrollState = scrollState,
+            modifier = Modifier.padding(vertical = AmroTvDimensions.spacingSmall),
         )
     }
 }
 
+private fun LazyGridScope.movieGridItems(
+    movies: ImmutableList<MoviePresentationModel>,
+    genres: ImmutableList<GenrePresentationModel>,
+    selectedGenreId: Int?,
+    errors: ImmutableList<MovieError>,
+    onIntent: (TrendingMoviesIntent) -> Unit,
+    bleedModifier: Modifier,
+    gridState: androidx.compose.foundation.lazy.grid.LazyGridState,
+    genreFilterScrollState: ScrollState,
+) {
+    val featuredMovie = movies.firstOrNull()
+    if (featuredMovie != null) {
+        item(span = { GridItemSpan(maxLineSpan) }) {
+            FeaturedMovieBanner(
+                movie = featuredMovie,
+                onMovieClick = { id -> onIntent(TrendingMoviesIntent.OpenMovieDetail(id)) },
+                modifier =
+                    bleedModifier.graphicsLayer {
+                        val bannerInfo =
+                            gridState.layoutInfo.visibleItemsInfo.firstOrNull { it.index == 0 }
+                        alpha =
+                            if (bannerInfo == null) {
+                                0f
+                            } else {
+                                val visibleHeight =
+                                    (bannerInfo.size.height + bannerInfo.offset.y).coerceAtLeast(0)
+                                (visibleHeight.toFloat() / bannerInfo.size.height).coerceIn(0f, 1f)
+                            }
+                    },
+            )
+        }
+    }
+    // Primary (scrollable) GenreFilterRow — hidden by the sticky overlay once it scrolls out of
+    // view.
+    item(key = "genre_filter", span = { GridItemSpan(maxLineSpan) }) {
+        GenreFilterRow(
+            genres = genres,
+            selectedGenreId = selectedGenreId,
+            onGenreSelect = { id -> onIntent(TrendingMoviesIntent.FilterByGenre(id)) },
+            scrollState = genreFilterScrollState,
+            modifier = bleedModifier.padding(vertical = AmroTvDimensions.spacingSmall),
+        )
+    }
+    item(span = { GridItemSpan(maxLineSpan) }) {
+        InlineErrorBanner(errors = errors, onRetry = { onIntent(TrendingMoviesIntent.LoadMovies) })
+    }
+    items(movies.drop(1), key = { it.id }) { movie ->
+        MovieCard(
+            movie = movie,
+            onMovieClick = { id -> onIntent(TrendingMoviesIntent.OpenMovieDetail(id)) },
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun TrendingMoviesContentPreview(
+    @PreviewParameter(TrendingMoviesStateProvider::class) state: TrendingMoviesState
+) {
+    AmroTvTheme { TrendingMoviesContent(state = state, onIntent = {}) }
+}

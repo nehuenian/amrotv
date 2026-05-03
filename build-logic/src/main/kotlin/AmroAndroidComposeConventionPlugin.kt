@@ -9,12 +9,14 @@ class AmroAndroidComposeConventionPlugin : Plugin<Project> {
             pluginManager.apply("org.jetbrains.kotlin.plugin.compose")
 
             pluginManager.withPlugin("com.android.library") {
-                (extensions.getByName("android") as LibraryExtension)
-                    .buildFeatures { compose = true }
+                (extensions.getByName("android") as LibraryExtension).buildFeatures {
+                    compose = true
+                }
             }
             pluginManager.withPlugin("com.android.application") {
-                (extensions.getByName("android") as ApplicationExtension)
-                    .buildFeatures { compose = true }
+                (extensions.getByName("android") as ApplicationExtension).buildFeatures {
+                    compose = true
+                }
             }
         }
     }

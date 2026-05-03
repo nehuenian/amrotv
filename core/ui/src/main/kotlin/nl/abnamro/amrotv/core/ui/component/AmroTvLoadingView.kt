@@ -4,8 +4,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -25,10 +25,7 @@ import nl.abnamro.amrotv.core.ui.theme.AmroTvTheme
  * @param message Optional message to display below the progress indicator
  */
 @Composable
-fun AmroTvLoadingView(
-    modifier: Modifier = Modifier.fillMaxSize(),
-    message: String? = null,
-) {
+fun AmroTvLoadingView(modifier: Modifier = Modifier.fillMaxSize(), message: String? = null) {
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -54,31 +51,23 @@ fun AmroTvLoadingView(
 @Preview(showBackground = true, name = "Light Mode")
 @Composable
 private fun AmroTvLoadingViewLightPreview() {
-    AmroTvTheme(darkTheme = false) {
-        AmroTvLoadingView()
-    }
+    AmroTvTheme(darkTheme = false) { AmroTvLoadingView() }
 }
 
 @Preview(showBackground = true, name = "Dark Mode")
 @Composable
 private fun AmroTvLoadingViewDarkPreview() {
-    AmroTvTheme(darkTheme = true) {
-        AmroTvLoadingView()
-    }
+    AmroTvTheme(darkTheme = true) { AmroTvLoadingView() }
 }
 
 @Preview(showBackground = true, name = "Light Mode - With Message")
 @Composable
 private fun AmroTvLoadingViewWithMessageLightPreview() {
-    AmroTvTheme(darkTheme = false) {
-        AmroTvLoadingView(message = "Loading movies...")
-    }
+    AmroTvTheme(darkTheme = false) { AmroTvLoadingView(message = "Loading movies...") }
 }
 
 @Preview(showBackground = true, name = "Dark Mode - With Message")
 @Composable
 private fun AmroTvLoadingViewWithMessageDarkPreview() {
-    AmroTvTheme(darkTheme = true) {
-        AmroTvLoadingView(message = "Loading movies...")
-    }
+    AmroTvTheme(darkTheme = true) { AmroTvLoadingView(message = "Loading movies...") }
 }

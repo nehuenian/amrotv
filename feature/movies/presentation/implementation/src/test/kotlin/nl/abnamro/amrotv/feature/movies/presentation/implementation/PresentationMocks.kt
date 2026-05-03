@@ -13,26 +13,28 @@ object PresentationMocks {
         const val ACTION_GENRE_ID = 28
         const val COMEDY_GENRE_ID = 35
 
-        val action = Movie(
-            id = 1,
-            title = "Alpha",
-            genreIds = listOf(ACTION_GENRE_ID),
-            popularity = 80.0,
-            releaseDate = "2024-01-01",
-            posterUrl = null,
-            backdropUrl = null,
-            voteAverage = 0.0,
-        )
-        val comedy = Movie(
-            id = 2,
-            title = "Beta",
-            genreIds = listOf(COMEDY_GENRE_ID),
-            popularity = 50.0,
-            releaseDate = "2023-06-15",
-            posterUrl = null,
-            backdropUrl = null,
-            voteAverage = 0.0,
-        )
+        val action =
+            Movie(
+                id = 1,
+                title = "Alpha",
+                genreIds = listOf(ACTION_GENRE_ID),
+                popularity = 80.0,
+                releaseDate = "2024-01-01",
+                posterUrl = null,
+                backdropUrl = null,
+                voteAverage = 0.0,
+            )
+        val comedy =
+            Movie(
+                id = 2,
+                title = "Beta",
+                genreIds = listOf(COMEDY_GENRE_ID),
+                popularity = 50.0,
+                releaseDate = "2023-06-15",
+                posterUrl = null,
+                backdropUrl = null,
+                voteAverage = 0.0,
+            )
         val all = listOf(action, comedy)
     }
 
@@ -43,26 +45,28 @@ object PresentationMocks {
     }
 
     object PresentationMovies {
-        val action = MoviePresentationModel(
-            id = 1,
-            title = "Alpha",
-            genreIds = persistentListOf(Movies.ACTION_GENRE_ID),
-            popularity = 80.0,
-            releaseYear = "2024",
-            posterUrl = null,
-            backdropUrl = null,
-            formattedRating = "0.0",
-        )
-        val comedy = MoviePresentationModel(
-            id = 2,
-            title = "Beta",
-            genreIds = persistentListOf(Movies.COMEDY_GENRE_ID),
-            popularity = 50.0,
-            releaseYear = "2023",
-            posterUrl = null,
-            backdropUrl = null,
-            formattedRating = "0.0",
-        )
+        val action =
+            MoviePresentationModel(
+                id = 1,
+                title = "Alpha",
+                genreIds = persistentListOf(Movies.ACTION_GENRE_ID),
+                popularity = 80.0,
+                releaseYear = "2024",
+                posterUrl = null,
+                backdropUrl = null,
+                formattedRating = "0.0",
+            )
+        val comedy =
+            MoviePresentationModel(
+                id = 2,
+                title = "Beta",
+                genreIds = persistentListOf(Movies.COMEDY_GENRE_ID),
+                popularity = 50.0,
+                releaseYear = "2023",
+                posterUrl = null,
+                backdropUrl = null,
+                formattedRating = "0.0",
+            )
         val all = listOf(action, comedy)
     }
 
@@ -76,22 +80,23 @@ object PresentationMocks {
         const val DEFAULT_ID = 42
         const val IMDB_ID = "tt1234567"
 
-        fun of(id: Int = DEFAULT_ID) = MovieDetail(
-            id = id,
-            title = "Test Movie",
-            tagline = null,
-            posterUrl = null,
-            backdropUrl = null,
-            genres = emptyList(),
-            overview = "Overview",
-            voteAverage = 7.5,
-            voteCount = 100,
-            budget = null,
-            revenue = null,
-            imdbId = IMDB_ID,
-            status = "Released",
-            runtimeInMinutes = 120,
-            releaseDate = "2024-01-01",
-        )
+        fun of(id: Int = DEFAULT_ID) =
+            MovieDetail(
+                id = id,
+                title = "Test Movie",
+                tagline = null,
+                posterUrl = null,
+                backdropUrl = null,
+                genres = emptyList(),
+                overview = "Overview",
+                voteAverage = 7.5,
+                voteCount = 100,
+                budget = null,
+                revenue = null,
+                imdbId = IMDB_ID,
+                status = "Released",
+                runtimeInMinutes = 120,
+                releaseDate = "2024-01-01",
+            )
     }
 }

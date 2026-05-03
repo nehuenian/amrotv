@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import kotlinx.collections.immutable.ImmutableList
-import nl.abnamro.amrotv.core.ui.preview.LightDarkPreview
+import nl.abnamro.amrotv.core.ui.preview.PreviewLightDark
 import nl.abnamro.amrotv.core.ui.theme.AmroTvDimensions
 import nl.abnamro.amrotv.core.ui.theme.AmroTvTheme
 import nl.abnamro.amrotv.feature.movies.presentation.api.model.GenrePresentationModel
@@ -28,7 +28,7 @@ import nl.abnamro.amrotv.feature.movies.ui.trendingmovies.component.preview.Genr
 fun GenreFilterRow(
     genres: ImmutableList<GenrePresentationModel>,
     selectedGenreId: Int?,
-    onGenreSelected: (Int?) -> Unit,
+    onGenreSelect: (Int?) -> Unit,
     modifier: Modifier = Modifier,
     scrollState: ScrollState = rememberScrollState(),
 ) {
@@ -39,41 +39,42 @@ fun GenreFilterRow(
         Spacer(modifier = Modifier)
         FilterChip(
             selected = selectedGenreId == null,
-            onClick = { onGenreSelected(null) },
+            onClick = { onGenreSelect(null) },
             label = { Text(stringResource(R.string.genre_filter_all)) },
             shape = CircleShape,
-            colors = FilterChipDefaults.filterChipColors(
-                selectedContainerColor = MaterialTheme.colorScheme.primary,
-                selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
-            ),
+            colors =
+                FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = MaterialTheme.colorScheme.primary,
+                    selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
+                ),
         )
         genres.forEach { genre ->
             FilterChip(
                 selected = selectedGenreId == genre.id,
-                onClick = { onGenreSelected(genre.id) },
+                onClick = { onGenreSelect(genre.id) },
                 label = { Text(genre.name) },
                 shape = CircleShape,
-                colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = MaterialTheme.colorScheme.primary,
-                    selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
-                ),
+                colors =
+                    FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = MaterialTheme.colorScheme.primary,
+                        selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
+                    ),
             )
         }
         Spacer(modifier = Modifier)
     }
 }
 
-@LightDarkPreview
+@PreviewLightDark
 @Composable
 private fun GenreFilterRowPreview(
-    @PreviewParameter(GenreFilterRowPreviewProvider::class) state: GenreFilterRowPreviewState,
+    @PreviewParameter(GenreFilterRowPreviewProvider::class) state: GenreFilterRowPreviewState
 ) {
     AmroTvTheme {
         GenreFilterRow(
             genres = state.genres,
             selectedGenreId = state.selectedGenreId,
-            onGenreSelected = {},
+            onGenreSelect = {},
         )
     }
 }
-
