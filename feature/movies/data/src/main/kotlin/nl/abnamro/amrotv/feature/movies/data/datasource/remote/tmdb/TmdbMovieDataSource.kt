@@ -3,8 +3,10 @@ package nl.abnamro.amrotv.feature.movies.data.datasource.remote.tmdb
 import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
 import nl.abnamro.amrotv.feature.movies.data.datasource.remote.RemoteMovieDataSource
+import nl.abnamro.amrotv.feature.movies.data.datasource.remote.tmdb.dto.GenreDataToDomainMapper
+import nl.abnamro.amrotv.feature.movies.data.datasource.remote.tmdb.dto.MovieDataToDomainMapper
+import nl.abnamro.amrotv.feature.movies.data.datasource.remote.tmdb.dto.MovieDetailDataToDomainMapper
 import nl.abnamro.amrotv.feature.movies.data.datasource.remote.tmdb.dto.MovieDto
-import nl.abnamro.amrotv.feature.movies.data.datasource.remote.tmdb.dto.toDomain
 import nl.abnamro.amrotv.feature.movies.domain.api.model.Genre
 import nl.abnamro.amrotv.feature.movies.domain.api.model.Movie
 import nl.abnamro.amrotv.feature.movies.domain.api.model.MovieDetail
@@ -18,8 +20,13 @@ private const val TARGET_MOVIE_COUNT = 100
 
 internal class TmdbMovieDataSource
 @Inject
-constructor(private val apiService: TmdbApiService, private val logger: Logger) :
-    RemoteMovieDataSource {
+constructor(
+    private val apiService: TmdbApiService,
+    private val logger: Logger,
+    private val movieMapper: MovieDataToDomainMapper,
+    private val movieDetailMapper: MovieDetailDataToDomainMapper,
+    private val genreMapper: GenreDataToDomainMapper,
+) : RemoteMovieDataSource {
 
     // Pages are fetched sequentially by design. Page 1 failure throws to the caller.
     // Any subsequent page failure stops pagination early and returns what was accumulated so far
@@ -36,7 +43,7 @@ constructor(private val apiService: TmdbApiService, private val logger: Logger) 
             totalPages = newTotalPages
             page++
         }
-        return accumulated.take(TARGET_MOVIE_COUNT).map { it.toDomain() }
+        return accumulated.take(TARGET_MOVIE_COUNT).map { movieMapper.map(it) }
     }
 
     private suspend fun fetchPage(
@@ -64,8 +71,8 @@ constructor(private val apiService: TmdbApiService, private val logger: Logger) 
         }
 
     override suspend fun getMovieDetail(id: Int): MovieDetail =
-        apiService.getMovieDetail(movieId = id, language = LANGUAGE).toDomain()
+        movieDetailMapper.map(apiService.getMovieDetail(movieId = id, language = LANGUAGE))
 
     override suspend fun getGenres(): List<Genre> =
-        apiService.getGenres(language = LANGUAGE).genres.map { it.toDomain() }
+        apiService.getGenres(language = LANGUAGE).genres.map { genreMapper.map(it) }
 }

@@ -5,7 +5,7 @@ internal object E2ETestData {
 
     // UI labels
     const val VIEW_ON_IMDB_LABEL = "View on IMDb"
-    const val FEATURED_BANNER_MORE_INFO_PREFIX = "More info about"
+    const val FEATURED_BANNER_CONTENT_DESC_PREFIX = "More info about"
     const val TRENDING_MOVIES_TITLE = "Trending Movies"
     const val GENRE_FILTER_ALL = "All"
     const val NAVIGATE_BACK_DESCRIPTION = "Navigate back"

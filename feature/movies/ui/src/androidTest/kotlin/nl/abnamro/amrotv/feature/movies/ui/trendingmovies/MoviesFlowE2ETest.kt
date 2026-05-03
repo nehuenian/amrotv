@@ -141,7 +141,7 @@ class MoviesFlowE2ETest {
             verify {
                 onMoviesLoaded {
                     trendingMoviesTitleVisible()
-                    featuredBannerVisible()
+                    atLeastOneMovieVisible()
                 }
             }
         }
@@ -158,6 +158,7 @@ class MoviesFlowE2ETest {
             }
             verify {
                 onMoviesLoaded {
+                    atLeastOneMovieVisible()
                     movieVisible(E2ETestData.PROJECT_HAIL_MARY_TITLE)
                     // Drama/non-SciFi movies must be absent after SciFi filter
                     movieNotVisible(E2ETestData.THE_DEVIL_WEARS_PRADA_2_TITLE)

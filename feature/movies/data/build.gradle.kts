@@ -9,6 +9,7 @@ android { namespace = "nl.abnamro.amrotv.feature.movies.data" }
 dependencies {
     implementation(projects.feature.movies.domain.api)
     implementation(projects.core.data)
+    implementation(projects.core.mvi.kotlin)
     implementation(projects.libraries.logger.api)
     implementation(libs.retrofit)
     implementation(libs.retrofit.kotlinx.serialization)

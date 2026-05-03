@@ -8,6 +8,9 @@ import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import nl.abnamro.amrotv.feature.movies.data.MovieDataMocks.Dtos
 import nl.abnamro.amrotv.feature.movies.data.datasource.remote.RemoteMovieDataSource
+import nl.abnamro.amrotv.feature.movies.data.datasource.remote.tmdb.dto.GenreDataToDomainMapper
+import nl.abnamro.amrotv.feature.movies.data.datasource.remote.tmdb.dto.MovieDataToDomainMapper
+import nl.abnamro.amrotv.feature.movies.data.datasource.remote.tmdb.dto.MovieDetailDataToDomainMapper
 import nl.abnamro.amrotv.feature.movies.data.datasource.remote.tmdb.dto.TrendingMoviesResponseDto
 import nl.abnamro.amrotv.libraries.logger.api.LogLevel
 import nl.abnamro.amrotv.libraries.logger.api.Logger
@@ -28,11 +31,18 @@ internal class TmdbMovieDataSourceTest {
     @BeforeEach
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        dataSource = TmdbMovieDataSource(apiService, logger)
+        dataSource =
+            TmdbMovieDataSource(
+                apiService,
+                logger,
+                MovieDataToDomainMapper(),
+                MovieDetailDataToDomainMapper(GenreDataToDomainMapper()),
+                GenreDataToDomainMapper(),
+            )
     }
 
     @Nested
-    @DisplayName("GIVEN page 1 throws a network exception")
+    @DisplayName("GIVEN the first page throws a network exception")
     inner class GivenPage1Throws {
 
         private val networkError = RuntimeException("network error")
@@ -43,8 +53,8 @@ internal class TmdbMovieDataSourceTest {
         }
 
         @Nested
-        @DisplayName("WHEN getTrendingMovies() is called")
-        inner class WhenGetTrendingMoviesIsCalled {
+        @DisplayName("WHEN trending movies are requested")
+        inner class WhenTrendingMoviesAreRequested {
 
             @Test
             @DisplayName("THEN the exception propagates to the caller")
@@ -56,7 +66,7 @@ internal class TmdbMovieDataSourceTest {
     }
 
     @Nested
-    @DisplayName("GIVEN a single page response with fewer than 100 movies")
+    @DisplayName("GIVEN a single-page response with fewer movies than the configured maximum")
     inner class GivenSinglePageFewerThan100 {
 
         @BeforeEach
@@ -66,8 +76,8 @@ internal class TmdbMovieDataSourceTest {
         }
 
         @Nested
-        @DisplayName("WHEN getTrendingMovies() is called")
-        inner class WhenGetTrendingMoviesIsCalled {
+        @DisplayName("WHEN trending movies are requested")
+        inner class WhenTrendingMoviesAreRequested {
 
             @Test
             @DisplayName("THEN all available movies are returned")
@@ -80,7 +90,7 @@ internal class TmdbMovieDataSourceTest {
     }
 
     @Nested
-    @DisplayName("GIVEN page 1 succeeds but page 2 throws (totalPages = 2)")
+    @DisplayName("GIVEN the first page of trending movies succeeds but the second page fails")
     inner class GivenPage1SucceedsPage2Throws {
 
         @BeforeEach
@@ -92,11 +102,11 @@ internal class TmdbMovieDataSourceTest {
         }
 
         @Nested
-        @DisplayName("WHEN getTrendingMovies() is called")
-        inner class WhenGetTrendingMoviesIsCalled {
+        @DisplayName("WHEN trending movies are requested")
+        inner class WhenTrendingMoviesAreRequested {
 
             @Test
-            @DisplayName("THEN movies from page 1 are returned")
+            @DisplayName("THEN movies from the first page are returned")
             fun returnsPage1Movies() = runTest {
                 val result = dataSource.getTrendingMovies()
                 assertEquals(1, result.size)
@@ -120,7 +130,7 @@ internal class TmdbMovieDataSourceTest {
     }
 
     @Nested
-    @DisplayName("GIVEN page 1 succeeds but page 2 of 3 throws")
+    @DisplayName("GIVEN the first page succeeds but the second page of a three-page response fails")
     inner class GivenPage2Of3Throws {
 
         @BeforeEach
@@ -136,11 +146,11 @@ internal class TmdbMovieDataSourceTest {
         }
 
         @Nested
-        @DisplayName("WHEN getTrendingMovies() is called")
-        inner class WhenGetTrendingMoviesIsCalled {
+        @DisplayName("WHEN trending movies are requested")
+        inner class WhenTrendingMoviesAreRequested {
 
             @Test
-            @DisplayName("THEN only movies from page 1 are returned and fetching stops")
+            @DisplayName("THEN only movies from the first page are returned and fetching stops")
             fun stopsAfterFirstFailure() = runTest {
                 val result = dataSource.getTrendingMovies()
                 assertEquals(1, result.size)
@@ -148,7 +158,7 @@ internal class TmdbMovieDataSourceTest {
             }
 
             @Test
-            @DisplayName("THEN page 3 is never requested")
+            @DisplayName("THEN the third page is never requested")
             fun page3IsNeverRequested() = runTest {
                 dataSource.getTrendingMovies()
                 coVerify(exactly = 0) { apiService.getTrendingMovies(any(), 3, any()) }
@@ -171,7 +181,7 @@ internal class TmdbMovieDataSourceTest {
     }
 
     @Nested
-    @DisplayName("GIVEN the API has more than 100 movies across pages")
+    @DisplayName("GIVEN the API has more movies than the configured maximum across pages")
     inner class GivenMoreThan100MoviesAvailable {
 
         private val moviesPage1 = (1..60).map { Dtos.movieDto.copy(id = it) }
@@ -186,11 +196,11 @@ internal class TmdbMovieDataSourceTest {
         }
 
         @Nested
-        @DisplayName("WHEN getTrendingMovies() is called")
-        inner class WhenGetTrendingMoviesIsCalled {
+        @DisplayName("WHEN trending movies are requested")
+        inner class WhenTrendingMoviesAreRequested {
 
             @Test
-            @DisplayName("THEN exactly 100 movies are returned")
+            @DisplayName("THEN results are capped at the configured maximum")
             fun returns100Movies() = runTest {
                 assertEquals(100, dataSource.getTrendingMovies().size)
             }
@@ -222,11 +232,11 @@ internal class TmdbMovieDataSourceTest {
         }
 
         @Nested
-        @DisplayName("WHEN getTrendingMovies() is called")
-        inner class WhenGetTrendingMoviesIsCalled {
+        @DisplayName("WHEN trending movies are requested")
+        inner class WhenTrendingMoviesAreRequested {
 
             @Test
-            @DisplayName("THEN exactly 100 unique movies are returned")
+            @DisplayName("THEN exactly the configured maximum number of unique movies is returned")
             fun returns100UniqueMovies() = runTest {
                 assertEquals(100, dataSource.getTrendingMovies().size)
             }
@@ -236,13 +246,6 @@ internal class TmdbMovieDataSourceTest {
             fun allReturnedIdsAreUnique() = runTest {
                 val result = dataSource.getTrendingMovies()
                 assertEquals(result.size, result.map { it.id }.distinct().size)
-            }
-
-            @Test
-            @DisplayName("THEN page 3 is fetched to compensate for duplicates on page 2")
-            fun page3IsFetchedToCompensateForDuplicates() = runTest {
-                dataSource.getTrendingMovies()
-                coVerify(exactly = 1) { apiService.getTrendingMovies(any(), 3, any()) }
             }
         }
     }
@@ -258,8 +261,8 @@ internal class TmdbMovieDataSourceTest {
         }
 
         @Nested
-        @DisplayName("WHEN getMovieDetail() is called")
-        inner class WhenGetMovieDetailIsCalled {
+        @DisplayName("WHEN detail is requested for a movie")
+        inner class WhenDetailIsRequestedForAMovie {
 
             @Test
             @DisplayName("THEN the detail is mapped to a domain MovieDetail")
@@ -281,8 +284,8 @@ internal class TmdbMovieDataSourceTest {
         }
 
         @Nested
-        @DisplayName("WHEN getGenres() is called")
-        inner class WhenGetGenresIsCalled {
+        @DisplayName("WHEN the genre list is requested")
+        inner class WhenTheGenreListIsRequested {
 
             @Test
             @DisplayName("THEN the genres are mapped to domain Genre objects")

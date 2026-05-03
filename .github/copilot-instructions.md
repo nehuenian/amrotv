@@ -1,7 +1,7 @@
 # Copilot Instructions — AMRO
 
 This is an **Android-only** app built with:
-**Jetpack Compose + MVI + Dagger Hilt + Navigation Compose + Retrofit (TMDB API)**.
+**Jetpack Compose + MVI + Dagger Hilt + Navigation3 + Retrofit (TMDB API)**.
 
 These instructions describe the **target architecture that all new code must follow**.
 
@@ -40,6 +40,15 @@ Use the right tool for each domain — never substitute one for another:
 | Android development (build, deploy, SDK, AVD) | `android-cli` skill — wraps `sdkmanager`, `avdmanager`, `adb`, and Gradle CLI |
 | GitHub operations (PRs, issues, workflows, releases) | `gh` CLI |
 | Kotlin code intelligence (go-to-definition, find-references, hover, rename) | LSP — use the `lsp-setup` skill to configure the Kotlin language server if not already active |
+
+### Mandatory tooling rules (no exceptions)
+
+- For **any Kotlin code navigation** — symbol lookups, class definitions, call hierarchies,
+  references — **always use the LSP tool** (`goToDefinition`, `findReferences`, `hover`,
+  `workspaceSymbol`, `incomingCalls`). Do **NOT** use grep/glob for code intelligence tasks.
+- For **any Android build, test run, lint check, deployment, emulator, or SDK management** task,
+  **always use the `android-cli` skill**. Do **NOT** run `./gradlew`, `adb`, or `sdkmanager`
+  directly without it.
 
 ---
 
