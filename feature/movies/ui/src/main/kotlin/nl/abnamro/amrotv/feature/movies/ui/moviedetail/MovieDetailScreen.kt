@@ -1,5 +1,6 @@
 package nl.abnamro.amrotv.feature.movies.ui.moviedetail
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -48,29 +49,28 @@ import nl.abnamro.amrotv.feature.movies.ui.util.toStringResId
 
 @Composable
 fun MovieDetailScreen(
-    movieId: Int,
     navigateBack: () -> Unit,
     viewModel: AmroTvViewModel<MovieDetailState, MovieDetailIntent, MovieDetailEffect>,
 ) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
-    val currentUriHandler by rememberUpdatedState(LocalUriHandler.current)
-    val currentNavigateBack by rememberUpdatedState(navigateBack)
+  val state by viewModel.state.collectAsStateWithLifecycle()
+  val currentUriHandler by rememberUpdatedState(LocalUriHandler.current)
+  val currentNavigateBack by rememberUpdatedState(navigateBack)
 
-    LaunchedEffect(Unit) {
-        // TODO: Move to init + SavedStateHandle when the screen is wired up with Navigation component
-        viewModel.handleIntent(MovieDetailIntent.LoadMovieDetail(movieId))
-        viewModel.effects.collect { effect ->
-            when (effect) {
-                is MovieDetailEffect.NavigateBack -> currentNavigateBack()
-                is MovieDetailEffect.OpenUrl -> currentUriHandler.openUri(effect.url)
-            }
-        }
+  BackHandler { viewModel.handleIntent(MovieDetailIntent.NavigateBack) }
+
+  LaunchedEffect(Unit) {
+    viewModel.effects.collect { effect ->
+      when (effect) {
+        is MovieDetailEffect.NavigateBack -> currentNavigateBack()
+        is MovieDetailEffect.OpenUrl -> currentUriHandler.openUri(effect.url)
+      }
     }
+  }
 
-    MovieDetailContent(
-        state = state,
-        onIntent = viewModel::handleIntent,
-    )
+  MovieDetailContent(
+      state = state,
+      onIntent = viewModel::handleIntent,
+  )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -80,41 +80,33 @@ fun MovieDetailContent(
     onIntent: (MovieDetailIntent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Scaffold(
-        modifier = modifier,
-        topBar = {
-            MovieDetailTopBar(onIntent = onIntent)
-        },
-    ) { innerPadding ->
-        when {
-            state.movieDetail == null && state.errors.isEmpty() ->
-                AmroTvLoadingView(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding)
-                )
+  Scaffold(
+      modifier = modifier,
+      topBar = { MovieDetailTopBar(onIntent = onIntent) },
+  ) { innerPadding ->
+    when {
+      state.movieDetail == null && state.errors.isEmpty() ->
+          AmroTvLoadingView(modifier = Modifier.fillMaxSize().padding(innerPadding))
 
-            state.errors.isNotEmpty() && state.movieDetail == null ->
-                AmroTvErrorView(
-                    message = stringResource(state.errors.first().toStringResId()),
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding),
-                    onRetry = { onIntent(MovieDetailIntent.Retry) },
-                )
+      state.errors.isNotEmpty() && state.movieDetail == null ->
+          AmroTvErrorView(
+              message = stringResource(state.errors.first().toStringResId()),
+              modifier = Modifier.fillMaxSize().padding(innerPadding),
+              onRetry = { onIntent(MovieDetailIntent.Retry) },
+          )
 
-            state.movieDetail != null -> {
-                val detail = requireNotNull(state.movieDetail)
-                MovieDetailBody(
-                    detail = detail,
-                    errors = state.errors,
-                    onIntent = onIntent,
-                    // Only bottom padding: backdrop extends behind the transparent TopAppBar
-                    modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding()),
-                )
-            }
-        }
+      state.movieDetail != null -> {
+        val detail = requireNotNull(state.movieDetail)
+        MovieDetailBody(
+            detail = detail,
+            errors = state.errors,
+            onIntent = onIntent,
+            // Only bottom padding: backdrop extends behind the transparent TopAppBar
+            modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding()),
+        )
+      }
     }
+  }
 }
 
 @Composable
@@ -124,54 +116,48 @@ private fun MovieDetailBody(
     onIntent: (MovieDetailIntent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState()),
-    ) {
-        MovieDetailHero(detail = detail)
+  Column(
+      modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState()),
+  ) {
+    MovieDetailHero(detail = detail)
 
-        Surface(
-            modifier = Modifier
-                .fillMaxWidth()
-                .offset(y = -AmroTvDimensions.cornerRadiusMedium),
-            shape = RoundedCornerShape(
+    Surface(
+        modifier = Modifier.fillMaxWidth().offset(y = -AmroTvDimensions.cornerRadiusMedium),
+        shape =
+            RoundedCornerShape(
                 topStart = AmroTvDimensions.cornerRadiusMedium,
                 topEnd = AmroTvDimensions.cornerRadiusMedium,
             ),
-            color = MaterialTheme.colorScheme.surface,
-        ) {
-            Column(
-                modifier = Modifier.padding(
-                    horizontal = AmroTvDimensions.spacingMedium,
-                    vertical = AmroTvDimensions.spacingMedium,
-                ),
-                verticalArrangement = Arrangement.spacedBy(AmroTvDimensions.spacingMedium),
-            ) {
-                InlineErrorBanner(
-                        errors = errors,
-                        onRetry = { onIntent(MovieDetailIntent.Retry) })
+        color = MaterialTheme.colorScheme.surface,
+    ) {
+      Column(
+          modifier =
+              Modifier.padding(
+                  horizontal = AmroTvDimensions.spacingMedium,
+                  vertical = AmroTvDimensions.spacingMedium,
+              ),
+          verticalArrangement = Arrangement.spacedBy(AmroTvDimensions.spacingMedium),
+      ) {
+        InlineErrorBanner(errors = errors, onRetry = { onIntent(MovieDetailIntent.Retry) })
 
-                detail.tagline?.takeIf { it.isNotBlank() }?.let {
-                    MovieDetailTagline(tagline = it)
-                }
+        detail.tagline?.takeIf { it.isNotBlank() }?.let { MovieDetailTagline(tagline = it) }
 
-                if (detail.genres.isNotEmpty()) {
-                    MovieDetailGenres(genres = detail.genres)
-                }
-
-                MovieDetailOverview(overview = detail.overview)
-
-                MovieDetailStats(detail = detail)
-
-                MovieDetailFinancials(detail = detail)
-
-                detail.imdbId?.takeIf { it.isNotBlank() }?.let {
-                    MovieDetailImdbButton(onClick = { onIntent(MovieDetailIntent.OpenImdb(it)) })
-                }
-            }
+        if (detail.genres.isNotEmpty()) {
+          MovieDetailGenres(genres = detail.genres)
         }
+
+        MovieDetailOverview(overview = detail.overview)
+
+        MovieDetailStats(detail = detail)
+
+        MovieDetailFinancials(detail = detail)
+
+        detail.imdbId
+            ?.takeIf { it.isNotBlank() }
+            ?.let { MovieDetailImdbButton(onClick = { onIntent(MovieDetailIntent.OpenImdb(it)) }) }
+      }
     }
+  }
 }
 
 @LightDarkPreview
@@ -179,11 +165,10 @@ private fun MovieDetailBody(
 private fun MovieDetailContentPreview(
     @PreviewParameter(MovieDetailStateProvider::class) state: MovieDetailState,
 ) {
-    AmroTvTheme {
-        MovieDetailContent(
-            state = state,
-            onIntent = {},
-        )
-    }
+  AmroTvTheme {
+    MovieDetailContent(
+        state = state,
+        onIntent = {},
+    )
+  }
 }
-

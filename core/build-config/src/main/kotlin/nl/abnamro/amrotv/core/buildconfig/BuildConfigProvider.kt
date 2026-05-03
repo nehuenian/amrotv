@@ -8,7 +8,7 @@ package nl.abnamro.amrotv.core.buildconfig
  * touching any consumer module.
  *
  * The `:app` module provides the implementation backed by `BuildConfig`, which is
- * compiled from `local.properties` entries (never committed to source control).
+ * compiled from `amrotv.properties` entries (never committed to source control).
  */
 interface BuildConfigProvider {
 
