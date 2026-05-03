@@ -1,5 +1,6 @@
 package nl.abnamro.amrotv.feature.movies.domain.implementation.usecase
 
+import java.time.LocalDate
 import nl.abnamro.amrotv.feature.movies.domain.api.model.Genre
 import nl.abnamro.amrotv.feature.movies.domain.api.model.Movie
 import nl.abnamro.amrotv.feature.movies.domain.api.model.MovieDetail
@@ -17,7 +18,7 @@ object MovieDomainMocks {
                 title = "Alpha",
                 genreIds = listOf(ACTION_GENRE_ID),
                 popularity = 80.0,
-                releaseDate = "2024-01-01",
+                releaseDate = LocalDate.of(2024, 1, 1),
                 posterUrl = null,
                 backdropUrl = null,
                 voteAverage = 0.0,
@@ -28,7 +29,7 @@ object MovieDomainMocks {
                 title = "Beta",
                 genreIds = listOf(COMEDY_GENRE_ID),
                 popularity = 50.0,
-                releaseDate = "2023-06-15",
+                releaseDate = LocalDate.of(2023, 6, 15),
                 posterUrl = null,
                 backdropUrl = null,
                 voteAverage = 0.0,
@@ -39,7 +40,18 @@ object MovieDomainMocks {
                 title = "Gamma",
                 genreIds = listOf(ACTION_GENRE_ID, COMEDY_GENRE_ID),
                 popularity = 95.0,
-                releaseDate = "2022-03-10",
+                releaseDate = LocalDate.of(2022, 3, 10),
+                posterUrl = null,
+                backdropUrl = null,
+                voteAverage = 0.0,
+            )
+        val noReleaseDate =
+            Movie(
+                id = 4,
+                title = "Delta",
+                genreIds = emptyList(),
+                popularity = 60.0,
+                releaseDate = null,
                 posterUrl = null,
                 backdropUrl = null,
                 voteAverage = 0.0,
@@ -70,7 +82,7 @@ object MovieDomainMocks {
                 imdbId = null,
                 status = "Released",
                 runtimeInMinutes = null,
-                releaseDate = "2024-01-01",
+                releaseDate = LocalDate.of(2024, 1, 1),
             )
     }
 }

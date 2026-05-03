@@ -29,7 +29,7 @@ constructor(private val genreMapper: GenreDomainToPresentationMapper) :
             imdbId = input.imdbId,
             status = input.status,
             runtimeInMinutes = input.runtimeInMinutes,
-            releaseYear = extractReleaseYear(input.releaseDate),
+            releaseDate = formatReleaseDate(input.releaseDate),
         )
 
     // TODO: Replace with a locale-aware currency formatter from an i18n library

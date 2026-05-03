@@ -3,9 +3,9 @@ package nl.abnamro.amrotv.feature.movies.data.datasource.remote.tmdb
 import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
 import nl.abnamro.amrotv.feature.movies.data.datasource.remote.RemoteMovieDataSource
-import nl.abnamro.amrotv.feature.movies.data.datasource.remote.tmdb.dto.GenreDataToDomainMapper
-import nl.abnamro.amrotv.feature.movies.data.datasource.remote.tmdb.dto.MovieDataToDomainMapper
-import nl.abnamro.amrotv.feature.movies.data.datasource.remote.tmdb.dto.MovieDetailDataToDomainMapper
+import nl.abnamro.amrotv.feature.movies.data.datasource.remote.tmdb.mapper.GenreDataToDomainMapper
+import nl.abnamro.amrotv.feature.movies.data.datasource.remote.tmdb.mapper.MovieDataToDomainMapper
+import nl.abnamro.amrotv.feature.movies.data.datasource.remote.tmdb.mapper.MovieDetailDataToDomainMapper
 import nl.abnamro.amrotv.feature.movies.data.datasource.remote.tmdb.dto.MovieDto
 import nl.abnamro.amrotv.feature.movies.domain.api.model.Genre
 import nl.abnamro.amrotv.feature.movies.domain.api.model.Movie

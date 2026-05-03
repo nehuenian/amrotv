@@ -1,7 +1,9 @@
-package nl.abnamro.amrotv.feature.movies.data.datasource.remote.tmdb.dto
+package nl.abnamro.amrotv.feature.movies.data.datasource.remote.tmdb.mapper
 
+import java.time.LocalDate
 import nl.abnamro.amrotv.core.mvi.Mapper
 import nl.abnamro.amrotv.feature.movies.data.MovieDataMocks.Dtos
+import nl.abnamro.amrotv.feature.movies.data.datasource.remote.tmdb.dto.MovieDetailDto
 import nl.abnamro.amrotv.feature.movies.domain.api.model.MovieDetail
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
@@ -24,18 +26,57 @@ internal class MovieDetailDataToDomainMapperTest {
         inner class WhenConvertingToADomainMovieDetail {
 
             @Test
-            @DisplayName("THEN passthrough scalar fields are mapped to domain")
-            fun passthroughFieldsMapped() {
-                val result = mapper.map(Dtos.movieDetailDto)
-                assertEquals(Dtos.movieDetailDto.id, result.id)
-                assertEquals(Dtos.movieDetailDto.title, result.title)
-                assertEquals(Dtos.movieDetailDto.tagline, result.tagline)
-                assertEquals(Dtos.movieDetailDto.overview, result.overview)
-                assertEquals(Dtos.movieDetailDto.voteAverage, result.voteAverage)
-                assertEquals(Dtos.movieDetailDto.voteCount, result.voteCount)
-                assertEquals(Dtos.movieDetailDto.status, result.status)
-                assertEquals(Dtos.movieDetailDto.runtime, result.runtimeInMinutes)
-                assertEquals(Dtos.movieDetailDto.releaseDate, result.releaseDate)
+            @DisplayName("THEN id is preserved")
+            fun idIsPreserved() {
+                assertEquals(Dtos.movieDetailDto.id, mapper.map(Dtos.movieDetailDto).id)
+            }
+
+            @Test
+            @DisplayName("THEN title is preserved")
+            fun titleIsPreserved() {
+                assertEquals(Dtos.movieDetailDto.title, mapper.map(Dtos.movieDetailDto).title)
+            }
+
+            @Test
+            @DisplayName("THEN tagline is preserved")
+            fun taglineIsPreserved() {
+                assertEquals(Dtos.movieDetailDto.tagline, mapper.map(Dtos.movieDetailDto).tagline)
+            }
+
+            @Test
+            @DisplayName("THEN overview is preserved")
+            fun overviewIsPreserved() {
+                assertEquals(Dtos.movieDetailDto.overview, mapper.map(Dtos.movieDetailDto).overview)
+            }
+
+            @Test
+            @DisplayName("THEN voteAverage is preserved")
+            fun voteAverageIsPreserved() {
+                assertEquals(Dtos.movieDetailDto.voteAverage, mapper.map(Dtos.movieDetailDto).voteAverage)
+            }
+
+            @Test
+            @DisplayName("THEN voteCount is preserved")
+            fun voteCountIsPreserved() {
+                assertEquals(Dtos.movieDetailDto.voteCount, mapper.map(Dtos.movieDetailDto).voteCount)
+            }
+
+            @Test
+            @DisplayName("THEN status is preserved")
+            fun statusIsPreserved() {
+                assertEquals(Dtos.movieDetailDto.status, mapper.map(Dtos.movieDetailDto).status)
+            }
+
+            @Test
+            @DisplayName("THEN runtimeInMinutes is preserved")
+            fun runtimeInMinutesIsPreserved() {
+                assertEquals(Dtos.movieDetailDto.runtime, mapper.map(Dtos.movieDetailDto).runtimeInMinutes)
+            }
+
+            @Test
+            @DisplayName("THEN release date is parsed to LocalDate")
+            fun releaseDateIsParsed() {
+                assertEquals(LocalDate.of(2024, 6, 15), mapper.map(Dtos.movieDetailDto).releaseDate)
             }
 
             @Test

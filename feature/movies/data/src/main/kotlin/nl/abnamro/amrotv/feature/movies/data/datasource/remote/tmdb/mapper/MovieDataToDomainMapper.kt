@@ -1,7 +1,8 @@
-package nl.abnamro.amrotv.feature.movies.data.datasource.remote.tmdb.dto
+package nl.abnamro.amrotv.feature.movies.data.datasource.remote.tmdb.mapper
 
 import javax.inject.Inject
 import nl.abnamro.amrotv.core.mvi.Mapper
+import nl.abnamro.amrotv.feature.movies.data.datasource.remote.tmdb.dto.MovieDto
 import nl.abnamro.amrotv.feature.movies.domain.api.model.Movie
 
 internal class MovieDataToDomainMapper @Inject constructor() : Mapper<MovieDto, Movie> {
@@ -10,11 +11,11 @@ internal class MovieDataToDomainMapper @Inject constructor() : Mapper<MovieDto, 
         Movie(
             id = input.id,
             title = input.title,
-            posterUrl = input.posterPath?.let { "$IMAGE_BASE_URL$it" },
-            backdropUrl = input.backdropPath?.let { "$IMAGE_BASE_URL$it" },
+            posterUrl = input.posterPath?.let { "${IMAGE_BASE_URL}$it" },
+            backdropUrl = input.backdropPath?.let { "${IMAGE_BASE_URL}$it" },
             genreIds = input.genreIds,
             popularity = input.popularity,
-            releaseDate = input.releaseDate,
+            releaseDate = parseTmdbDate(input.releaseDate),
             voteAverage = input.voteAverage,
         )
 }

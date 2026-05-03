@@ -1,7 +1,8 @@
-package nl.abnamro.amrotv.feature.movies.data.datasource.remote.tmdb.dto
+package nl.abnamro.amrotv.feature.movies.data.datasource.remote.tmdb.mapper
 
 import nl.abnamro.amrotv.core.mvi.Mapper
 import nl.abnamro.amrotv.feature.movies.data.MovieDataMocks.Dtos
+import nl.abnamro.amrotv.feature.movies.data.datasource.remote.tmdb.dto.GenreDto
 import nl.abnamro.amrotv.feature.movies.domain.api.model.Genre
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.DisplayName

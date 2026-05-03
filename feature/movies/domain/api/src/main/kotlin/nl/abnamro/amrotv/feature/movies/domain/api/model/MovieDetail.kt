@@ -1,5 +1,7 @@
 package nl.abnamro.amrotv.feature.movies.domain.api.model
 
+import java.time.LocalDate
+
 data class MovieDetail(
     val id: Int,
     val title: String,
@@ -15,5 +17,5 @@ data class MovieDetail(
     val imdbId: String?,
     val status: String,
     val runtimeInMinutes: Int?,
-    val releaseDate: String,
+    val releaseDate: LocalDate?,
 )

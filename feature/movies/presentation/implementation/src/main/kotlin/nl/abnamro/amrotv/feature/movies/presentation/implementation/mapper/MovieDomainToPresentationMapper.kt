@@ -17,7 +17,8 @@ class MovieDomainToPresentationMapper @Inject constructor() :
             backdropUrl = input.backdropUrl,
             genreIds = input.genreIds.toImmutableList(),
             popularity = input.popularity,
-            releaseYear = extractReleaseYear(input.releaseDate),
+            releaseDate = formatReleaseDate(input.releaseDate),
+            isReleased = isReleased(input.releaseDate),
             formattedRating = formatRating(input.voteAverage),
         )
 }

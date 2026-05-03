@@ -1,11 +1,19 @@
 package nl.abnamro.amrotv.feature.movies.presentation.implementation.mapper
 
-// TODO: Replace with a proper i18n date library for locale-aware year extraction
-private const val RELEASE_YEAR_LENGTH = 4
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
-internal fun extractReleaseYear(releaseDate: String): String? =
-    releaseDate.split("-").firstOrNull()?.takeIf { it.length == RELEASE_YEAR_LENGTH }
+private val releaseDateFormatter = DateTimeFormatter.ofPattern("MMM d, yyyy", Locale.US)
+
+// TODO: Replace with a locale-aware date formatter from an i18n library
+internal fun formatReleaseDate(releaseDate: LocalDate?): String? =
+    releaseDate?.format(releaseDateFormatter)
+
+// TODO: Replace with a locale-aware date helper from an i18n library
+internal fun isReleased(releaseDate: LocalDate?): Boolean =
+    releaseDate != null && !releaseDate.isAfter(LocalDate.now())
 
 // TODO: Replace with a locale-aware number formatter from an i18n library
 internal fun formatRating(voteAverage: Double): String =
-    String.format(java.util.Locale.US, "%.1f", voteAverage)
+    String.format(Locale.US, "%.1f", voteAverage)

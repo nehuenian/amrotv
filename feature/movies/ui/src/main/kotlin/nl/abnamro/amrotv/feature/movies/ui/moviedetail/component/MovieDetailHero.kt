@@ -72,7 +72,7 @@ internal fun MovieDetailHero(detail: MovieDetailPresentationModel, modifier: Mod
                 color = AmroTvColors.OnMediaPrimary,
                 maxLines = 2,
             )
-            detail.releaseYear?.let {
+            detail.releaseDate?.let {
                 Text(
                     text = it,
                     style =

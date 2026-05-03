@@ -1,5 +1,8 @@
 package nl.abnamro.amrotv.feature.movies.domain.implementation.usecase
 
+import java.util.Comparator.naturalOrder
+import java.util.Comparator.nullsLast
+import java.util.Comparator.reverseOrder
 import javax.inject.Inject
 import nl.abnamro.amrotv.feature.movies.domain.api.model.Movie
 import nl.abnamro.amrotv.feature.movies.domain.api.model.SortOption
@@ -20,15 +23,21 @@ internal class FilterAndSortMoviesUseCaseImpl @Inject constructor() : FilterAndS
                 when (sortOption) {
                     SortOption.POPULARITY -> filtered.sortedBy { it.popularity }
                     SortOption.TITLE -> filtered.sortedBy { it.title }
-                    SortOption.RELEASE_DATE -> filtered.sortedBy { it.releaseDate }
+                    SortOption.RELEASE_DATE -> filtered.sortedWith(releaseDateAscComparator)
                 }
-
             SortOrder.DESC ->
                 when (sortOption) {
                     SortOption.POPULARITY -> filtered.sortedByDescending { it.popularity }
                     SortOption.TITLE -> filtered.sortedByDescending { it.title }
-                    SortOption.RELEASE_DATE -> filtered.sortedByDescending { it.releaseDate }
+                    SortOption.RELEASE_DATE -> filtered.sortedWith(releaseDateDescComparator)
                 }
         }
+    }
+
+    private companion object {
+        private val releaseDateAscComparator: Comparator<Movie> =
+            Comparator.comparing({ movie: Movie -> movie.releaseDate }, nullsLast(naturalOrder()))
+        private val releaseDateDescComparator: Comparator<Movie> =
+            Comparator.comparing({ movie: Movie -> movie.releaseDate }, nullsLast(reverseOrder()))
     }
 }

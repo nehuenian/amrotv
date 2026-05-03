@@ -89,6 +89,7 @@ class MoviesFlowE2ETest {
                     genreFilterAllChipVisible()
                     featuredBannerVisible()
                     atLeastOneMovieVisible()
+                    releasedTagVisible()
                 }
             }
         }
@@ -177,7 +178,7 @@ class MoviesFlowE2ETest {
             }
             verify {
                 onMoviesLoaded {
-                    // Hoppers (2026-03-04) is oldest — must appear as featured banner
+                    // Hoppers (2020-01-01) is oldest — must appear as featured banner
                     movieVisible(E2ETestData.HOPPERS_TITLE)
                     // Highest-popularity movie is no longer featured but still in the list
                     movieVisible(E2ETestData.APEX_TITLE)

@@ -34,7 +34,11 @@
     <string name="movie_runtime_label">Runtime</string>
     <!-- %d = runtime in minutes -->
     <string name="movie_runtime_value_format">%d min</string>
-    <string name="movie_release_date_label">Release Year</string>
+    <string name="movie_release_date_label">Release Date</string>
+    <string name="tag_released">Released</string>
+    <string name="tag_upcoming">Upcoming</string>
+    <!-- %1$s = tag label (e.g. "Released" or "Upcoming") -->
+    <string name="tag_status_description">Movie status: %1$s</string>
     <string name="movie_status_label">Status</string>
     <string name="movie_budget_label">Budget</string>
     <string name="movie_revenue_label">Revenue</string>
