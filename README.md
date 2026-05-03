@@ -57,38 +57,29 @@ ones; inner layers know nothing about the outer world.
 
 ### Why MVI (not MVVM)?
 
-MVVM leaves the data flow open: a ViewModel can expose multiple `LiveData` or `StateFlow` streams
-and the View may write back to the ViewModel through arbitrary methods. State can end up scattered
-across several streams, and one-shot events (navigation, toasts) require conventions like
-`SingleLiveEvent` that are easy to break.
+Both MVI and MVVM use unidirectional data flow: UI renders state → user acts → ViewModel updates
+state → UI re-renders. The core difference is **how the entire user interaction surface is
+expressed**:
 
-MVI enforces **strict unidirectional data flow**:
+- **MVVM**: named public functions (`onSearchChanged()`, `onSaveClicked()`) for actions; ad-hoc
+  solutions (`SingleLiveEvent`, callbacks) for one-shot events
+- **MVI**: every possible user action is a subtype of a sealed `Intent`; every possible one-shot
+  response is a subtype of a sealed `Effect` — the complete user interaction surface is visible
+  in two files
 
 ```
   User Interaction
-       │  (Intent)
+       │  (sealed Intent — every action enumerated)
        ▼
-  ViewModel
-       │  applies StateReducer → new State
+  ViewModel.onIntent()
+       │  updates State
        ▼
   StateFlow<State>   ──→   UI re-renders (pure function of state)
        │
        └─ Channel<Effect>     ──→  one-shot events (navigation, snackbars)
-           (exposed as Flow)         consumed exactly once
+           (sealed Effect —           consumed exactly once,
+            every response enumerated) never re-delivered on re-subscribe
 ```
-
-Key differences from MVVM in this project:
-
-| Concern | MVVM (typical) | MVI (this project) |
-|---------|---------------|-------------------|
-| State shape | Multiple streams | Single `State` data class in `StateFlow` |
-| State transitions | ViewModel mutates fields directly | `StateReducer` lambdas — pure, named, independently testable |
-| User actions | Arbitrary method calls on ViewModel | Sealed `Intent` — every possible user action is enumerated |
-| One-shot events | Convention-based (`SingleLiveEvent`) | `Effect` via `Channel` — consumed exactly once, never re-delivered on re-subscribe |
-| Testability | Must instantiate ViewModel to test state logic | `StateReducer`s are pure functions; tested without a ViewModel |
-
-The explicit `Intent` sealed class is particularly valuable as a **forcing function for design**:
-if you cannot name the user action as a sealed subtype, the feature scope is unclear.
 
 ---
 
@@ -211,6 +202,27 @@ TMDB returns ≤20 results per page. `TmdbMovieDataSource` fetches pages sequent
 unique movies are collected. Page 1 failure propagates immediately; subsequent page failures
 stop pagination early and return however many movies were collected so far — preventing cascading
 requests on rate limits or auth errors.
+
+### 11. E2E tests live in `:feature:movies:ui`
+
+Full-stack instrumented tests (`MoviesFlowE2ETest`) are co-located with the UI module rather
+than in a dedicated `:feature:movies:e2e` module.
+
+**Why:** The UI module already has the Compose test infrastructure (Hilt, `ComposeContentTestRule`,
+Robot helpers) and keeping tests next to the code they exercise makes them easier to find,
+run, and maintain without context-switching between modules.
+
+**The trade-off:** The `androidTest` classpath of `:feature:movies:ui` must pull in
+`:presentation:implementation`, `:domain:implementation`, `:data`, and their transitive
+dependencies — modules that would normally be hidden behind module boundaries at compile time.
+This partially undermines one of the key benefits of a multi-module build: parallel compilation
+and incremental build isolation. A change in `:data` now invalidates the `:ui` androidTest
+compilation even though the UI module's production code doesn't depend on `:data` directly.
+
+**Should be re-evaluated when:** the feature grows to multiple screens, the E2E suite becomes
+slow to compile, or a second feature is added that would benefit from a shared test
+infrastructure module. At that point, extracting a `:feature:movies:e2e` module (or a
+`:core:testing:e2e` harness) becomes worthwhile.
 
 ---
 
